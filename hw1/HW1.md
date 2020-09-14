@@ -43,9 +43,9 @@ T1 = project_{classcode, sitename} Classmeetings
 T2 = project_{classcode, sitename} Exams
 T3 = project_{classcode, sitename} Officehours
 T4 = project_{classcode, sitename} Resources
-T5 = T1 union T2 union T3 union T4 union T5
+T5 = T1 union T2 union T3 union T4
 T6(classcode6, sitename6) = T5
-T7 = project_{classcode6, classcode} (T6 x T5)
+T7 = project_{classcode6, classcode} (select_{classcode <> classcode6} (T6 x T5))
 T8 = project_{classcode6, classcode} (select_{classcode6 <> classcode and sitename = sitename6 } (T6 x T5))
 Result = T7 - T8
 ```
@@ -64,9 +64,7 @@ Result = project_{classcode, classname} (select_{classcode <> classcode3} (Class
 ```
 T1 = (select_{dayofweek <> 'Monday' and dayofweek <> 'Wednesday'} (Officehours))
 T2 = project_{classcode} (select_{semester = 'Fall', year = '2000'} (Clesses))
-T3 = project_{classcode, starttime, duration} (T1 * T2)
-ResultCourseCode = project_{classcode} T3
-ResultOfficeHour = T3
+Result = project_{classcode, starttime, duration} (T1 * T2)
 ```
 
 ## Question 2
@@ -142,11 +140,15 @@ ABC, BDC
 
 #### BCNF
 
-Satisfied, because
+Not Satisfied, because
 
-- `ABC -> DEF` is not trival and `ABC` is a superkey
-- `BD -> A` is not trival and `BD` is a superkey
+- `BD -> A` is not trival and `BD` is a not a superkey
 
 #### 3NF
 
-Satisfied, because BCNF is satisfied
+Satisfied, because
+
+- `ABC -> DEF` is not trival and `ABC` is a superkey
+- `BD -> A` is not trival and `BD` is not a superkey, but `A` is a prime attribute
+
+
