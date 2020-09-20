@@ -47,7 +47,11 @@ T5 = T1 union T2 union T3 union T4
 T6(classcode6, sitename6) = T5
 T7 = project_{classcode6, classcode} (select_{classcode <> classcode6} (T6 x T5))
 T8 = project_{classcode6, classcode} (select_{classcode6 <> classcode and sitename = sitename6 } (T6 x T5))
-Result = T7 - T8
+T9 = T7 - T8
+T10(classcode10, classname10) = project_{classname} (Classes)
+T11(classcode11, classesname11) = project_{classname} (Classes)
+T12 = select_{classcode = classcode10 and classcode6 = classcode 11} (T9 x T10 x T11)
+Result = project_{classname10, classname11} T12
 ```
 
 ### Question g
