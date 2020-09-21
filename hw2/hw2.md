@@ -20,8 +20,9 @@
 ## Functional Dependencies
 
 - `edate starttime => duration URL description host`
-- `participantid => participantname participantemail participantaddress ticketprice`
+- `participantid => participantname participantemail participantaddress`
 - `edate starttime panelistname => panelistemail`
+- `edate starttime participantid =>  ticketprice`
 
 ## Relation checks
 
@@ -41,7 +42,7 @@ Not satisfied, because
 
 Not satisfied, because
 
-- -  `edate starttime => duration URL description host` is not trival, `edate starttime` is not a superkey, and `duration, URL, description, host` are not prime arrtibutes
+- `edate starttime => duration URL description host` is not trival, `edate starttime` is not a superkey, and `duration, URL, description, host` are not prime arrtibutes
 
 
 # Question 2
@@ -125,40 +126,18 @@ Relation R2 has no subscript, so this decomposition is lossless.
 ### Keys
 
 ```
-ABGHF
+ABHFG, ABHFD, ABHFC, ABHFE
+```
+
+#### Prime Attributes
+
+```
+A, B, C, D, E, F, G, H
 ```
 
 ### 3NF
 
-Not satisfied, because `AD -> CE` is not trival and `AD` is not superkey 
-
-## Section b
-
-- `R1(A, D, C, E)`
-- `R2(B, E, F, G)`
-- `R3(A, G, C)`
-- `R4(A, B, G, H, F)`
-
-## Section c
-
-### BCNF 
-
-- `R1(A, D, C, E)`
-  - F1 = `{ AD -> CE, C -> D }`
-  - Key: `AD`
-  - Not Satisfied, `C -> D` is not trival and `C` is not a super key
-- `R2(B, E, F, G)`
-  - F2 = `{ BEF -> G }`
-  - Key : `BEF`
-  - Satisfied, because `BEF -> G` is not trival and `BEF` is a superkey
-- `R3(A, G, C)`
-  - F3 = `{ AG -> C }`
-  - Key: `AG`
-  - Satisfied, because `AG -> C` is not trival and `AG` is a superkey
-- `R4(A, B, G, H, F)`
-  - F4 = `{}`
-  - Key: `ABGHF`
-  - Satisfied
+Satisfied, all attributes are in Prime Attributes, so no matter how the right hand side changes, 3NF will always true.
 
 # Question 5
 
@@ -195,10 +174,10 @@ Not satisfied, because `AD -> CE` is not trival and `AD` is not superkey
     - For F, BC+ = `{B, C, E}`
     - Not equivalent
 - `ABC -> E`
-  - Cannot remove
-    - For F', ABC+ = `{ A, B, C, D }`
+  - Can remove
+    - For F', ABC+ = `{ A, B, C, D, E}`
     - For F, ABC+ = `{ A, B, C, D, E }`
-    - Not equivalent
+    - Equivalent/Same
 
 ## Replace `XZ -> Y` with `X -> Y`
 
@@ -235,23 +214,16 @@ Not satisfied, because `AD -> CE` is not trival and `AD` is not superkey
         - For F', B+ = `{ B, E }`
         - For F, B+ = `{ B }`
         -  Not equivalent
-- `ABC -> E`
-    - Remove `A`, we have `BC -> E` for F' 
-      - Can replace
-        - For F', BC+ = `{ B, C, E }`
-        - For F, BC+ = `{ B, C, E }`
-        -  Equivalent/Same
-
+        -  
 So we have: 
 
 - `AC -> B`
 - `AC -> D`
 - `BC -> E`
-- `BC -> E`
 
 ## Combining Rule
 
-Minimal Basis:
+Already in form of Minimal Basis:
 
 - `AC -> B`
 - `AC -> D`
