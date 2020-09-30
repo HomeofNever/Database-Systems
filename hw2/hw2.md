@@ -214,7 +214,7 @@ Satisfied, all attributes are in Prime Attributes, so no matter how the right ha
         - For F', B+ = `{ B, E }`
         - For F, B+ = `{ B }`
         -  Not equivalent
-        -  
+
 So we have: 
 
 - `AC -> B`
