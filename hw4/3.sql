@@ -21,7 +21,7 @@ GROUP BY
  	m.title, 
     md.director
 HAVING
-    COUNT(ml.language) > 1
+    COUNT(DISTINCT ml.language) > 1
 INTERSECT
 SELECT 
     m.title, 

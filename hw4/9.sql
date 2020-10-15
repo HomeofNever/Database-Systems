@@ -1,10 +1,25 @@
-For series that are on fuboTV, find the other platforms that they are also on. For each other platform, return the total number of series from fuboTV that they feature (numseries). Order results by numseries.
-
 SELECT
-FROM
-    series s, 
+    sop.platform,
+    COUNT(*) as numseries
+FROM 
+    series s ,
     seriesonplatform sop
 WHERE
-    sop.seriesid = s.seriesid
-    AND lower(sop.platform) LIKE '%fubotv%'
+    s.seriesid IN (
+        SELECT
+            s.seriesid
+        FROM
+            series s, 
+            seriesonplatform sop
+        WHERE
+            sop.seriesid = s.seriesid
+            AND lower(sop.platform) LIKE '%fubotv%'
+    ) AND
+    sop.seriesid = s.seriesid AND
+    lower(sop.platform) NOT LIKE '%fubotv%'
+GROUP BY
+    sop.platform
+ORDER BY
+    numseries DESC,
+    platform;
     

@@ -3,6 +3,6 @@ SELECT
 FROM
 	movies
 WHERE
-	(imdbrating is NULL 
-    OR rottentomatoes is NULL)
-    AND (year is NULL or year > 2015);
+	imdbrating is NULL 
+	AND rottentomatoes is NULL
+    AND (year is NULL OR year > 2015);
