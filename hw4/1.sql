@@ -9,5 +9,5 @@ WHERE
 	AND s.imdbrating < 5 
     AND s.seasons >= 15
 ORDER BY
-	s.title ASC,
-    sd.director ASC;
+	title,
+    director;
