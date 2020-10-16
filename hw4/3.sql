@@ -33,4 +33,7 @@ FROM
 WHERE 
 	m.movieid = ml.movieid
     AND m.movieid = md.movieid
-    AND lower(ml.language) LIKE '%english%';
+    AND lower(ml.language) LIKE '%english%'
+ORDER BY
+    title,
+    director;
