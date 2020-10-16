@@ -1,7 +1,7 @@
 SELECT
     s.title,
-    COUNT(sc) as numcountries,
-    COUNT(sop) as numplatforms
+    COUNT(DISTINCT sc.country) as numcountries,
+    COUNT(DISTINCT sop.platform) as numplatforms
 FROM
     seriescountry sc,
     series s,
