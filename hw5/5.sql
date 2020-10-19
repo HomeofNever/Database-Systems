@@ -1,7 +1,7 @@
 SELECT
     b.avgbefore::NUMERIC(5,2),
     a.avgafter::NUMERIC(5,2),
-    ABS(b.avgbefore - a.avgafter)::NUMERIC(5, 2) as avgdiff
+    (b.avgbefore - a.avgafter)::NUMERIC(5, 2) as avgdiff
 FROM
     (SELECT
         AVG(imdbrating) as avgafter
