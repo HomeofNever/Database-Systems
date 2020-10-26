@@ -1,0 +1,382 @@
+ ?column? 
+----------
+ Query 1
+(1 row)
+
+     director      
+-------------------
+ Ethan Coen
+ Joel Coen
+ Noah Baumbach
+ Quentin Tarantino
+ Robert Vince
+ Umesh Mehra
+ Vishal Bhardwaj
+(7 rows)
+
+ ?column? 
+----------
+ Query 2
+(1 row)
+
+       country        | numseries 
+----------------------+-----------
+ United States        |       168
+ United Kingdom       |        33
+ Taiwan               |        25
+ Canada               |        23
+ Australia            |        10
+ France               |        10
+ Japan                |        10
+ South Korea          |         6
+ Brazil               |         5
+ India                |         5
+ Norway               |         5
+ China                |         4
+ Spain                |         4
+ Thailand             |         3
+ Germany              |         2
+ Ireland              |         2
+ Russia               |         2
+ Singapore            |         2
+ Argentina            |         1
+ Austria              |         1
+ Cyprus               |         1
+ Denmark              |         1
+ Egypt                |         1
+ Hong Kong            |         1
+ Italy                |         1
+ Malaysia             |         1
+ Mexico               |         1
+ Netherlands          |         1
+ South Africa         |         1
+ Sweden               |         1
+ Switzerland          |         1
+ Ukraine              |         1
+ West Germany         |         1
+ Belgium              |         0
+ Chile                |         0
+ Colombia             |         0
+ Croatia              |         0
+ Cuba                 |         0
+ Czech Republic       |         0
+ Finland              |         0
+ Greece               |         0
+ Hungary              |         0
+ Iceland              |         0
+ Indonesia            |         0
+ Israel               |         0
+ Jordan               |         0
+ Kuwait               |         0
+ Lebanon              |         0
+ Malta                |         0
+ Mauritius            |         0
+ New Zealand          |         0
+ Pakistan             |         0
+ Philippines          |         0
+ Poland               |         0
+ Saudi Arabia         |         0
+ Syria                |         0
+ Turkey               |         0
+ United Arab Emirates |         0
+(58 rows)
+
+ ?column? 
+----------
+ Query 3
+(1 row)
+
+        language        | num 
+------------------------+-----
+ American Sign Language |   6
+ Greek                  |   6
+ Norwegian              |   6
+ Afrikaans              |   7
+ Ukrainian              |   7
+ Catalan                |   8
+ Malay                  |   8
+ Romanian               |   8
+ Latin                  |   9
+ Danish                 |  10
+ Kannada                |  10
+ Swedish                |  11
+ Hebrew                 |  13
+ Chinese                |  14
+ Dutch                  |  15
+ Telugu                 |  18
+ Thai                   |  19
+ Bengali                |  21
+ Indonesian             |  27
+ Malayalam              |  27
+ Portuguese             |  27
+ Turkish                |  27
+ Tagalog                |  29
+ Urdu                   |  32
+ Filipino               |  34
+ Tamil                  |  38
+(26 rows)
+
+ ?column? 
+----------
+ Query 4
+(1 row)
+
+        title        | numlanguages 
+---------------------+--------------
+ Babel               |            8
+ Die Another Day     |            8
+ The Wandering Earth |            8
+(3 rows)
+
+ ?column? 
+----------
+ Query 5
+(1 row)
+
+ avgbefore | avgafter | avgdiff 
+-----------+----------+---------
+      5.47 |     5.25 |    0.22
+(1 row)
+
+ ?column? 
+----------
+ Query 6
+(1 row)
+
+ country  |                  title                  | imdbrating 
+----------+-----------------------------------------+------------
+ China    | Singles Villa                           |        7.5
+ China    | Somewhere Only We Know                  |        7.5
+ China    | Flavorful Origins                       |        7.6
+ China    | Here to Heart                           |        7.6
+ China    | Put Your Head on My Shoulder            |        7.9
+ China    | Love O2O                                |          8
+ China    | Meteor Garden                           |        8.1
+ China    | A Little Thing Called First Love        |        8.2
+ China    | Handsome Siblings                       |        8.2
+ China    | The King''s Avatar                      |        8.3
+ China    | Eternal Love                            |        8.4
+ China    | Ashes of Love                           |        8.5
+ China    | The Rise of Phoenixes                   |        8.6
+ China    | The Untamed                             |        8.9
+ France   | Marianne                                |        7.5
+ France   | Einsatzgruppen: The Nazi Death Squads   |        7.6
+ France   | Oscar''s Oasis                          |        7.6
+ France   | The Bonfire of Destiny                  |        7.7
+ France   | A Very Secret Service                   |        7.8
+ France   | The Spy                                 |        7.9
+ France   | The Staircase                           |        7.9
+ France   | Wakfu                                   |        8.2
+ France   | November 13: Attack on Paris            |        8.3
+ France   | Molang                                  |        8.5
+ India    | Devlok with Devdutt Pattanaik           |        7.7
+ India    | Dharmakshetra                           |        8.1
+ India    | Little Things                           |        8.2
+ India    | Girls Hostel                            |        8.3
+ India    | Delhi Crime                             |        8.5
+ India    | Raja Rasoi Aur Anya Kahaniyan           |        8.9
+ India    | Stories by Rabindranath Tagore          |        8.9
+ India    | College Romance                         |          9
+ India    | Regiment Diaries                        |          9
+ India    | Ramayan                                 |        9.2
+ India    | Yeh Meri Family                         |        9.2
+ Japan    | Girls und Panzer                        |        7.5
+ Japan    | Smoking                                 |        7.5
+ Japan    | Teasing Master Takagi-san               |        7.5
+ Japan    | Cells at Work!                          |        7.6
+ Japan    | Kantaro: The Sweet Tooth Salaryman      |        7.6
+ Japan    | Magi: Adventure of Sinbad               |        7.6
+ Japan    | Sword Art Online                        |        7.6
+ Japan    | Angel Beats!                            |        7.7
+ Japan    | Good Morning Call                       |        7.7
+ Japan    | The Devil Is a Part-Timer!              |        7.7
+ Japan    | Black Butler                            |        7.8
+ Japan    | Knights of Sidonia                      |        7.8
+ Japan    | Soul Eater                              |        7.8
+ Japan    | Terrace House: Opening New Doors        |        7.8
+ Japan    | The Naked Director                      |        7.8
+ Japan    | Durarara!!                              |        7.9
+ Japan    | Erased                                  |        7.9
+ Japan    | InuYasha                                |        7.9
+ Japan    | Kill la Kill                            |        7.9
+ Japan    | Little Witch Academia                   |        7.9
+ Japan    | Yu-Gi-Oh!                               |        7.9
+ Japan    | Aggretsuko                              |          8
+ Japan    | Fairy Tail                              |          8
+ Japan    | Stay Tuned!                             |          8
+ Japan    | Bleach                                  |        8.1
+ Japan    | Hibana: Spark                           |        8.1
+ Japan    | The Seven Deadly Sins                   |        8.1
+ Japan    | Anohana: The Flower We Saw That Day     |        8.2
+ Japan    | Japanese Style Originator               |        8.2
+ Japan    | Ouran High School Host Club             |        8.2
+ Japan    | Samurai Gourmet                         |        8.2
+ Japan    | Terrace House: Boys & Girls in the City |        8.2
+ Japan    | Fate/Zero                               |        8.3
+ Japan    | Gurren Lagann                           |        8.3
+ Japan    | Naruto                                  |        8.3
+ Japan    | Puella Magi Madoka Magica               |        8.3
+ Japan    | The Disastrous Life of Saiki K.         |        8.3
+ Japan    | Case Closed                             |        8.4
+ Japan    | JoJo''s Bizarre Adventure               |        8.4
+ Japan    | March Comes in Like a Lion              |        8.4
+ Japan    | Midnight Diner: Tokyo Stories           |        8.4
+ Japan    | Violet Evergarden                       |        8.4
+ Japan    | Fullmetal Alchemist                     |        8.5
+ Japan    | Mob Psycho 100                          |        8.5
+ Japan    | Neon Genesis Evangelion                 |        8.5
+ Japan    | Rurouni Kenshin                         |        8.5
+ Japan    | Saint Seiya                             |        8.5
+ Japan    | Code Geass: Lelouch of the Rebellion    |        8.6
+ Japan    | Haikyu!!                                |        8.7
+ Japan    | Attack on Titan                         |        8.8
+ Japan    | One-Punch Man                           |        8.8
+ Japan    | Fullmetal Alchemist: Brotherhood        |        9.1
+ Thailand | Monkey Twins                            |        7.8
+ Thailand | Hormones                                |          8
+ Turkey   | The Gift                                |        7.5
+ Turkey   | Resurrection: Ertugrul                  |        7.8
+(91 rows)
+
+ ?column? 
+----------
+ Query 7
+(1 row)
+
+       country        |              title               | imdbrating 
+----------------------+----------------------------------+------------
+ Argentina            | Monzón: A Knockout Blow          |          8
+ Australia            | Rake                             |        8.6
+ Australia            | Wentworth                        |        8.6
+ Belgium              | Tabula Rasa                      |        8.1
+ Brazil               | The Mechanism                    |        8.4
+ Canada               | Anne with an E                   |        8.7
+ Chile                | El Reemplazante                  |        8.4
+ China                | The Untamed                      |        8.9
+ Colombia             | La Niña                          |        8.6
+ Croatia              | The Paper                        |        8.2
+ Denmark              | Warrior                          |        8.2
+ Egypt                | This Evening                     |        8.4
+ France               | Molang                           |        8.5
+ Germany              | Babylon Berlin                   |        8.4
+ Hong Kong            | Hong Kong West Side Stories      |        7.4
+ Iceland              | Case                             |        7.2
+ India                | Ramayan                          |        9.2
+ India                | Yeh Meri Family                  |        9.2
+ Ireland              | Puffin Rock                      |        8.7
+ Israel               | Shtisel                          |        8.6
+ Italy                | Suburra: Blood on Rome           |          8
+ Japan                | Fullmetal Alchemist: Brotherhood |        9.1
+ Lebanon              | Peasants Rebellion               |        8.6
+ Malaysia             | Rimba Racer                      |        8.2
+ Mexico               | Legend Quest: Masters of Myth    |          8
+ Mexico               | Monarca                          |          8
+ Netherlands          | Toon                             |        7.7
+ New Zealand          | Dark Tourist                     |        7.5
+ Norway               | Nobel                            |        8.1
+ Pakistan             | Humsafar                         |          9
+ Pakistan             | Zindagi Gulzar Hai               |          9
+ Philippines          | AMO                              |        6.4
+ Poland               | Ultraviolet                      |          7
+ Russia               | Silver Spoon                     |          8
+ Singapore            | Unriddle                         |        7.9
+ South Korea          | Mr. Sunshine                     |        8.8
+ Spain                | Merlí                            |        8.6
+ Sweden               | Bonus Family                     |        7.7
+ Switzerland          | Station Horizon                  |        7.1
+ Taiwan               | Age of Rebellion                 |        8.5
+ Taiwan               | La Grande Chaumière Violette     |        8.5
+ Thailand             | Hormones                         |          8
+ Turkey               | Resurrection: Ertugrul           |        7.8
+ Ukraine              | Servant of the People            |        6.8
+ United Arab Emirates | Justice                          |        7.9
+ United Kingdom       | Planet Earth II                  |        9.5
+(46 rows)
+
+ ?column? 
+----------
+ Query 8
+(1 row)
+
+      platform1      |   platform2    | numcommon 
+---------------------+----------------+-----------
+ ABC                 | Hulu           |      1.00
+ Adult Swim          | Hulu           |      0.67
+ BET                 | fuboTV         |      0.67
+ Disney              | Disney+        |      1.00
+ FYI                 | Hoopla         |      1.00
+ HBO                 | HBO MAX        |      0.88
+ Hallmark Movies Now | Hallmark       |      1.00
+ IFC                 | Netflix        |      0.67
+ IFC                 | fuboTV         |      1.00
+ IndieFlix           | Prime Video    |      1.00
+ NBC                 | Hulu           |      1.00
+ Nick                | CBS All Access |      0.67
+ Science             | fuboTV         |      0.71
+ Showtime            | fuboTV         |      0.71
+ Syfy                | Netflix        |      0.75
+ Syfy                | fuboTV         |      0.75
+ TNT                 | Netflix        |      1.00
+ TVLand              | Hulu           |      1.00
+ Travel Channel      | Hulu           |      1.00
+(19 rows)
+
+ ?column? 
+----------
+ Query 9
+(1 row)
+
+      castname       
+---------------------
+ Abdelilah Wahbi
+ Ait Youssef Youssef
+ Aki Toyosaki
+ Anupam Kher
+ Asrani
+ Barrie Dunn
+ Boman Irani
+ Carrie-Anne Moss
+ David DeLuise
+ Diedrich Bader
+ Donnie Yen
+ El Mahmoudi M'Barek
+ George Newbern
+ Gulshan Grover
+ Harrison Ford
+ Hiroaki Iwanaga
+ Hugo Weaving
+ Jeff Dunham
+ John Dunsworth
+ Kaitlyn Maher
+ Kazuki Yao
+ Kevin Hart
+ Laurence Fishburne
+ Lucy Decoutere
+ Lynn Hung
+ Macon Blair
+ Makenzie Moss
+ Manoj Bajpayee
+ Michael Madsen
+ Michael York
+ Mike Myers
+ Minako Kotobuki
+ Mindy Sterling
+ Mourad Zaoui
+ Paresh Rawal
+ Patrick Roach
+ Rajpal Yadav
+ Reggie De Leon
+ Robert Wagner
+ Sam Kinison
+ Scott Adkins
+ Selva Rasalingam
+ Seth Green
+ Shahid Kapoor
+ Takahiro Fujiwara
+ Takahiro Sakurai
+ Toa Yukinari
+ Vice Ganda
+ Yoshiro Matsumoto
+ Yuki Kaji
+(50 rows)
+
