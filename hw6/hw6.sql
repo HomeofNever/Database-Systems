@@ -37,14 +37,17 @@ BEGIN
             castname
     );
     CREATE TABLE IF NOT EXISTS __my_ranking AS (
-        SELECT 
+        SELECT
             seriesid,
             title,
             0 AS a1,
             0 AS a2,
             0 AS a3,
             0.0 AS a4
-        FROM series s
+        FROM 
+            series
+        WHERE
+            seriesid NOT IN (SELECT * FROM unnest(inputseries))
     );
     
     -- Calculate All a1
@@ -118,14 +121,14 @@ BEGIN
     LOOP
         UPDATE __my_ranking 
             SET a4 = CASE
-                    WHEN myrow.imdbrating is NULL THEN myrow.rottentomatoes / 10
+                    WHEN myrow.imdbrating is NULL THEN (myrow.rottentomatoes + 0.0) / 10
                     WHEN myrow.rottentomatoes is NULL THEN myrow.imdbrating
-                    ELSE ((myrow.rottentomatoes / 10) + myrow.imdbrating) / 2
+                    ELSE (((myrow.rottentomatoes  + 0.0) / 10) + myrow.imdbrating) / 2
             END
         WHERE seriesid = myrow.seriesid;
     END LOOP;
 
-    -- Calculate Score
+    -- Calculate Socre and Generate Result
     values = '';
     FOR myrow IN
         SELECT 
@@ -135,7 +138,8 @@ BEGIN
         FROM
             __my_ranking
         ORDER BY
-            score DESC
+            score DESC,
+            title
         LIMIT
             topk
     LOOP
@@ -152,4 +156,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql ;
 
+
 -- select recommendation (ARRAY[4987,1823,16],20,0.5,1,2,0.5);
+-- select recommendation (ARRAY[4987,1823,16],20,1,1,0.5,0.5);
+-- select recommendation(ARRAY[1587,13,255],20,1,0.2,2,0.3);
+-- select recommendation(ARRAY[111,321,7726,369],20,1,0.2,2,0.3) ;
+-- select recommendation(ARRAY[111,321,7726,369],20,10,2,0.5,0.1) ;
+-- select recommendation(ARRAY[35,870,1395,82],20,1,1,1,0.5) ;
+-- select recommendation(ARRAY[35,870,1395,82],20,0.2,10,10,1) ;
