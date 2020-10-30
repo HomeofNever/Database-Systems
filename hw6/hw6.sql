@@ -128,7 +128,7 @@ BEGIN
         WHERE seriesid = myrow.seriesid;
     END LOOP;
 
-    -- Calculate Socre and Generate Result
+    -- Calculate Score and Generate Result
     values = '';
     FOR myrow IN
         SELECT 
@@ -156,7 +156,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql ;
 
-
+-- test cases
 -- select recommendation (ARRAY[4987,1823,16],20,0.5,1,2,0.5);
 -- select recommendation (ARRAY[4987,1823,16],20,1,1,0.5,0.5);
 -- select recommendation(ARRAY[1587,13,255],20,1,0.2,2,0.3);
