@@ -1,0 +1,39 @@
+series  1149
+series_idx5  89
+series_idx3  69
+seriescast  68
+seriesonplatform  62
+seriescast_pkey  54
+seriescast_idx2  54
+onplatformseries_pkey  46
+seriescast_idx1  42
+series_pkey  36
+series_idx2  36
+seriescategory  21
+seriescategory_pkey  18
+series_idx1  13
+series_idx4  13
+seriescountry_idx2  9
+seriescountry  9
+seriescountry_pkey  9
+seriescountry_idx1  4
+seriesdirectors_pkey  2
+seriesdirectors  1
+
+series 12353
+seriescast 11018
+seriescountry 1481
+
+q1 467
+q2 18
+q3 7
+q4 1359
+q5 795
+q6 5
+q7 20
+q8 13
+q9 11
+q10 2
+q11 105
+q12 4
+
