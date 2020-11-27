@@ -2,7 +2,7 @@ q1,series_idx4,3,467
 q2,series_idx4,3,18
 q3,series_idx1,3,7
 q3,series_idx5,90,0
-q4,series_idx1,4,1359
+q4,series_idx1,4,1149
 q4,series_idx5,90,0
 q5,series_idx2,5,795
 q5,series_idx5,90,0
@@ -11,7 +11,7 @@ q6,series_idx5,90,0
 q7,series_idx2,3,77
 q7,series_idx3,9,1134
 q7,series_idx5,11,0
-q8,series_idx1,4,1359
+q8,series_idx1,4,1149
 q8,series_idx2,4,795
 q8,series_idx3,3,1134
 q8,series_idx5,3,0
