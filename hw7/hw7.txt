@@ -12,17 +12,17 @@ q7,series_idx2,3,77
 q7,series_idx3,9,1134
 q7,series_idx5,11,0
 q8,series_idx1,4,1149
-q8,series_idx2,4,795
-q8,series_idx3,3,1134
-q8,series_idx5,3,0
+q8,series_idx2,5,795
+q8,series_idx3,9,1134
+q8,series_idx5,4,0
 q9,seriescast_pkey,55,0
 q9,seriescast_idx1,3,11
 q9,seriescast_idx2,3,0
 q10,seriescast_pkey,55,0
 q10,seriescast_idx1,3,2
-q10 ,seriescast_idx2,3,0
+q10,seriescast_idx2,3,0
 q11,seriescountry_pkey,10,0
-q11,seriescountry_idx1,3,105
+q11,seriescountry_idx1,3,9
 q11,seriescountry_idx2,3,0
 q12,seriescountry_pkey,10,0
 q12,seriescountry_idx1,3,4
