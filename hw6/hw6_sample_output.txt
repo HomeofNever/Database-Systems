@@ -1,0 +1,218 @@
+ please_read_this_first_and_also_read_hw_instructions_carefully 
+----------------------------------------------------------------
+ DO NOT USE ANY PUBLIC DATABASE FOR THIS HOMEWORK              +
+ ONLY USE YOUR OWN PERSONAL DATABASE PLEASE!                   +
+ The data for this homework, is given in hw6_fall20.dmp        +
+ It is different from all other databases given to you.
+(1 row)
+
+                        function_call                        
+-------------------------------------------------------------
+ select recommendation (ARRAY[4987,1823,16],20,0.5,1,2,0.5);
+(1 row)
+
+                  recommendation                   
+---------------------------------------------------
+ Durarara!! (33.600)                              +
+ JoJo''s Bizarre Adventure (27.975)               +
+ Black Butler (26.725)                            +
+ Cells at Work! (22.500)                          +
+ Fullmetal Alchemist: Brotherhood (22.500)        +
+ Magi: Adventure of Sinbad (22.350)               +
+ Haikyu!! (22.150)                                +
+ March Comes in Like a Lion (21.625)              +
+ One-Punch Man (20.275)                           +
+ B: The Beginning (18.350)                        +
+ Gurren Lagann (17.775)                           +
+ The Disastrous Life of Saiki K. (17.725)         +
+ Angel Beats! (17.575)                            +
+ The Irregular at Magic High School (17.525)      +
+ Teasing Master Takagi-san (17.500)               +
+ Fairy Tail (13.875)                              +
+ Vampire Knight (13.475)                          +
+ Code Geass: Lelouch of the Rebellion (12.000)    +
+ Sword Art Online (11.825)                        +
+ Mobile Suit Gundam: Iron-Blooded Orphans (11.500)+
+ 
+(1 row)
+
+                        function_call                        
+-------------------------------------------------------------
+ select recommendation (ARRAY[4987,1823,16],20,1,1,0.5,0.5);
+(1 row)
+
+                recommendation                 
+-----------------------------------------------
+ Durarara!! (16.100)                          +
+ Black Butler (15.225)                        +
+ JoJo''s Bizarre Adventure (14.975)           +
+ Fullmetal Alchemist: Brotherhood (14.000)    +
+ Haikyu!! (13.650)                            +
+ One-Punch Man (13.275)                       +
+ March Comes in Like a Lion (13.125)          +
+ Magi: Adventure of Sinbad (12.350)           +
+ Gurren Lagann (12.275)                       +
+ The Disastrous Life of Saiki K. (12.225)     +
+ Angel Beats! (12.075)                        +
+ The Irregular at Magic High School (12.025)  +
+ Teasing Master Takagi-san (12.000)           +
+ Cells at Work! (11.500)                      +
+ Fairy Tail (11.375)                          +
+ Soul Eater (11.375)                          +
+ B: The Beginning (11.350)                    +
+ Code Geass: Lelouch of the Rebellion (11.000)+
+ Vampire Knight (10.975)                      +
+ Sword Art Online (10.825)                    +
+ 
+(1 row)
+
+                       function_call                       
+-----------------------------------------------------------
+ select recommendation(ARRAY[1587,13,255],20,1,0.2,2,0.3);
+(1 row)
+
+          recommendation           
+-----------------------------------
+ The Walking Dead (7.195)         +
+ Mob Psycho 100 (6.785)           +
+ Resurrection: Ertugrul (6.585)   +
+ Van Helsing (6.520)              +
+ Jericho (6.470)                  +
+ Frontier (6.360)                 +
+ The King''s Avatar (6.345)       +
+ The Legend of Bruce Lee (6.290)  +
+ Bard of Blood (6.240)            +
+ Jericho (6.215)                  +
+ Black Summer (6.195)             +
+ Star Trek (6.090)                +
+ V Wars (6.075)                   +
+ Thieves of the Wood (6.060)      +
+ Outlander (5.980)                +
+ Blazing Transfer Students (5.970)+
+ Schitt''s Creek (5.935)          +
+ The 100 (5.890)                  +
+ Star Trek: Enterprise (5.865)    +
+ Gotham (5.815)                   +
+ 
+(1 row)
+
+                          function_call                          
+-----------------------------------------------------------------
+ select recommendation(ARRAY[111,321,7726,369],20,1,0.2,2,0.3) ;
+(1 row)
+
+           recommendation            
+-------------------------------------
+ Marco Polo (41.585)                +
+ Outlander (11.980)                 +
+ The Witcher (10.765)               +
+ Twin Peaks (9.270)                 +
+ The Originals (8.585)              +
+ The Order (8.390)                  +
+ Black Summer (8.195)               +
+ The Walking Dead (8.195)           +
+ V Wars (8.075)                     +
+ Dexter (8.055)                     +
+ The Sinner (8.045)                 +
+ NCIS (7.985)                       +
+ Wynonna Earp (7.925)               +
+ How to Get Away with Murder (7.890)+
+ The 100 (7.890)                    +
+ Another Life (7.865)               +
+ Criminal Minds (7.860)             +
+ 21 Thunder (7.850)                 +
+ Dirty John (7.820)                 +
+ Gotham (7.815)                     +
+ 
+(1 row)
+
+                          function_call                           
+------------------------------------------------------------------
+ select recommendation(ARRAY[111,321,7726,369],20,10,2,0.5,0.1) ;
+(1 row)
+
+            recommendation            
+--------------------------------------
+ The Witcher (63.355)                +
+ The Originals (62.795)              +
+ The Order (62.730)                  +
+ Black Summer (62.665)               +
+ V Wars (62.625)                     +
+ Another Life (62.555)               +
+ Marco Polo (61.295)                 +
+ The Walking Dead (56.865)           +
+ The Sinner (56.815)                 +
+ NCIS (56.795)                       +
+ Wynonna Earp (56.775)               +
+ Dirty John (56.740)                 +
+ Van Helsing (56.640)                +
+ Outlander (55.860)                  +
+ Dexter (54.885)                     +
+ How to Get Away with Murder (54.830)+
+ The 100 (54.830)                    +
+ Criminal Minds (54.820)             +
+ Gotham (54.805)                     +
+ Manhunt (54.805)                    +
+ 
+(1 row)
+
+                        function_call                        
+-------------------------------------------------------------
+ select recommendation(ARRAY[35,870,1395,82],20,1,1,1,0.5) ;
+(1 row)
+
+            recommendation            
+--------------------------------------
+ The Sinner (14.075)                 +
+ NCIS (13.975)                       +
+ Dirty John (13.700)                 +
+ How to Get Away with Murder (13.150)+
+ Criminal Minds (13.100)             +
+ Manhunt (13.025)                    +
+ Manhunt (12.525)                    +
+ Twin Peaks (12.450)                 +
+ The Code (12.400)                   +
+ Ozark (12.350)                      +
+ Penny Dreadful (12.200)             +
+ American Horror Story (12.075)      +
+ Limitless (11.900)                  +
+ Quantico (11.500)                   +
+ The Code (11.425)                   +
+ Republic of Doyle (11.350)          +
+ Deep Water (11.275)                 +
+ Good Girls (11.075)                 +
+ Wentworth (11.050)                  +
+ Gotham (11.025)                     +
+ 
+(1 row)
+
+                           ?column?                            
+---------------------------------------------------------------
+ select recommendation(ARRAY[35,870,1395,82],20,0.2,10,10,1) ;
+(1 row)
+
+             recommendation              
+-----------------------------------------
+ Twin Peaks (39.900)                    +
+ The Sinner (39.550)                    +
+ Penny Dreadful (39.400)                +
+ NCIS (39.350)                          +
+ American Horror Story (39.150)         +
+ Friends (39.150)                       +
+ The Walking Dead (39.050)              +
+ Dirty John (38.800)                    +
+ Limitless (38.800)                     +
+ Star Trek: The Next Generation (38.600)+
+ The Big Bang Theory (38.550)           +
+ Heartland (38.450)                     +
+ The Tudors (38.450)                    +
+ The Fosters (38.400)                   +
+ Star Trek (38.300)                     +
+ The Borgias (38.300)                   +
+ The Universe (38.150)                  +
+ Wynonna Earp (38.150)                  +
+ The Magicians (38.050)                 +
+ Star Trek: Deep Space Nine (38.000)    +
+ 
+(1 row)
+

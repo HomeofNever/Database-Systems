@@ -1,0 +1,159 @@
+\documentclass[11pt]{article}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{upquote,textcomp}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=sql,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{mygray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{mygreen},
+  stringstyle=\color{mymauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\setlength{\parindent}{0cm}
+
+\setlength{\parskip}{0.2cm}
+
+\oddsidemargin = 0.2in
+\textwidth = 6.5 in
+\textheight = 9.8 in
+\headsep = -1in
+
+\title{Database Systems, CSCI 4380-01 \\
+Homework \# 8 \\
+Due Friday December 11, 2020 at 11:59:59 PM}
+\date{}
+\begin{document}
+\maketitle
+
+\vspace*{-0.7in}
+
+\noindent{\bf Homework Statement.} This homework is worth 7\% of your
+total grade. If you choose to skip it, Final Exam will be worth 7\%
+more.
+
+
+{\bf Question 1.} In this question, you are asked the reverse of
+previous homework. Improve the expected run time of {\bf two queries}
+from either Homework \#4 or Homework \#5 with respect to the
+\verb+mediumstreaming+ database.
+
+To facilitate this, I have created a new database for each student
+with name \verb+db2_<username>+ and created a copy of mediumstreaming
+database in this personal space. Please do not drop any tables as
+in Homework \#6.
+
+You can improve the run time in one of two ways:
+
+\begin{itemize}
+\item Rewrite the query solution such that it is different than your
+  previous solution and my own solution, and has lower query cost. To
+  do this, in your solution, list your initial query (from your
+  submission), my solution and your new query. For each query, list
+  the first few lines of the query plans.
+
+\item An easier method is to create one or two indices and use my
+  solution or your own solution. To document the improvement, list (a)
+  the query, (b) index creation commands, (c) a few lines of the query
+  plan before you create the index and (d) full query plan after you
+  create the index. It is important that the full query plan in (d)
+  shows that your index is being used.
+  \end{itemize}
+
+In either case, the query plans after your changes should be lower
+than before for the second cost value (the time to get all the
+answers). However, it is not required that the reduction in cost is
+large. Even smaller improvements will be accepted.
+
+When creating indices, consider a few simple rules of thumb that you
+may have learn from the previous homework:
+
+\begin{itemize}
+  \item Relations with lots of tuples and span many disk pages are
+    likely to benefit more from indices.
+  \item Conditions that are more selective are likely to be more
+    useful. In this include any join conditions as well.
+    \item In case very selective conditions don't exist, you can still
+      target index only scans. In this case, ordering of attributes is
+      important.
+  \end{itemize}
+
+When I tested, I found small improvements with indices in almost all
+queries, but a large improvement in only one query. Homework \#4
+queries lend themselves to better improvements.
+
+Please document this for two queries!
+
+{\bf Question 2.} You are given the following schedules. For each
+schedule, (a) check if it is serializable by drawing the conflict
+graph, and (b) discuss if it is possible to obtain this schedule using
+Two Phase Locking.
+
+\verb+S1: r1(x) r2(z) r1(y) w2(w) w2(z) r3(z) w3(x) r1(w) w1(y) w3(z)+
+
+\verb+S2: r1(x) r1(y) r2(z) r3(z) r3(x) w3(x) w2(w) w2(z) r1(w) w1(y)+
+
+{\bf Question 3.} Suppose you are using REDO/UNDO recovery, and
+the following are the contents of the log and the disk after crash.
+
+\begin{enumerate} [(a)]
+\item Which log entries should be redone, which should be undone and in
+  which order?
+
+\item Based on this information, can you conclude if FORCE or NO FORCE
+  is used? Discuss.
+
+\item Based on this information, can you conclude if STEAL or NO STEAL
+  is used? Discuss.
+\end{enumerate}
+
+\begin{tabular}{ll}
+LOG: 
+\begin{tabular}{l|l} 
+LSN & Entry \\ \hline
+100 & T1 update P2 \\
+101 & T2 update P1 \\
+102 & T2 commit \\ 
+103 & T3 update P1 \\
+104 & T3 update P3 \\
+105 & T1 update P4 \\
+106 & T3 commit \\ 
+\end{tabular}
+&
+Data pages: 
+\begin{tabular}{l|l} 
+Data Page & LSN of Last recorded log entry \\ \hline
+P1 & 101 \\ 
+P2 & 100 \\
+P3 & 104 \\
+P4 & - \\
+\end{tabular}
+\end{tabular}
+
+\newpage
+
+{\bf SUBMISSION INSTRUCTIONS.}
+
+Submit a single text or PDF file that documents your answers to the
+homework.
+
+\end{document}

@@ -1,0 +1,180 @@
+ ?column? 
+----------
+ Query 1
+(1 row)
+
+ title | director 
+-------+----------
+(0 rows)
+
+ ?column? 
+----------
+ Query 2
+(1 row)
+
+ nummovies 
+-----------
+        17
+(1 row)
+
+ ?column? 
+----------
+ Query 3
+(1 row)
+
+               title               |        director         
+-----------------------------------+-------------------------
+ Kill Bill: Vol. 2                 | Quentin Tarantino
+ Pink                              | Aniruddha Roy Chowdhury
+ Spider-Man: Into the Spider-Verse | Bob Persichetti
+ Spider-Man: Into the Spider-Verse | Peter Ramsey
+ Spider-Man: Into the Spider-Verse | Rodney Rothman
+ Swades                            | Ashutosh Gowariker
+ The Pursuit of Happyness          | Gabriele Muccino
+ The Square                        | Ruben Östlund
+(8 rows)
+
+ ?column? 
+----------
+ Query 4
+(1 row)
+
+  id   |                title                 | streamingtype 
+-------+--------------------------------------+---------------
+   787 | Voyeur                               | movie
+  1827 | The Music of Silence                 | movie
+  5769 | The Church                           | movie
+  2010 | Suburra: Blood on Rome               | series
+  3174 | Saverio Raimondo: Il Satiro Parlante | movie
+   982 | S Is for Stanley                     | movie
+ 13490 | Rats                                 | movie
+  3014 | Edoardo Ferrario: Temi Caldi         | movie
+(8 rows)
+
+ ?column? 
+----------
+ Query 5
+(1 row)
+
+ numtuples | numdate | minyear | maxyear | avgduration | avgrating 
+-----------+---------+---------+---------+-------------+-----------
+      1022 |     873 |    1924 |    2020 |      100.46 |      6.19
+(1 row)
+
+ ?column? 
+----------
+ Query 6
+(1 row)
+
+           castname            | nummovies | numseries 
+-------------------------------+-----------+-----------
+ Anna Torv                     |         1 |         1
+ Billy Brown                   |         1 |         1
+ Chaleumpol Tikumpornteerawong |         1 |         1
+ Daniel Hendler                |         1 |         1
+ Devin Druid                   |         1 |         1
+ Emraan Hashmi                 |         1 |         1
+ Kirti Kulhari                 |         1 |         1
+ Madeline Brewer               |         1 |         1
+ Max Martini                   |         1 |         1
+ Sofía Gala                    |         1 |         1
+ Sohum Shah                    |         1 |         1
+ Tom Sizemore                  |         1 |         1
+ Viola Davis                   |         1 |         1
+ John Leguizamo                |         1 |         2
+(14 rows)
+
+ ?column? 
+----------
+ Query 7
+(1 row)
+
+               title                | numcountries | numplatforms 
+------------------------------------+--------------+--------------
+ Life                               |            6 |            1
+ Criminal: UK                       |            4 |            1
+ La Reina del Sur                   |            4 |            2
+ Rainbow Ruby                       |            4 |            1
+ The Borgias                        |            4 |            3
+ The Tudors                         |            4 |            3
+ Bakugan: Battle Planet             |            3 |            3
+ Big Bad Beetleborgs                |            3 |            1
+ Borderliner                        |            3 |            1
+ Bottersnikes & Gumbles             |            3 |            1
+ Hilda                              |            3 |            1
+ Pac-Man and the Ghostly Adventures |            3 |            3
+ Talking Tom and Friends            |            3 |            1
+ The Indian Detective               |            3 |            1
+(14 rows)
+
+ ?column? 
+----------
+ Query 8
+(1 row)
+
+ language  | minimdb | maximdb | minrotten | maxrotten 
+-----------+---------+---------+-----------+-----------
+ Hindi     |     1.7 |     8.6 |        10 |       100
+ English   |     1.8 |     8.7 |         6 |       100
+ Spanish   |     2.4 |     8.5 |        16 |       100
+ Japanese  |     2.5 |     8.1 |         9 |        95
+ Mandarin  |     2.5 |       8 |        16 |       100
+ Arabic    |       3 |     7.5 |        57 |       100
+ Tamil     |     3.3 |     7.5 |        80 |        80
+ Italian   |     3.5 |     8.5 |         6 |        95
+ Thai      |     3.5 |     7.1 |        50 |        50
+ Marathi   |     3.9 |     8.3 |        80 |       100
+ German    |       4 |     7.8 |         6 |        98
+ French    |     4.5 |     8.2 |        20 |       100
+ Punjabi   |     4.7 |     7.1 |           |          
+ Russian   |     4.8 |     7.6 |        16 |        85
+ Cantonese |     4.9 |       8 |        50 |       100
+ Malayalam |       5 |     8.2 |           |          
+ Korean    |     5.1 |     8.1 |        46 |        97
+(17 rows)
+
+ ?column? 
+----------
+ Query 9
+(1 row)
+
+    platform    | numseries 
+----------------+-----------
+ Netflix        |        18
+ Free Services  |         7
+ Hulu           |         3
+ Showtime       |         3
+ CBS All Access |         2
+ IFC            |         2
+ Prime Video    |         2
+ HGTV           |         1
+(8 rows)
+
+ ?column? 
+----------
+ Query 10
+(1 row)
+
+       castname       
+----------------------
+ Akiva Schaffer
+ Alan Rickman
+ Camille Shooshani
+ Charles Martin Smith
+ Christopher Nolen
+ Dax Shepard
+ Farhan Akhtar
+ Jenna Laurenzo
+ Jing Wu
+ Kabir Sadanand
+ Kubilay Sarikaya
+ Louis C.K.
+ Michael James Regan
+ Scott Martin
+ Sean Penn
+ Sedat Kirtan
+ Stephen Chow
+ Syamsul Yusof
+ Tigmanshu Dhulia
+(19 rows)
+
