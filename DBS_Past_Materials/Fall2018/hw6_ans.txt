@@ -1,0 +1,245 @@
+
+drop function parsingreport(int);
+drop trigger scores_trigger on scores2 ;
+drop function scores_trigger_f() cascade;
+drop table follows;
+drop table contestants2 ;
+drop table scores2;
+
+
+SELECT 'Student: Sibel Adali (adalis@rpi.edu)';
+
+create table scores2 as select * from scores ;
+create table contestants2 as select * from contestants ;
+alter table contestants2 add iswinner boolean ;  
+
+SELECT 'Problem 1';
+
+-- First make everyone false
+update contestants2
+set iswinner = False ;
+
+-- Now make the winners false
+update contestants2 
+set iswinner = True
+where not exists
+     (select 1
+      from scores sc, scores so
+      where sc.gameid = contestants2.gameid
+            and so.gameid = contestants2.gameid
+	    and sc.shortname = contestants2.shortname
+	    and so.shortname <> contestants2.shortname
+	    and sc.round = 'Final Score'
+	    and so.round = 'Final Score'
+	    and so.score > sc.score) ;
+
+select 'Testing results of problem 1: Test 1 (num tuples with iswinner=True)';
+
+select count(*) from contestants2 where iswinner=True;
+
+select 'Testing results of problem 1: Test 2 (games with more than 1 winner)';
+
+select gameid, count(*) from contestants2 where iswinner=True group by gameid having count(*)>1;
+
+SELECT 'Problem 2';
+
+create table follows as
+select
+   g1.gameid as gameid1
+   , g2.gameid as gameid2
+   , g1.airdate as airdate1
+   , g2.airdate as airdate2
+from
+   games g1
+   , games g2
+where
+   g2.airdate = g1.airdate + 1
+   or (extract(isodow from g1.airdate)=5
+       and g2.airdate = g1.airdate + 3) ;
+
+insert into follows
+select
+   g1.gameid as gameid1
+   , g2.gameid as gameid2
+from
+   games g1
+   , games g2
+   , contestants c1
+   , contestants c2
+where
+   not exists (select 1 from follows f
+                where f.gameid1=g1.gameid and f.gameid2=g2.gameid)
+   and g2.airdate > g1.airdate
+   and g2.airdate-g1.airdate <=60
+   and g1.gameid = c1.gameid
+   and g2.gameid = c2.gameid
+   and c1.shortname = c2.shortname
+   and not exists
+       (select 1 from games g3
+        where g3.airdate > g1.airdate and g2.airdate > g3.airdate);
+
+select 'testing problem 2 results: Test 1 (select count(*) from follows)';
+
+select count(*) from follows ;
+
+select 'testing problem 2 results: Test 2 (follows tuples for games more than 3 days apart)';
+
+select f.gameid1,f.gameid2 from follows f, games g1, games g2
+       where f.gameid1=g1.gameid and f.gameid2=g2.gameid
+             and g2.airdate-g1.airdate>3;
+
+SELECT 'Problem 3';
+
+CREATE OR REPLACE FUNCTION scores_trigger_f () RETURNS trigger AS $$
+DECLARE
+   maxscore INT ;
+   myrow RECORD; 
+BEGIN
+IF (NEW.round = 'Final Score') THEN
+    UPDATE contestants2 SET iswinner = False where gameid = NEW.gameid;
+    SELECT max(s.score) into maxscore
+    FROM scores2 s
+    WHERE s.gameid = NEW.gameid
+          and s.round = 'Final Score';
+    FOR myrow IN
+       SELECT s.shortname
+       FROM scores2 s
+       WHERE s.gameid = NEW.gameid
+             and s.round = 'Final Score'
+	     and s.score = maxscore LOOP
+        UPDATE contestants2 SET iswinner = True
+	WHERE gameid = NEW.gameid and shortname = myrow.shortname;	     
+     END LOOP ;	     
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER scores_trigger AFTER UPDATE ON scores2
+FOR EACH ROW EXECUTE PROCEDURE scores_trigger_f();
+
+select 'Testing results of problem 3: Test 1 (gameid=3913)';
+
+
+select shortname, iswinner from contestants2 where gameid=3913;
+select shortname, score
+from scores2
+where gameid=3913 and round='Final Score';
+
+update scores2
+set score=28805
+where round='Final Score'
+      and gameid=3913
+      and shortname='Rosanne';
+select shortname, score
+from scores2
+where gameid=3913 and round='Final Score';
+
+select 'Testing results of problem 3: Test 2 (gameid: 4056)';
+
+
+select shortname, iswinner from contestants2 where gameid=4056;
+select shortname, score
+from scores2
+where gameid=4056 and round='Final Score';
+
+update scores2
+set score=22000
+where round='Final Score'
+      and gameid=4056
+      and shortname='Tim';
+
+select shortname, iswinner from contestants2 where gameid=4056;
+select shortname, score
+from scores2
+where gameid=4056 and round='Final Score';
+
+
+SELECT 'Problem 4';
+-- Insert the code for creating your function for Problem 4 here.
+-- Your code should only create a single function named
+-- parsingreport(input_year)
+-- and nothing else
+
+CREATE OR REPLACE FUNCTION parsingreport(input_year int) RETURNS TEXT AS $$
+DECLARE
+   reportstr TEXT ;
+   tmpstr TEXT ;
+   num INT;
+   numgames INT;
+BEGIN
+   reportstr = 'Year: ' || cast(input_year as text)  || E'\n';
+
+   CREATE TABLE chosen_games
+   AS SELECT gameid FROM games
+   WHERE extract(year from airdate) = input_year;
+
+   SELECT count(*) INTO numgames FROM chosen_games ;
+
+   SELECT
+       cast(count(*) as text) INTO tmpstr
+   FROM
+       games g join contestants c
+            on c.gameid = g.gameid
+               and extract(year from g.airdate) = input_year
+       left join responses r
+            on r.gameid = c.gameid
+	       and r.shortname = c.shortname
+       left join final_responses r2	       
+            on r2.gameid = c.gameid
+	       and r2.shortname = c.shortname
+   WHERE
+       r.gameid is null
+       and r2.gameid is null ;
+
+   reportstr = reportstr || tmpstr || ' contestants with no clues' || E'\n';
+
+   SELECT count(*) INTO num
+   FROM clues c, chosen_games g
+   WHERE c.gameid = g.gameid ;
+
+   SELECT cast(numgames*61 - num - count(*) as text) into tmpstr
+   FROM final_clues c, chosen_games g
+   WHERE c.gameid = g.gameid ;
+
+   reportstr = reportstr || tmpstr || ' missing clues' || E'\n';
+
+   -- count only for games with final clues
+   SELECT
+      cast(count(*)-count(r.gameid) as text) into tmpstr
+   FROM
+      chosen_games g
+      join final_clues f on f.gameid = g.gameid
+      join scores s on s.gameid = g.gameid
+         and s.round = '3'
+         and s.score > 0
+      left join final_responses r
+         on r.gameid = g.gameid
+	    and s.shortname = r.shortname ;
+
+   reportstr = reportstr || tmpstr || ' missing final responses' || E'\n';
+
+   DROP TABLE chosen_games ;
+RETURN reportstr;
+END;
+$$ LANGUAGE plpgsql;
+
+select 'Testing problem 4: Test 1 (year 2012)';
+
+select parsingreport(2012) ;
+
+select 'Testing problem 4: Test 2 (year 2013)';
+
+select parsingreport(2013) ;
+
+select 'Testing problem 4: Test 3 (year 2014)';
+
+select parsingreport(2014) ;
+
+select 'Testing problem 4: Test 4 (year 2015)';
+
+select parsingreport(2015) ;
+
+select 'Testing problem 4: Test 5 (year 2016)';
+
+select parsingreport(2016) ;

@@ -1,0 +1,306 @@
+-- Query 1. Return name of categories that appeared in final jeopardy
+-- 6 or more times that never appeared in the other rounds of the game
+-- (i.e. in the clues table). Order by category name.
+
+select 'query 1' ;
+
+select distinct
+    f.category
+from
+    final_clues f
+where
+    f.category not in (SELECT c.category
+                   FROM clues c)
+group by
+    f.category
+having
+    count(*)>5
+order by
+    category;
+
+
+-- Query 2. Find the full name of the contestant with highest total
+-- score over all his/her games. You can assume there is a single such
+-- person.
+
+SELECT 'Query 2';
+
+SELECT
+    c.fullname
+    , sum(s.score) as totalscore
+FROM
+    scores s
+    , contestants c
+WHERE
+    s.gameid = c.gameid
+    and s.shortname = c.shortname
+    and s.round = 'Final Score'
+GROUP BY
+    c.fullname
+ORDER BY
+    totalscore DESC
+LIMIT 1;    
+
+
+-- Query 3. Find answers longer than 20 characters that were in more
+-- than 6 clues. Return the answer, number of clues and number of
+-- categores with this answer, order by the number of clues.
+
+SELECT 'Query 3';
+SELECT
+   cast(c.correct_answer as char(50))
+   , count(*) as numclue
+   , count(distinct c.category)
+FROM
+   clues c
+WHERE
+   length(c.correct_answer)>20
+GROUP BY
+   c.correct_answer
+HAVING
+   count(*)>6
+ORDER BY numclue desc;   
+
+-- Query 4: Find categories that have correct responses less 70% of
+-- the time (number of times a correct answer is given for a clue in
+-- this category divided by the number of clues in the category) and
+-- return the top 20 most frequent categories (based on the number of
+-- different games they appeared in.) For each category, return the
+-- name, number of games it appeared, and the percentage of correct
+-- answers in that category
+
+SELECT 'Query 4';
+SELECT
+    c.category
+    , count(distinct c.gameid) as numtimes
+    , cast(cast(count(r.gameid) as float)/count(*) as numeric(5,2))
+      as percentcorrect
+FROM
+    clues c
+    LEFT JOIN responses r
+    ON c.gameid=r.gameid
+       AND c.clueid=r.clueid
+       AND r.iscorrect=True
+GROUP BY
+    c.category
+HAVING
+    cast(count(r.gameid) as float)/count(*) < 0.6
+ORDER BY
+    numtimes desc, percentcorrect desc
+LIMIT 20
+;
+
+-- Query 5. Find people who had higher scores than 'Ken Jennings' in
+-- Round 3. Return their full name, gameid in which this happened and
+-- the score difference in Round 3. Order by score difference.
+
+SELECT 'Query 5';
+
+select distinct
+    c2.fullname
+    , c2.gameid
+    , s2.score-s.score as scorediff
+from
+    contestants c
+    , contestants c2
+    , scores s
+    , scores s2
+where
+    c.fullname = 'Ken Jennings'
+    and s.gameid = c.gameid
+    and s.shortname = c.shortname
+    and s.round = '3'
+    --- other player
+    and c2.fullname <> 'Ken Jennings'
+    and s2.gameid = c2.gameid
+    and s2.shortname = c2.shortname
+    and s2.round = '3'
+    --- now the comparison
+    and c.gameid = c2.gameid
+    and s2.score>s.score
+order by
+    scorediff desc;
+
+
+-- Query 6. Return the gameid and air date of games that has at least
+-- 15 triple stumpers in Jeopardy or Double Jeopardy rounds. Order
+-- ther results by airdate.
+
+SELECT 'Query 6';
+
+SELECT DISTINCT
+    g.gameid
+    , g.airdate	
+FROM
+     clues c
+     , games g
+WHERE
+     c.gameid = g.gameid
+     and not exists
+         (select 1
+	  from
+	     responses r
+	  where
+	     r.gameid = c.gameid
+	     and r.clueid = c.clueid
+	     and r.iscorrect = True)
+GROUP BY
+     g.gameid
+HAVING
+     count(distinct c.clueid) >= 15
+ORDER BY
+     airdate ;
+
+
+-- Query 7. Find the full name and total winnings of the lowest total
+-- scoring 5 time champion (i.e. sum of final scores of exactly 5 time
+-- champions in).
+
+SELECT 'Query 7';
+
+WITH fivetimer AS
+(SELECT
+    c.fullname
+    , sum(s.score) as winnings
+ FROM
+    scores s
+    , contestants c
+ WHERE
+    s.gameid = c.gameid
+    and s.shortname = c.shortname
+    and s.round = 'Final Score'
+    and s.score = (SELECT
+                      max(s2.score)
+                   FROM
+		      scores s2
+		   WHERE
+		      s2.gameid = s.gameid
+		      and s2.round = 'Final Score')
+  GROUP BY
+     c.fullname
+  HAVING
+     count(distinct c.gameid) = 5)
+SELECT
+    *
+FROM
+    fivetimer f
+WHERE
+    f.winnings = (SELECT min(winnings) FROM fivetimer) ;
+
+
+-- Query 8.  Find categories that appeared with more than 30 years
+-- between them (meaning the category did not appear between two
+-- appearances that are 30 years apart.) Use 365 days to represent a
+-- year.
+
+SELECT 'Query 8';
+
+SELECT DISTINCT
+    c1.category
+FROM
+    clues c1
+    , games g1
+    , clues c2
+    , games g2
+WHERE    
+    c1.category = c2.category
+    and c1.gameid = g1.gameid
+    and c2.gameid = g2.gameid
+    and g2.airdate-g1.airdate >= 30*365
+    and NOT EXISTS (
+        SELECT 1
+	FROM
+	    clues cx
+	    , games gx
+	WHERE
+	     cx.category = c1.category
+	     and cx.gameid = gx.gameid
+	     and gx.airdate > g1.airdate
+	     and gx.airdate < g2.airdate)
+ORDER BY
+    category;
+
+
+-- Query 9. For each state, return the state name and the number of
+-- contestants per capita from this state (percapita) as well as the
+-- number of contestants who were at least 5 time champions per capita
+-- (percapita5times) from this state. Order by percapita5times. Note:
+-- for this query, we added a new table called states(name,population)
+-- To find a percapita value, you need to divide the population of the
+-- state with number of contestants.
+
+SELECT 'Query 9';
+
+SELECT
+   s.name
+   , count(distinct c.fullname) as numcontestants
+   , cast(cast(s.population as float)/count(distinct c.fullname) as int)
+     as percapita
+   , cast(cast(s.population as float)/(1+count(distinct c2.fullname)) as int)
+     as percapita5times
+FROM
+   contestants c
+   join states s on c.description like '%from%,%'|| s.name || '%'
+   left join contestants c2 on c.fullname=c2.fullname
+             and c2.description like '%5-day%' and
+	     c2.description like '%from%,%'|| s.name || '%'
+GROUP BY
+   s.name
+   , s.population
+ORDER BY
+   percapita5times desc ;
+   
+
+
+--- FINAL JEOPARDY -----
+-- Query 10. Find the full name of contestants who won at least two
+-- games in which they were third going into final jeopardy (i.e. at
+-- round 3).  Order by name.
+
+SELECT 'Query 10';
+
+WITH won AS
+(SELECT
+    s.gameid
+    , s.shortname
+    , c.fullname
+ FROM
+    scores s
+    , contestants c
+ WHERE
+    s.gameid = c.gameid
+    and s.shortname = c.shortname
+    and s.round = 'Final Score'
+    and s.score = (SELECT
+                      max(s2.score)
+                   FROM
+		      scores s2
+		   WHERE
+		      s2.gameid = s.gameid
+		      and s2.round = 'Final Score'))
+SELECT
+    w.fullname
+FROM
+    won w
+    , scores s
+    , scores s2
+    , scores s3
+WHERE
+    w.gameid = s.gameid
+    and w.gameid = s2.gameid
+    and w.gameid = s3.gameid
+    and s.round = '3'
+    and s2.round = '3'
+    and s3.round = '3'
+    and s.shortname = w.shortname
+    and s2.shortname  <> s.shortname
+    and s3.shortname <> s.shortname
+    and s3.shortname <> s2.shortname
+    and s2.score > s.score
+    and s3.score > s.score
+GROUP BY
+    w.fullname
+HAVING
+    count(distinct w.gameid) >= 2;
+
+

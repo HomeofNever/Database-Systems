@@ -1,0 +1,253 @@
+ ?column? 
+----------
+ query 1
+(1 row)
+
+    fullname     
+-----------------
+ Austin Rogers
+ Gilbert Collins
+ Josh Hill
+ Kyle Jones
+ Rachel Lindgren
+ Rob Worman
+ Ryan Fenster
+(7 rows)
+
+ ?column? 
+----------
+ query 2
+(1 row)
+
+     fullname     | shortname 
+------------------+-----------
+ Barbara Gooby    | Barbara
+ Becky Wilson     | Becky
+ Betsy Knudson    | Betsy
+ Brandey Chandler | Brandey
+ Brandon Brooks   | Brandon
+ Brennan Summers  | Brennan
+ Brian Kato       | Brian
+ Bryce Johnson    | Bryce
+ Bucky McMahon    | Bucky
+ Bunny Miller     | Bunny
+ Burt Westermeier | Burt
+ Buzzy Cohen      | Buzzy
+(12 rows)
+
+ ?column? 
+----------
+ query 3
+(1 row)
+
+ gameid |                                                                                      clue                                                                                       |          category          
+--------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------
+   5776 | In 1929 Georgia O'Keeffe painted the tree in New Mexico under which this British-born author used to write                                                                      | ARTISTS &amp; AUTHORS
+   5781 | Consisting of 21 verses, the book of this minor prophet, whose name means "servant of God", is the shortest                                                                     | THE OLD TESTAMENT
+   5802 | It's the only country that borders both the Caspian Sea &amp; the Persian Gulf                                                                                                  | ASIAN GEOGRAPHY
+   5809 | This 8-letter word meaning "cultured" or "intellectual" originated with a phrenology concept                                                                                    | ETYMOLOGY
+   5813 | The Mopan River flows about 20 miles from the capital of this country                                                                                                           | THE WESTERN HEMISPHERE
+   5824 | The world's highest international airport, at an elevation of over 13,000', serves this South American capital city                                                             | WORLD CAPITALS
+   5834 | When Time Magazine named it Invention of the Year in 2007, it was described as too slow, too big, pretty &amp; touchy-feely                                                     | INVENTIONS
+   5835 | A state capital since 1805, its name begins with the last 4 letters of the state's name                                                                                         | STATE CAPITALS
+   5844 | In the 1870s this phrase meant a hairdo, using a British word for bangs; now it's an extreme group on the edge of a cause                                                       | FAMILIAR PHRASES
+   5849 | This 1814-1815 gathering of leaders prompted Beethoven to compose the cantata "The Glorious Moment"                                                                             | 19th CENTURY EUROPE
+   5854 | The name of this city in the Département du Nord comes from the Flemish for "church of the dunes"                                                                               | FRENCH CITIES
+   5869 | Following a show's success in 2011, this group began advertising, "You've seen the play...now read the book"                                                                    | BROADWAY
+   5871 | A 2015 BBC list of the 25 greatest British novels included 12 by women, 3 of them by this woman who died in 1941                                                                | NOVELISTS
+   5879 | The last names of these 2 current senators, one from Virginia &amp; one from Massachusetts, are anagrams of each other                                                          | SENATORS
+   5891 | This character first appeared in "The Adventure of the Greek Interpreter", an 1893 story in London's Strand Magazine                                                            | LITERARY BROTHERS
+   5893 | In an 1889 letter to his brother, he wrote, “I wouldn’t exactly have chosen madness if there had been a choice”                                                                 | 19th CENTURY EUROPEANS
+   5901 | "You need us...for everything you do" was a slogan used by this channel, one of the first to customize content by location                                                      | CABLE TV HISTORY
+   5902 | Despite the title, in this Plato work, Socrates says, "I shall never alter my ways, not even if I have to die many times"                                                       | PHILOSOPHY
+   5913 | Site of an arduous WWI campaign, this town on the Dardanelles gets its name from the Greek for "beautiful city"                                                                 | WORLD WAR I
+   5914 | Already an Emmy winner, in 2017 she won an Oscar for the same role that had won her a Tony                                                                                      | ACTRESSES
+   5916 | In 1994 Wired magazine described this 4-letter word as an idea leaping "from mind to mind... as viruses leap from body to body"                                                 | MODERN WORDS
+   5918 | Though it means "one who serves", in medieval Japan it was a property holder who received rent from serfs                                                                       | MEDIEVAL ASIA
+   5922 | Once known as the Norman Isles, per the British government this group is "not part of the U.K." &amp; has "never been colonies"                                                 | EUROPEAN ISLANDS
+   5936 | Hesiod said it fawns on all who enter "with actions of...tail &amp; both ears", but when people try to exit it "eats them up"                                                   | MYTHOLOGICAL BEASTS
+   5961 | Its official seal includes the year 1864 for when it was established, a folded flag &amp; a scroll inscribed "our most sacred shrine"                                           | U.S. HISTORIC SITES
+   5969 | Translated from Roman numerals, "55" appears in luggage &amp; watch product names from a company founded by this man                                                            | FASHION BRANDS
+   5970 | On July 10, 1804 he wrote a letter of goodbye, just in case, to "my dearest Theodosia"; he lived until 1836                                                                     | 19th CENTURY AMERICANS
+   5971 | The New York premiere of this film was on Thanksgiving, 15 days after the liberation of its title place                                                                         | FILM &amp; WAR
+   5973 | This city, also the title of a film that won 2 Oscars, was named for a businessman known for 19th c. transportation                                                             | U.S. CITIES
+   5978 | In "Gone With the Wind", Rhett Butler says this city named for a monarch "is the South, only intensified"                                                                       | CITIES IN LITERATURE
+   5982 | Adding "P" to a word for a chronic back condition gets you this synonym for graphite or pencil lead                                                                             | SCHOOL SUPPLY WORDS
+   5984 | In November 1836 this writer got a letter naming him to the Most Serene Order of Cuckolds; in February 1837 he was dead                                                         | FAMOUS RUSSIANS
+   5994 | 20-euro notes available in 2015 fittingly feature <a href="http://www.j-archive.com/media/2018-05-31_FJ.jpg" target="_blank">this</a> mythological mother to some of Zeus' kids | CURRENCY
+   5998 | He got a real N.Y. Times obit in 1975; it said he wore "false mustaches to mask signs of age that offended his vanity"                                                          | FICTIONAL CHARACTERS
+   6003 | In a 1789 letter, Benjamin Franklin relates the durability of the new constitution to these 2 things                                                                            | AMERICAN QUOTES
+   6014 | This Zodiac constellation includes 2 lines (or strings) that terminate in a star called Alrescha, the knot                                                                      | CONSTELLATIONS
+   6015 | A Portuguese explorer gave this name to an island he sighted off Africa's coast 40 days after Easter                                                                            | ISLAND NAMES
+   6024 | Australia's fourth-largest city, it's at the southern end of the road called Indian Ocean Drive                                                                                 | WORLD GEOGRAPHY
+   6029 | Getting its nickname from a capital, Dhallywood is the name for the film industry in this Asian country                                                                         | INTERNATIONAL CINEMA
+   6035 | Researchers in London &amp; Vienna now speculate that his 1791 death was due to a strep infection, not poisoning                                                                | 18th CENTURY NOTABLES
+   6037 | Like UNESCO, the EU has heritage sites; 2 of the first 4, a WWII internment camp &amp; a Peace Palace, were in this occupied country                                            | THE EUROPEAN UNION
+   6044 | Of the presidents who served more than 4 years, but less than 2 full terms, he served the longest: <br />7 years, 9 months, 8 days                                              | PRESIDENTS
+   6046 | Turkey is the world's largest producer of these fruits; its town of Cerasus was famous for them                                                                                 | AGRICULTURE
+   6079 | The last survivor of this battle that started a war died in 1854 &amp; more men marched at his funeral than fought with him                                                     | AMERICAN HISTORY
+   6099 | On October 4, 1940, for the premiere of what's been called his most famous movie role, Ronald Reagan was in this city                                                           | BEFORE THEY WERE PRESIDENT
+   6106 | In legend, he called all the animals together but only 12 came, including a rat &amp; a dragon                                                                                  | FOLKLORE
+   6107 | This word for a gem &amp; a shade of blue derives from the name of a Eurasian country from which gems came to Western Europe                                                    | COLOR ETYMOLOGY
+   6110 | In Sept. 2017 Prince Charles became the longest-serving Prince of Wales, passing the man who became this king                                                                   | BRITISH ROYALTY
+   6115 | In a recent poll of 125 authors, this long 1870s novel about a woman ranked as the greatest work of fiction of all time                                                         | WORLD LITERATURE
+   6116 | This actor has never been nominated for acting--he won, though, as a writer for 1997 &amp; as a producer for 2012                                                               | OSCAR HYPHENATES
+(50 rows)
+
+ ?column? 
+----------
+ query 4
+(1 row)
+
+ gameid |  name1   |  name2  
+--------+----------+---------
+   5802 | Carlos   | Fran
+   5837 | Eric     | Kiana
+   5850 | Eric     | Lindsay
+   5888 | Marilyn  | Ryan
+   5945 | Emily    | Shannan
+   5950 | Jack     | Kristin
+   6039 | Kate     | Liz
+   6055 | Michelle | Rebecca
+(8 rows)
+
+ ?column? 
+----------
+ Query 5
+(1 row)
+
+ gameid | cat_type 
+--------+----------
+   5816 | J
+   5837 | DJ
+   5857 | J
+   5863 | J
+   5872 | J
+   5881 | J
+   5896 | J
+   5926 | J
+   5929 | J
+(9 rows)
+
+ ?column? 
+----------
+ Query 6
+(1 row)
+
+     fullname      | score |             description              
+-------------------+-------+--------------------------------------
+ Caitlin Silberman |  8401 | an archivist from Madison, Wisconsin
+(1 row)
+
+ ?column? 
+----------
+ Query 7
+(1 row)
+
+ gameid |       fullname       | numcorrect 
+--------+----------------------+------------
+   5871 | Olev Jaakson         |          0
+   5879 | Lindsay Resnick      |          0
+   5881 | Alex Cook            |          0
+   5881 | Alisha Mathalikunnel |          0
+   5882 | Gilbert Collins      |          0
+   5882 | Steve Garbacz        |          0
+   5883 | Gilbert Collins      |          0
+   5883 | Olivia Ochoa         |          0
+   5888 | Ryan Graham          |          0
+   5891 | Alex Schindele       |          0
+   5895 | Ryan Fenster         |          0
+   5897 | Ryan Fenster         |          0
+   5870 | Henry Ayoola         |          1
+   5870 | Lisa McAndrews       |          1
+   5870 | Nick Spicher         |          1
+   5872 | Saralee Etter        |          1
+   5873 | Sean Sullivan        |          1
+   5873 | Steph Bundy          |          1
+   5874 | Brandon Brooks       |          1
+   5874 | Claudia Hochstein    |          1
+   5874 | Sean Sullivan        |          1
+   5880 | Julie Zauzmer        |          1
+   5882 | Tyler Miksanek       |          1
+   5883 | David Rosen          |          1
+   5887 | Amanda Griggs        |          1
+   5888 | Lee Quinn            |          1
+   5889 | Lee Quinn            |          1
+   5889 | Sarah Daly           |          1
+   5891 | Katie Champagne      |          1
+   5892 | Rachel Lindgren      |          1
+   5893 | Jeff Machusko        |          1
+   5893 | Rachel Lindgren      |          1
+   5895 | Jennifer Tomassi     |          1
+   5897 | Elizabeth Connor     |          1
+   5897 | Nate Pochomis        |          1
+   5873 | Meghan Whalen        |          2
+   5876 | Dave Daniel          |          2
+   5879 | Gilbert Collins      |          2
+   5881 | Gilbert Collins      |          2
+   5888 | Marilyn Rose         |          2
+   5889 | Rachel Lindgren      |          2
+   5890 | Gerard Simonette     |          2
+   5891 | Rachel Lindgren      |          2
+   5892 | Del Scott            |          2
+   5892 | Eric Raygor          |          2
+   5894 | Jennifer Tomassi     |          2
+   5894 | Melissa Stewart      |          2
+   5895 | Maria Pecoraro       |          2
+   5896 | Brandey Chandler     |          2
+   5896 | Emily Lewis          |          2
+   5871 | Saralee Etter        |          3
+   5879 | Flora Leen           |          3
+   5880 | Gilbert Collins      |          3
+   5880 | Rebecca Zoshak       |          3
+   5871 | Nick Spicher         |          4
+   5876 | Jamie Rosler         |          4
+   5887 | Gilbert Collins      |          4
+   5890 | Rachel Lindgren      |          4
+   5893 | Rosie Jonker         |          4
+   5894 | Rachel Lindgren      |          4
+   5872 | Michael Shockley     |          5
+   5876 | Brandon Brooks       |          5
+   5887 | Lee Quinn            |          5
+   5890 | Adrianne Woodward    |          5
+   5872 | Steph Bundy          |          9
+   5896 | Ryan Fenster         |          9
+(66 rows)
+
+ ?column? 
+----------
+ Query 8
+(1 row)
+
+ gameid | shortname | finalscore | coryatscore 
+--------+-----------+------------+-------------
+   5862 | Justin    |       1199 |       12200
+   5898 | Justin    |       1200 |       12200
+   5924 | Rob       |       1200 |       13800
+   6079 | Jerry     |       1399 |       16400
+(4 rows)
+
+ ?column? 
+----------
+ Query 9
+(1 row)
+
+                                                      clue                                                       
+-----------------------------------------------------------------------------------------------------------------
+ Form of education focused on methods to help students not on site but attending via the internet or other means
+ I'd put this at 1--I'm certain that hippocampus.org has a section called "Statistics and" this
+ It's the first Oscar nominee for Best Picture to be produced by an internet streaming service
+ Join Bill Gates among users of this free language-learning site whose name includes a word meaning "pair"
+(4 rows)
+
+ ?column? 
+----------
+ Query 10
+(1 row)
+
+ gameid | shortname | round2score | finalscore 
+--------+-----------+-------------+------------
+   5849 | Kyle      |        -600 |      11999
+   5903 | John      |       -2000 |      19601
+(2 rows)
+

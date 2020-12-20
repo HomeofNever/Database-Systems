@@ -1,0 +1,992 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Entity-Relationship (ER) Models &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Entity-Relationship (ER) Models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2018/course_notes/er.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="entity-relationship-er-models">
+<h1>Entity-Relationship (ER) Models<a class="headerlink" href="#entity-relationship-er-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Entity-relationship (ER) modeling is a method for designing
+databases.</p></li>
+<li><p>It helps give the high-level view of the whole database, while
+normalization is more geared towards optimizing individual
+relations.</p></li>
+<li><p>ER models are also meant to help you modularize your database
+design so that most normalization decisions are easier, often
+at the entity level.</p></li>
+<li><p>ER models are object-oriented, not relational (despite the obvious
+name). They can be mapped to different data models, but we will see
+relational data models.</p></li>
+<li><p>There is no single accepted notation for ER models, so it is
+important that you understand the convention used for a specific one
+you encounter before making assumptions.</p></li>
+<li><p>ER is not the only way to model a database, but it is one of the most
+popular.</p></li>
+</ul>
+</div>
+<div class="section" id="er-data-models">
+<h2>ER Data Models<a class="headerlink" href="#er-data-models" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ER Data models design a whole database using entities and
+relationships.</p>
+<ul>
+<li><p>Remember: this is not a relational data model. So, a relationship
+is not necessarily a relation.</p></li>
+</ul>
+</li>
+<li><p>We will use pictures to demonstrate the full database model. Once
+we understand the model, we will see different ways to
+convert it to the relational data model.</p></li>
+</ul>
+</div>
+<div class="section" id="entity-classes">
+<h2>Entity Classes<a class="headerlink" href="#entity-classes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Entities are the main building blocks of your database, representing
+a class of objects we would like to store information about.</p></li>
+<li><p>An entity has multiple attributes.</p>
+<ul>
+<li><p>Attributes of an entity must be simple values.</p></li>
+<li><p>This is a departure than the convention used in other places, so be
+careful. We will only look at simply values: no sets or multi-valued
+attributes.</p></li>
+</ul>
+</li>
+<li><p>An entity must have a key. The key may be one or more attributes.</p>
+<ul>
+<li><p>The key defines what the entity means. Entities without keys have
+no real meaning.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.001.png"><img alt="fall2018/course_notes/er_images/ER.001.png" class="align-center" src="fall2018/course_notes/er_images/ER.001.png" style="width: 400px;" /></a>
+<div class="section" id="notation">
+<h3>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Use boxes for entities with names in them</p></li>
+<li><p>Use ellipses for attributes with names in them</p></li>
+<li><p>Underline all attributes of a key</p>
+<ul>
+<li><p>If there are multiple keys, mark them elsewhere</p></li>
+<li><p>If you want to list relevant functional dependencies, mark
+them elsewhere</p></li>
+</ul>
+</li>
+<li><p>A good practice is to use plural names for entity names: People,
+Students, Faculty, Companies</p>
+<ul>
+<li><p>Each entity in the entity class will be an instance of it: person,
+student, faculty, company</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="key-selection-for-entities">
+<h3>Key selection for entities<a class="headerlink" href="#key-selection-for-entities" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Aim for real attributes as much as possible when choosing keys
+instead of inventing IDs.</p></li>
+<li><p>Think of an entity as a relation.</p>
+<ul>
+<li><p>The key of an entity must imply all its other attributes: i.e. the
+entity must be in BCNF, and if that is not possible in 3NF.</p></li>
+<li><p>Get in the habit of thinking of all functional dependencies that apply
+to an entity and checking that the entity is in BCNF.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="attributes-for-entities">
+<h3>Attributes for entities<a class="headerlink" href="#attributes-for-entities" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Make sure the entity does not have an attribute that relates to
+another entity.</p></li>
+<li><p>Example: entities Students and Faculty</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Faculty</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span> <span class="p">{</span> <span class="nb">id</span> <span class="o">-&gt;</span> <span class="n">name</span> <span class="p">}</span>
+<span class="n">Students</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span><span class="n">name</span> <span class="p">{</span> <span class="nb">id</span> <span class="o">-&gt;</span> <span class="n">name</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Note: advisor is not a good attribute for students as it refers to a
+faculty. List only attributes of students and students only.</p>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.001a.png"><img alt="fall2018/course_notes/er_images/ER.001a.png" class="align-center" src="fall2018/course_notes/er_images/ER.001a.png" style="width: 600px;" /></a>
+</div>
+</div>
+<div class="section" id="relationships">
+<h2>Relationships<a class="headerlink" href="#relationships" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Entities are linked to each other through relationships.</p></li>
+<li><p>Think of each relationship as a sentence:</p>
+<ul>
+<li><p>Entity is-linked-through-relationship-to entity</p></li>
+<li><p>Faculty work-in Departments</p></li>
+<li><p>Students take Classes</p></li>
+</ul>
+</li>
+<li><p>The relationship is the verb in the sentence, connecting
+other entities</p>
+<ul>
+<li><p>For each combining entity, there is a participation constraint</p></li>
+<li><p>Use an arrow to represent a one participation, a rounded
+arrow means participation is required</p></li>
+<li><p>No arrow means many participation</p></li>
+</ul>
+</li>
+<li><p>Remember: most relationships will be binary, it will be rare to have
+3-way (ternary) or higher level relationships.</p></li>
+<li><p>Note that relationships do not have a key.</p>
+<ul>
+<li><p>In some other conventions, this is allowed. But, the more restricted
+model makes it easier to develop simpler and more modular models.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="one-to-many-relationships">
+<h3>One-to-many relationships<a class="headerlink" href="#one-to-many-relationships" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Use an arrow from entity A to B to mean that for each entity A,
+there needs to be exactly one matching entity B.</p>
+<ul>
+<li><p>Each faculty is in a specific department.</p></li>
+</ul>
+</li>
+<li><p>If there is no arrow from B to A that means that for each entity B,
+there can be many entities of type A.</p>
+<ul>
+<li><p>For a given department, there can be many faculty.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.002.png"><img alt="fall2018/course_notes/er_images/ER.002.png" class="align-center" src="fall2018/course_notes/er_images/ER.002.png" style="width: 500px;" /></a>
+</div>
+<div class="section" id="one-to-one-relationships">
+<h3>One-to-one relationships<a class="headerlink" href="#one-to-one-relationships" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>One to one relationships have a one (arrow) on both sides.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.003.png"><img alt="fall2018/course_notes/er_images/ER.003.png" class="align-center" src="fall2018/course_notes/er_images/ER.003.png" style="width: 500px;" /></a>
+</div>
+<div class="section" id="many-to-many-relationships">
+<h3>Many-to-many relationships<a class="headerlink" href="#many-to-many-relationships" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Many to many relations are by far the most common. A given student
+can be in many classes and a class can have many students.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.004.png"><img alt="fall2018/course_notes/er_images/ER.004.png" class="align-center" src="fall2018/course_notes/er_images/ER.004.png" style="width: 500px;" /></a>
+</div>
+<div class="section" id="recursive-relationships">
+<h3>Recursive relationships<a class="headerlink" href="#recursive-relationships" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Relationships may connect an entity to itself.</p>
+<ul>
+<li><p>Roles marked on combining linkes are crucial in determining the
+cardinality of the relationship for a specific role.</p></li>
+<li><p>Each faculty has a single mentor, but a faculty may serve as
+mentor to many (and has many mentee faculty.)</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.005.png"><img alt="fall2018/course_notes/er_images/ER.005.png" class="align-center" src="fall2018/course_notes/er_images/ER.005.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="relationship-attributes">
+<h3>Relationship attributes<a class="headerlink" href="#relationship-attributes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Relationships may have attributes.</p>
+<ul>
+<li><p>The attributes should not be about the entities connected, but
+their relationship to each other.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.006.png"><img alt="fall2018/course_notes/er_images/ER.006.png" class="align-center" src="fall2018/course_notes/er_images/ER.006.png" style="width: 500px;" /></a>
+<ul class="simple">
+<li><p>In this example, the grade is of a student for a specific class
+she/he took.</p></li>
+</ul>
+</div>
+<div class="section" id="referential-integrity">
+<h3>Referential Integrity<a class="headerlink" href="#referential-integrity" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>The regular arrow is used to represent that there is at
+most one entity of a given type.</p>
+<ul>
+<li><p>A faculty can be the chair of at most one department.</p></li>
+<li><p>Faculty can be chair of zero departments, and this is by far more
+common.</p></li>
+<li><p>Some books represent this as 0..1 (0 or 1) participation.</p></li>
+</ul>
+</li>
+<li><p>The rounded arrow is used to represent that for an entity A, there
+must exist one and only one entity B.</p>
+<ul>
+<li><p>Each department must have a chair at all times.</p></li>
+<li><p>We cannot store departments without chairs.</p></li>
+<li><p>Some books represent this as 1 participation (zero is not allowed).</p></li>
+<li><p>These strong referential integrity constraints will help avoid
+incorrect data from being stored, but they will also limit what
+values can be entered.</p></li>
+<li><p>Use the constraints that you know are true and useful, or otherwise
+your user base will not be happy with you.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.007.png"><img alt="fall2018/course_notes/er_images/ER.007.png" class="align-center" src="fall2018/course_notes/er_images/ER.007.png" style="width: 500px;" /></a>
+<ul class="simple">
+<li><p>You can even put more complex participating constraints by explicitly
+listing the number on the relationship link.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.007b.png"><img alt="fall2018/course_notes/er_images/ER.007b.png" class="align-center" src="fall2018/course_notes/er_images/ER.007b.png" style="width: 500px;" /></a>
+<ul class="simple">
+<li><p>Employees must work in at least 1 and at most 2 teams, and each team
+must have between 2 to 4 members.</p></li>
+<li><p>There are multiple ways to map these to relational data model,
+but it helps to spell out all relevant constraints at modeling
+time and then decide which ones enforce in the database depending
+on the resulting data model and application software.</p></li>
+</ul>
+</div>
+<div class="section" id="ternary-relationships">
+<h3>Ternary relationships<a class="headerlink" href="#ternary-relationships" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Not all relationships combine two entities. Ternary relationships are
+between three separate entities.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.008.png"><img alt="fall2018/course_notes/er_images/ER.008.png" class="align-center" src="fall2018/course_notes/er_images/ER.008.png" style="width: 500px;" /></a>
+<ul class="simple">
+<li><p>When deciding the participation constraints, we consider pairs of
+attibutes:</p>
+<ul>
+<li><p>For a specific major and student, there is at most one faculty who
+is an advisor.</p></li>
+<li><p>For a specific advisor and major, there could be many students.</p></li>
+<li><p>For specific student and faculty, there could be multiple majors
+that the faculty is the advisor of (for example cog sci and games
+major).</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="do-you-really-need-a-ternary-relationship">
+<h3>Do you really need a ternary relationship?<a class="headerlink" href="#do-you-really-need-a-ternary-relationship" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Many ternary relationships are actually combination of binary
+relationships! Make sure you really need a ternary relationship.</p>
+<ul>
+<li><p>Example:</p>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.009.png"><img alt="fall2018/course_notes/er_images/ER.009.png" class="align-center" src="fall2018/course_notes/er_images/ER.009.png" style="width: 500px;" /></a>
+</li>
+<li><p>Classes can be cross listed. But, assume a given CRN for
+a class is for a specific department code.</p></li>
+<li><p>The department code of a class is not dependent on the student,
+but the actually class. Hence, no need to use a ternary
+relationship!</p></li>
+<li><p>In fact, you realize that it is the case that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">classid</span> <span class="o">-&gt;</span> <span class="n">departmentcode</span>
+</pre></div>
+</div>
+<p>Hence, the departmentcode has nothing to do with the student.</p>
+<p>In this case, we should really use the following model:</p>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.010.png"><img alt="fall2018/course_notes/er_images/ER.010.png" class="align-center" src="fall2018/course_notes/er_images/ER.010.png" style="width: 500px;" /></a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="lossless-decomposition-or-not">
+<h3>Lossless decomposition or not<a class="headerlink" href="#lossless-decomposition-or-not" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Consider our earlier model.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.011.png"><img alt="fall2018/course_notes/er_images/ER.011.png" class="align-center" src="fall2018/course_notes/er_images/ER.011.png" style="width: 500px;" /></a>
+<ul>
+<li><p>Suppose it is the case that a faculty can advise multiple majors,
+then the major is not implied from a given faculty.</p></li>
+<li><p>The arrow implies the following functional dependency between the
+entities in a relation involving the keys of the three entities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AdvisedBy</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">major</span><span class="p">,</span> <span class="n">faculty</span><span class="p">)</span>  <span class="n">student</span><span class="p">,</span> <span class="n">major</span> <span class="o">-&gt;</span> <span class="n">faculty</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">student</span><span class="p">,</span> <span class="n">major</span>
+</pre></div>
+</div>
+</li>
+<li><p>Suppose, we stored the same information using the following model:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.012.png"><img alt="fall2018/course_notes/er_images/ER.012.png" class="align-center" src="fall2018/course_notes/er_images/ER.012.png" style="width: 500px;" /></a>
+<ul>
+<li><p>This is not the same data model as before. Either one of the following
+is true:</p>
+<ul>
+<li><p>If we keep the arrow in advised 2, students can have only one
+advisor overall.</p></li>
+<li><p>If we remove the arrow in advised 2, students can have
+many advisors for the same major also!</p></li>
+<li><p>This is in fact a lossy decomposition. We can see it using the Chase
+algorithm with respect to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AdvisedBy</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">major</span><span class="p">,</span> <span class="n">faculty</span><span class="p">)</span>  <span class="n">student</span><span class="p">,</span> <span class="n">major</span> <span class="o">-&gt;</span> <span class="n">faculty</span>
+<span class="n">Decomposed</span> <span class="n">to</span><span class="p">:</span>
+<span class="n">A1</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">major</span><span class="p">)</span>
+<span class="n">A2</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">faculty</span><span class="p">)</span>
+<span class="n">A3</span><span class="p">(</span><span class="n">major</span><span class="p">,</span> <span class="n">faculty</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 26%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>student</p></th>
+<th class="head"><p>major</p></th>
+<th class="head"><p>faculty</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>s</p></td>
+<td><p>m</p></td>
+<td><p>f1</p></td>
+</tr>
+<tr class="row-odd"><td><p>s</p></td>
+<td><p>m2</p></td>
+<td><p>f</p></td>
+</tr>
+<tr class="row-even"><td><p>s3</p></td>
+<td><p>m</p></td>
+<td><p>f</p></td>
+</tr>
+</tbody>
+</table>
+<p>As there is no way to apply the above functional dependency, this is a
+lossy decomposition.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="weak-entities">
+<h2>Weak Entities<a class="headerlink" href="#weak-entities" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The key for a weak entity is not guaranteed to be unique in the database</p></li>
+<li><p>Think of the weak entity as a special subclass of some other entities</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.013.png"><img alt="fall2018/course_notes/er_images/ER.013.png" class="align-center" src="fall2018/course_notes/er_images/ER.013.png" style="width: 200px;" /></a>
+<ul class="simple">
+<li><p>A weak entity is always linked to one or more (strong) entities.
+It is determined by them.</p>
+<ul>
+<li><p>The combination of the weak entity key with the strong entity it
+depends on is unique.</p></li>
+<li><p>For example: key2 is not unique but key1 and key2 together may be
+unique.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.014.png"><img alt="fall2018/course_notes/er_images/ER.014.png" class="align-center" src="fall2018/course_notes/er_images/ER.014.png" style="width: 300px;" /></a>
+<ul class="simple">
+<li><p>Names of dependents are not guaranteed to be unique Names of
+dependents of an employee are guaranteed to be unique</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.015.png"><img alt="fall2018/course_notes/er_images/ER.015.png" class="align-center" src="fall2018/course_notes/er_images/ER.015.png" style="width: 300px;" /></a>
+<div class="section" id="ternary-relationships-and-weak-entities">
+<h3>Ternary relationships and weak entities<a class="headerlink" href="#ternary-relationships-and-weak-entities" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Ternary relationships can be converted to binary using weak entities</p>
+<ul>
+<li><p>For each student major and faculty, there is a unique advising
+entity.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.016.png"><img alt="fall2018/course_notes/er_images/ER.016.png" class="align-center" src="fall2018/course_notes/er_images/ER.016.png" style="width: 400px;" /></a>
+</div>
+<div class="section" id="multivalued-attributes-and-weak-entities">
+<h3>Multivalued attributes and weak entities<a class="headerlink" href="#multivalued-attributes-and-weak-entities" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>A common methods is to model multi-valued attributes as weak
+entities.</p>
+<ul>
+<li><p>A student can have many emails.</p></li>
+<li><p>A student can have multiple phones.</p></li>
+<li><p>Phones and emails are unrelated (as in a multi-valued dependency),
+hence belong in different weak entities.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.016b.png"><img alt="fall2018/course_notes/er_images/ER.016b.png" class="align-center" src="fall2018/course_notes/er_images/ER.016b.png" style="width: 600px;" /></a>
+</div>
+</div>
+<div class="section" id="subclasses">
+<h2>Subclasses<a class="headerlink" href="#subclasses" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Entities of similar type can be organized in a type hierarchy.</p>
+<ul>
+<li><p>Unlike type inheritance in programming languages, inheritance
+in entities is about the attributes the relation has.</p></li>
+<li><p>The key and all other attributes are inherited from the parent.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.017.png"><img alt="fall2018/course_notes/er_images/ER.017.png" class="align-center" src="fall2018/course_notes/er_images/ER.017.png" style="width: 400px;" /></a>
+<ul>
+<li><p>Student &amp; Staff are subclasses of the person entity class.</p></li>
+<li><p>Student and Staff both inherit the attributes and key of Person.</p>
+<ul class="simple">
+<li><p>Student &amp; Staff are may have attributes special to them.</p></li>
+<li><p>A staff entity is a person, attributes related to a person are
+stored under person.Attributes related to a staff are stored
+under staff.</p></li>
+</ul>
+</li>
+<li><p>Ask the following questions?</p>
+<ul>
+<li><p>Are the subentities disjoint?</p>
+<p>Can a person be student and staff at the same time?</p>
+</li>
+<li><p>Are the subentities covering?</p>
+<p>Do the set of all students and staff make up all the people we
+will store in the database? Are the people who are not student or
+staff?</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="design-rules-and-guidelines">
+<h2>Design Rules and Guidelines<a class="headerlink" href="#design-rules-and-guidelines" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>All entities must have a key.The key defines the meaning of the entity.</p>
+<ul>
+<li><p>If for a class, the key is the code of the class (i.e. CSCI 4380),
+then we are talking about a catalog class.</p></li>
+<li><p>If for a class, the key is the CRN, then we are talking about a
+specific section of a class that is offered at a specific semester
+and year.</p></li>
+</ul>
+</li>
+<li><p>If no natural key exists, then it is reasonable to make up an
+arbitrary one.</p></li>
+<li><p>All relationships must be marked with referential integrity and
+cardinality constraints which are crucial in converting them to the
+relational model.</p></li>
+<li><p>The model must satisfy all the requirements of the given problem, no
+more no less. (Faitfulness)</p></li>
+<li><p>The model must not contain unnecessary information:</p>
+<ul>
+<li><p>no attributes or relationships that can be inferred from other
+information should be added</p></li>
+</ul>
+</li>
+<li><p>Repeated data must be put in a separate entities if it makes sense</p></li>
+<li><p>Relationships must combine only the entities that are involved in
+the relationships, binary relationships are better than higher order
+ones.</p></li>
+<li><p>Simpler models are better: if ternary relationships are not needed,
+then don’t use them.</p></li>
+<li><p>Attribute or entity?</p>
+<ul>
+<li><p>An entity that contains only key attributes may be converted to an
+attribute.</p></li>
+<li><p>Attributes that do not depend solely on the key of the entity must
+be put in a separate entity.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="example-of-an-unnecessary-entity">
+<h3>Example of an unnecessary entity<a class="headerlink" href="#example-of-an-unnecessary-entity" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>A user has a single email, we can simply list it as an attribute of
+the student entity.</p>
+<ul>
+<li><p>Unless there are other relationships specifically connecting to
+the email entity.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.018.png"><img alt="fall2018/course_notes/er_images/ER.018.png" class="align-center" src="fall2018/course_notes/er_images/ER.018.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="example-of-an-entity-not-in-bcnf">
+<h3>Example of an entity not in BCNF<a class="headerlink" href="#example-of-an-entity-not-in-bcnf" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Given:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.019.png"><img alt="fall2018/course_notes/er_images/ER.019.png" class="align-center" src="fall2018/course_notes/er_images/ER.019.png" style="width: 300px;" /></a>
+<ul>
+<li><p>Suppose the following functional dependency holds:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dormName</span> <span class="o">-&gt;</span> <span class="n">dormAddress</span>
+</pre></div>
+</div>
+<p>This entity is not in BCNF.</p>
+</li>
+<li><p>We can create a new entity with attributes: dormName and dormAddress.</p></li>
+<li><p>Here is a better model for the same attributes:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.020.png"><img alt="fall2018/course_notes/er_images/ER.020.png" class="align-center" src="fall2018/course_notes/er_images/ER.020.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>This one is in BCNF, and we do not have to repeat the same dorm info
+for different students</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="mapping-er-to-relational-model">
+<h2>Mapping ER to Relational Model<a class="headerlink" href="#mapping-er-to-relational-model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="entities">
+<h3>Entities<a class="headerlink" href="#entities" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Entities are mapped to relations:</p>
+<ul>
+<li><p>Simple attributes of the entity are mapped
+to attributes of the mapped relation</p></li>
+<li><p>Key of the entity is mapped to the primary key of the mapped relation</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>Weak Entities<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Weak entities together with their supporting relationships are
+mapped to a relation.</p>
+<ul>
+<li><p>The key of the entity is the combination of the keys of all the
+supporting entities and the key of the weak entity.</p></li>
+<li><p>All attributes of
+the weak entity are placed in the relation for the weak entity.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Given:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.021.png"><img alt="fall2018/course_notes/er_images/ER.021.png" class="align-center" src="fall2018/course_notes/er_images/ER.021.png" style="width: 500px;" /></a>
+<ul>
+<li><p>We get:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Employees</span><span class="p">(</span><span class="n">Id</span><span class="p">,</span> <span class="n">firstname</span><span class="p">,</span> <span class="n">lastname</span><span class="p">,</span> <span class="n">street</span><span class="p">,</span> <span class="n">city</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">zip</span><span class="p">)</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">Id</span>
+
+<span class="n">EmployeeHobbies</span><span class="p">(</span><span class="n">Id</span><span class="p">,</span> <span class="n">HobbyName</span><span class="p">)</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">Id</span><span class="p">,</span> <span class="n">HobbyName</span>
+
+<span class="n">EmployeePhones</span><span class="p">(</span><span class="n">Id</span><span class="p">,</span><span class="n">Type</span><span class="p">,</span><span class="n">Number</span><span class="p">)</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">Id</span><span class="p">,</span> <span class="n">Type</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="converting-relationships-to-er-model">
+<h3>Converting relationships to ER model<a class="headerlink" href="#converting-relationships-to-er-model" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>After converting all entities and weak entities (together with
+the dependency relationships for the weak entities), we now
+convert the relationships to the ER model.</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>One-to-many relationships<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>If the relationships is one-to-many, then map the relationship
+into the may side!</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.022.png"><img alt="fall2018/course_notes/er_images/ER.022.png" class="align-center" src="fall2018/course_notes/er_images/ER.022.png" style="width: 500px;" /></a>
+<ul>
+<li><p>For each A, there is a single B. Then store the B for each A as
+an attribute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="p">(</span><span class="n">keyforA</span><span class="p">,</span> <span class="n">attributesforA</span><span class="p">,</span> <span class="n">keyforB</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">keyforA</span>
+
+<span class="n">B</span><span class="p">(</span><span class="n">keyforB</span><span class="p">,</span> <span class="n">attributesforB</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">keyforB</span>
+</pre></div>
+</div>
+</li>
+<li><p>Technically, you can store the relationship as a new relation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="p">(</span><span class="n">keyforA</span><span class="p">,</span> <span class="n">attributesforA</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">keyforA</span>
+<span class="n">B</span><span class="p">(</span><span class="n">keyforB</span><span class="p">,</span> <span class="n">attributesforB</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">keyforB</span>
+
+<span class="n">R</span><span class="p">(</span><span class="n">keyforA</span><span class="p">,</span> <span class="n">keyforB</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">keyforA</span>
+</pre></div>
+</div>
+</li>
+<li><p>But it generally makes sense to combine R and A if we often query
+them together, hence the first model is better.</p></li>
+<li><p>Example:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.023.png"><img alt="fall2018/course_notes/er_images/ER.023.png" class="align-center" src="fall2018/course_notes/er_images/ER.023.png" style="width: 500px;" /></a>
+<ul>
+<li><p>We can add the key for Department in Employee</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Employee</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">departmentkey</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">keyforEmployee</span>
+</pre></div>
+</div>
+<p>For each employee, there is a single department that they work for.
+List the key of that department.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>One-to-one relationships<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>If the relationships is one-to-one, the key for one relation
+can be stored in the other relation.</p>
+<ul>
+<li><p>If one side has a referential integrity, then it is better to use
+the key of entity that must participate in the relationship as the
+key.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.024.png"><img alt="fall2018/course_notes/er_images/ER.024.png" class="align-center" src="fall2018/course_notes/er_images/ER.024.png" style="width: 500px;" /></a>
+<ul class="simple">
+<li><p>Store key for A in B or the key for B in A.</p></li>
+<li><p>Example:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.025.png"><img alt="fall2018/course_notes/er_images/ER.025.png" class="align-center" src="fall2018/course_notes/er_images/ER.025.png" style="width: 500px;" /></a>
+<ul>
+<li><p>As each department must have a chair, better to use key for
+department.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Department</span><span class="p">(</span><span class="o">....</span><span class="p">,</span> <span class="n">Employeekey</span><span class="p">)</span>   <span class="n">key</span><span class="p">:</span> <span class="n">keyforDepartment</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>Many-to-many relationships<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Many to many relationships must be mapped to a new relation. The
+above methods do not work.</p></li>
+<li><p>The key for the relation resulting from the mapping of a
+many-to-many relationship is the combination of the keys of all the
+participating entities.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.026.png"><img alt="fall2018/course_notes/er_images/ER.026.png" class="align-center" src="fall2018/course_notes/er_images/ER.026.png" style="width: 500px;" /></a>
+<ul>
+<li><p>We will get:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span><span class="p">(</span><span class="n">keyforA</span><span class="p">,</span> <span class="n">keyforB</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">keyforA</span><span class="p">,</span> <span class="n">keyforB</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="attributes-of-relationships">
+<h3>Attributes of relationships<a class="headerlink" href="#attributes-of-relationships" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>The attributes of the relationships are mapped to the same relation
+that the relationship is mapped to.</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.027.png"><img alt="fall2018/course_notes/er_images/ER.027.png" class="align-center" src="fall2018/course_notes/er_images/ER.027.png" style="width: 500px;" /></a>
+<ul>
+<li><p>Relational model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Aff_with</span><span class="p">(</span><span class="n">keyforEmployee</span><span class="p">,</span> <span class="n">keyforDepartment</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+<span class="n">key</span><span class="p">:</span> <span class="n">keyforEmployee</span><span class="p">,</span> <span class="n">keyforDepartment</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h3>Subclasses<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>There are three basic ways to map a subclass to relational data model.</p>
+<ul>
+<li><p>The best model will depend on the underlying class hierarchy: Is
+it covering and/or disjoint?</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.028.png"><img alt="fall2018/course_notes/er_images/ER.028.png" class="align-center" src="fall2018/course_notes/er_images/ER.028.png" style="width: 200px;" /></a>
+</div>
+<div class="section" id="option-1-store-only-unique-information-in-each-relation">
+<h3>Option 1: store only unique information in each relation<a class="headerlink" href="#option-1-store-only-unique-information-in-each-relation" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Given the above example, we can map as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+<span class="n">Student</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">class</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+<span class="n">Staff</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">salary</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Store all people in person</p></li>
+<li><p>Store additional info in the other relations</p></li>
+</ul>
+</li>
+<li><p>Advantages: finding all people is easy</p></li>
+<li><p>Disadvantages: the information for students and staff is in split
+into two relations, requiring frequent joins, increasing query time.</p></li>
+</ul>
+</div>
+<div class="section" id="option-2-map-each-entity-to-a-separate-relation">
+<h3>Option 2: map each entity to a separate relation<a class="headerlink" href="#option-2-map-each-entity-to-a-separate-relation" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Given the above example, we can map as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+<span class="n">Student</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">class</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+<span class="n">Staff</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">salary</span><span class="p">)</span>  <span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+</pre></div>
+</div>
+</li>
+<li><p>Store people who are not student or staff in person</p></li>
+<li><p>Do not need person relation if there are no people who are not
+student of staff</p></li>
+<li><p>Advantages: Information about each relation is not scattered in
+multiple relations, finding all information about a student or staff
+is fast</p></li>
+<li><p>Disadvantage: costly to answer queries about all people, need to
+union the three relations; may require more work mapping the
+relationships</p></li>
+</ul>
+</div>
+<div class="section" id="option-3-combine-all-the-information-in-a-single-relation">
+<h3>Option 3: Combine all the information in a single relation<a class="headerlink" href="#option-3-combine-all-the-information-in-a-single-relation" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Given the above example, we can map as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">personid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">student_class</span><span class="p">,</span> <span class="n">staff_salary</span><span class="p">,</span> <span class="n">is_person</span><span class="p">,</span> <span class="n">is_staff</span><span class="p">)</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">personid</span>
+
+<span class="n">is_person</span><span class="p">,</span> <span class="n">is_staff</span> <span class="n">are</span> <span class="n">boolean</span>
+</pre></div>
+</div>
+</li>
+<li><p>If a person can only be a student or staff, a single boolean is enough.</p></li>
+<li><p>Advantages: fast queries, everything is in a single relation,
+smaller data model.</p></li>
+<li><p>Disadvantages: may have a lot of null/empty values for attributes
+(for example staff_salary is null for all students), all
+relationships for students and staff are mapped to people making the
+data model harder to comprehend, document and use.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="example-of-conversion-to-relational-data-model">
+<h2>Example of conversion to relational data model<a class="headerlink" href="#example-of-conversion-to-relational-data-model" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Consider the design of a database to manage airline reservations:</p>
+<ul>
+<li><p>For flights, it contains code and name of the departure and
+arrival airports, departure and arrival dates and times</p></li>
+<li><p>For flights, it also contains a number of different pricing plans
+with different conditions (Saturday stay, advance booking, etc.)</p></li>
+<li><p>For passengers, it contains the name, telephone number and seat
+type preference</p></li>
+<li><p>Reservations include the seat assigned to a passenger</p></li>
+<li><p>Passengers can have multiple reservations</p></li>
+</ul>
+</li>
+<li><p>Solution:</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2018/course_notes/er_images/ER.031.png"><img alt="fall2018/course_notes/er_images/ER.031.png" class="align-center" src="fall2018/course_notes/er_images/ER.031.png" style="width: 600px;" /></a>
+<ul>
+<li><p>Convert to relational data model (note: pricingplans is a weak entity):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Airports</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">code</span>
+
+<span class="n">Flights</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">depAirportCode</span><span class="p">,</span> <span class="n">depDate</span><span class="p">,</span> <span class="n">depTime</span><span class="p">,</span> <span class="n">arrAirportCode</span><span class="p">,</span> <span class="n">arrDate</span><span class="p">,</span> <span class="n">ArrTime</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="nb">id</span>
+
+<span class="n">PricingPlans</span><span class="p">(</span><span class="n">flightId</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">conditions</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">flightid</span><span class="p">,</span> <span class="n">name</span>
+
+<span class="n">Passengers</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phone</span><span class="p">,</span> <span class="n">seatPref</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="nb">id</span>
+
+<span class="n">Reservations</span><span class="p">(</span><span class="n">passengerId</span><span class="p">,</span> <span class="n">flightid</span><span class="p">,</span> <span class="n">seat</span><span class="p">)</span> <span class="n">Key</span><span class="p">:</span> <span class="n">passengerId</span><span class="p">,</span> <span class="n">flightid</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

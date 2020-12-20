@@ -1,0 +1,79 @@
+
+
+drop function hw6() ;
+
+create function hw6() returns void AS $$
+BEGIN
+    -- add sports info to events
+    alter table events add sport varchar(255);
+    alter table events add discipline varchar(255);
+    alter table events add stype char(6);
+    alter table events add category char(6) ;
+    
+    update events e
+    set sport = (select s.name from sports s  where s.id = e.sid),
+        discipline = (select s.discipline from sports s  where s.id = e.sid),
+        stype = (select s.stype from sports s  where s.id = e.sid);
+    
+    -- add category info for specific events
+    update events set category =
+              (select w.etype from winter_eventcategories w
+    	   where w.eid = id) ;
+    
+    -- add category info for events with the same name
+    update events
+    set category = (select w.etype
+                    from
+    		     winter_eventcategories w
+    		     , events e
+                    where
+    		     w.eid = e.id -- e is an event with category info
+    		     and e.name = events.name
+    		     and e.id <> events.id
+    		     and e.discipline = events.discipline
+		     and e.sport = events.sport
+    		     and e.etype = events.etype
+    		     -- with same name, category and sport
+    		     -- as the event being updated
+                   )
+    where category is null and stype = 'winter';
+    
+    drop table winter_eventcategories; --make sure we can delete events
+    
+    -- change it so that there is only one tuple for each event, fix
+    -- winter and summer medal tables.
+    -- for each event name, create a temporary table that lists the correct
+    -- id, which is the mind id with that event name
+    create table eventcleaning(
+             name varchar(255)
+    	 , id int
+    	 , correct_id int
+    ) ;
+    
+    
+    insert into eventcleaning
+    select e.name, e.id, min(e2.id)
+    from events e, events e2
+    where e2.name = e.name
+          and e2.sport = e.sport
+	  and e2.discipline = e.discipline
+	  and e2.etype = e.etype
+    group by
+          e.id
+	  , e.name ;
+    
+    update summer_medals 
+    set eid = (select e.correct_id from eventcleaning e where e.id = eid)
+    where eid in (select id from eventcleaning where id <> correct_id);
+    
+    update winter_medals 
+    set eid = (select e.correct_id from eventcleaning e where e.id = eid) 
+    where eid in (select id from eventcleaning where id <> correct_id);
+    
+    delete from events where id in (select id from eventcleaning
+                                    where id <> correct_id) ;
+    
+    drop table eventcleaning;
+END ;
+$$ LANGUAGE plpgsql ;
+    

@@ -1,0 +1,1164 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Secondary Storage and Indexing &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Secondary Storage and Indexing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/spring2016/course_notes/secondary_storage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="secondary-storage-and-indexing">
+<h1>Secondary Storage and Indexing<a class="headerlink" href="#secondary-storage-and-indexing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Databases are (mainly) optimized for data that is too large to fit
+in memory.</p></li>
+<li><p>How data is stored on secondary storage is crucial for understanding:</p>
+<ol class="arabic simple">
+<li><p>how data is accessed to respond to queries and modify data</p></li>
+<li><p>how indices can help speed up queries and the various performance
+trade-offs in using indices in mixed workflows.</p></li>
+</ol>
+</li>
+<li><p>We will talk briefly about disk technology, storage of data on disk
+and then discuss various index structures.</p></li>
+</ul>
+</div>
+<div class="section" id="secondary-storage">
+<h2>Secondary Storage<a class="headerlink" href="#secondary-storage" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Data is often stored in hard disks, often there is a trade off:</p></li>
+<li><p>Magnetic disks are cheap and fast for certain type of access and
+slow for others</p>
+<p>They are not becoming much faster over time, but denser with lots
+of capacity</p>
+</li>
+<li><p>Solid state drives (SSD) are fast for most access types but much
+more expensive (though catching up), has less power draw</p>
+<p>Price difference is changing (about twice as expensive per TB),
+however most SSD drives tend to be smaller in max capacity</p>
+</li>
+<li><p>SSD is not likely to replace magnetic disks anytime soon, but hybrid
+solutions will exist.</p></li>
+<li><p>From now on, we will use the term <strong>disk</strong> to
+refer to magnetic disks but discuss differences when we can.</p></li>
+</ul>
+</div>
+<div class="section" id="disk-access">
+<h2>Disk Access<a class="headerlink" href="#disk-access" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Databases are generally large data stores, much larger than
+available memory.</p></li>
+<li><p>Data is stored on disk, brought to memory on demand for
+operations.</p>
+<p>All operations are performed in memory.</p>
+<p>If necessary, after an update operation, modified pages are written
+back to disk to make changes permanent.</p>
+</li>
+<li><p>A <strong>disk page</strong> or <strong>disk block</strong> is the smallest unit of access, to
+read and write.</p></li>
+<li><p>A disk page typically is 1K - 8K.</p></li>
+</ul>
+</div>
+<div class="section" id="data-organization">
+<h2>Data Organization<a class="headerlink" href="#data-organization" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A disk contains multiple <strong>platters</strong> (usually <strong>2 surfaces</strong> per platter)</p></li>
+<li><p>Usually, the disk contains read/write heads that allow is to
+read/write from all surfaces simultaneously</p></li>
+<li><p>A disk surface contains multiple concentric <strong>tracks</strong></p>
+<p>The same track on different surfaces can be read by different heads
+at the same time, this unit is called a cylinder</p>
+</li>
+<li><p>A track is broken down to <strong>sectors</strong>, sectors are separated from each
+other by blank spaces</p></li>
+<li><p>A sector is the smallest unit of operation (read/write) possible on
+a disk</p></li>
+<li><p>A <strong>disk block</strong> is usually composed of a number of consecutive
+sectors (determined by the operating system)</p>
+<ul class="simple">
+<li><p>Data are read/written in units of a disk block (or disk page)</p></li>
+<li><p>A disk block is the same size as a memory block or page.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/other_images/disk_overview.png"><img alt="spring2016/course_notes/other_images/disk_overview.png" class="align-center" src="spring2016/course_notes/other_images/disk_overview.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="reading-a-disk-page">
+<h2>Reading a disk page<a class="headerlink" href="#reading-a-disk-page" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Reading a page from disk requires the disk to start spinning</p></li>
+<li><p>Disk arm has to be moved to the correct track of the disk:
+<strong>seek operation</strong></p></li>
+<li><p>The disk head must wait until the right location on the track is
+found: <strong>rotational latency</strong></p></li>
+<li><p>Then, the disk page can be read from disk and copied to memory:
+<strong>transfer time</strong></p></li>
+<li><p>The cost of reading a disk page:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">seek</span> <span class="n">time</span> <span class="o">+</span> <span class="n">rotational</span> <span class="n">latency</span> <span class="n">time</span> <span class="o">+</span> <span class="n">transfer</span> <span class="n">time</span>
+</pre></div>
+</div>
+</li>
+<li><p>Multiple pages on the same track/cylinder can be read with a single
+seek/latency.</p></li>
+<li><p>Reading M pages on the same track/cylinder:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cost</span> <span class="o">=</span> <span class="n">seek</span> <span class="n">time</span> <span class="o">+</span> <span class="n">rotational</span> <span class="n">latency</span> <span class="n">time</span>
+       <span class="o">+</span> <span class="n">transfer</span> <span class="n">time</span> <span class="o">*</span> <span class="p">(</span><span class="n">percentage</span> <span class="n">of</span> <span class="n">disk</span> <span class="n">circumference</span> <span class="n">to</span> <span class="n">be</span> <span class="n">scanned</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="a-high-end-disk-example">
+<h2>A high end disk example<a class="headerlink" href="#a-high-end-disk-example" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Consider a disk with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">16</span> <span class="n">surfaces</span>
+<span class="mi">2</span><span class="o">^</span><span class="mi">16</span> <span class="n">tracks</span> <span class="n">per</span> <span class="n">surface</span> <span class="p">(</span><span class="n">approx</span><span class="o">.</span> <span class="mi">65</span><span class="n">K</span><span class="p">)</span>
+<span class="mi">2</span><span class="o">^</span><span class="mi">8</span><span class="o">=</span><span class="mi">256</span> <span class="n">sectors</span> <span class="n">per</span> <span class="n">track</span>
+<span class="mi">2</span><span class="o">^</span><span class="mi">12</span> <span class="nb">bytes</span> <span class="n">per</span> <span class="n">sector</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Each track has = 2^12 * 2^8 =2^20 bytes (1MB)</p></li>
+<li><p>Each surface has = 2^20 * 2^16 = 2^36 bytes</p></li>
+<li><p>The disk has = 2^4 * 2^36 = 2^40 byte = 1 TB</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="reading-a-page">
+<h2>Reading a page<a class="headerlink" href="#reading-a-page" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Typical times:</p>
+<ul>
+<li><p>7200 rpm means one rotation takes 8.33 ms (in the average, 1/2 of
+the disk needs to be rotated before the correct location is found,
+4.17ms)</p></li>
+<li><p>seek time between 0 - 17.38 ms (in the average, 1/3 of the disk
+surface is scanned = 6.46 ms)</p></li>
+<li><p>transfer time for one sector : 8.33/256 = 0.03 ms</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h2>Reading a page<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Reading a page of 8K (2 sectors):</p>
+<ul>
+<li><p>Sequential scan: 1 seek + 1 rotational latency + 2 sector transfer
+time</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">6.46</span> <span class="o">+</span> <span class="mf">4.17</span> <span class="o">+</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">=</span> <span class="mf">10.69</span> <span class="n">ms</span>
+</pre></div>
+</div>
+</li>
+<li><p>Random access: Reading 100 consecutive pages on the same track:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">6.46</span> <span class="o">+</span> <span class="mf">4.17</span> <span class="o">+</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">=</span> <span class="mf">13.63</span> <span class="n">ms</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>The lesson: Put blocks that are accessed together on the same
+track/cylinder as much as possible</p></li>
+<li><p><strong>Sequential scan</strong>: access of pages on the same track (or same
+cylinder requiring a single seek) consecutively: single seek and
+rotational latency, then transfer data, very fast.</p></li>
+<li><p><strong>Random access</strong>: In the worst case, as many seeks as the number of
+pages, very costly.</p></li>
+<li><p>Important messages: Depending on how data is stored, disk access
+times can vary greatly!</p></li>
+</ul>
+</div>
+<div class="section" id="disk-scheduling">
+<h2>Disk scheduling<a class="headerlink" href="#disk-scheduling" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The disk controller can order the requests to minimize seeks</p></li>
+<li><p>When the controller is moving from low tracks to high tracks, serve
+the next track request in the direction of the movement, queue the
+rest</p></li>
+<li><p>The method is called the elevator algorithm</p></li>
+</ul>
+</div>
+<div class="section" id="solid-state-drives">
+<h2>Solid State Drives<a class="headerlink" href="#solid-state-drives" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Magnetic disks can have significant different read times depending
+on how different data blocks are stored.</p>
+<p>On high update systems, it might be hard to store information in
+consecutive pages or same cylinder (fragmentation).</p>
+</li>
+<li><p>Solid state drives do not have this type of extremely different
+access times. No moving parts, less power usage and no seek penalty.</p>
+<p>However, still significantly slower than memory access.</p>
+</li>
+<li><p>Reliability of both is similar, though SSD’s are slightly worse
+at the moment.</p></li>
+</ul>
+</div>
+<div class="section" id="reliability-raid">
+<h2>Reliability - RAID<a class="headerlink" href="#reliability-raid" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Speed of access and reliability of disks can be increased by simply
+using multiple disks.</p></li>
+<li><p>RAID: Redundant arrays of inexpensive disks is a simple theory of using
+multiple disks to increase both speed of access and reliability of
+disks.</p></li>
+<li><p>RAID can be implemented using a hardware controller or a software
+controller.</p></li>
+<li><p>Different levels provide different solutions at different price
+points. We will see only some examples.</p></li>
+</ul>
+<div class="section" id="raid-0">
+<h3>RAID-0<a class="headerlink" href="#raid-0" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Striping of data to distribute it to multiple disks.</p></li>
+<li><p>Example with 4 disks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Disk</span> <span class="mi">1</span> <span class="n">has</span> <span class="n">pages</span> <span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span>
+<span class="n">Disk</span> <span class="mi">2</span> <span class="n">has</span> <span class="n">pages</span> <span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span>
+<span class="n">Disk</span> <span class="mi">3</span> <span class="n">has</span> <span class="n">pages</span> <span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">11</span>
+<span class="n">Disk</span> <span class="mi">4</span> <span class="n">has</span> <span class="n">pages</span> <span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">12</span>
+</pre></div>
+</div>
+</li>
+<li><p>Reads are faster as now multiple page reads can be from multiple
+disks in parallel.</p></li>
+<li><p>Writes are faster for the same reason.</p></li>
+<li><p>No redundancy. If one of the disks fail, the data stored in the
+whole array is unrecoverable.</p></li>
+</ul>
+</div>
+<div class="section" id="raid-1">
+<h3>RAID-1<a class="headerlink" href="#raid-1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Mirror data to two disks</p></li>
+<li><p>Reads are twice as fast as we can read from any disk.</p></li>
+<li><p>Writes are slowers because data must be written to both disks and
+the write is not complete until both writes are complete (cost of
+synchronization).</p></li>
+<li><p>Failure of one drive leads to no data loss because the second drive
+has the complete copy of data.</p></li>
+</ul>
+</div>
+<div class="section" id="raid-4">
+<h3>RAID-4<a class="headerlink" href="#raid-4" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Calculate a parity of N disk blocks as a new block of data. The
+simplest parity is a checksum:</p>
+<p>The checksum is 1 if the number of 1’s in the given sector is odd,
+and 0 if the number of 1’s is even.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Page</span> <span class="mi">1</span> <span class="n">Disk</span> <span class="mi">1</span><span class="p">:</span>  <span class="mi">10101011</span>
+<span class="n">Page</span> <span class="mi">2</span> <span class="n">Disk</span> <span class="mi">2</span><span class="p">:</span>  <span class="mi">01000101</span>
+<span class="n">Page</span> <span class="mi">3</span> <span class="n">Disk</span> <span class="mi">3</span><span class="p">:</span>  <span class="mi">10010110</span>
+<span class="n">Page</span> <span class="mi">4</span> <span class="n">Disk</span> <span class="mi">4</span><span class="p">:</span>  <span class="mi">10011000</span>
+<span class="n">Page</span>   <span class="n">Parity</span><span class="p">:</span>  <span class="mi">11100000</span>
+</pre></div>
+</div>
+</li>
+<li><p>Store each page and parity on a separate disk. The above solution
+requires 5 disks.</p></li>
+<li><p>Reads are faster due to potential parallel reads (same as RAID-0).</p></li>
+<li><p>Writes are slower because of the need to update the parity as well
+as the data disk.</p>
+<p>Note: You do not need to read all data pages at the same location,
+just the new data disk and parity, and update parity.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Page</span> <span class="n">X</span> <span class="n">Disk</span> <span class="n">Y</span> <span class="n">old</span> <span class="n">value</span><span class="p">:</span>      <span class="mi">10011000</span>
+<span class="n">Page</span> <span class="n">X</span> <span class="n">Disk</span> <span class="n">Y</span> <span class="n">new</span> <span class="n">value</span><span class="p">:</span>      <span class="mi">00010010</span>
+
+<span class="n">Old</span> <span class="n">parity</span> <span class="k">for</span> <span class="n">page</span> <span class="n">X</span><span class="p">:</span>        <span class="mi">11100000</span>
+<span class="n">Changes</span> <span class="k">for</span> <span class="n">parity</span><span class="p">:</span>           <span class="mi">01101010</span>
+</pre></div>
+</div>
+<p>Keeping all other data pages the same, we only need to flip the
+parity in bit locations page X has changed.</p>
+</li>
+<li><p>Redundancy: If there is a 1-disk failure, we can still recover the
+lost data by reading all the remaining data including the parity.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Page</span> <span class="mi">1</span> <span class="n">Disk</span> <span class="mi">1</span><span class="p">:</span>  <span class="mi">10101011</span>
+<span class="n">Page</span> <span class="mi">2</span> <span class="n">Disk</span> <span class="mi">2</span><span class="p">:</span>  <span class="mi">01000101</span>
+<span class="n">Page</span> <span class="mi">3</span> <span class="n">Disk</span> <span class="mi">3</span><span class="p">:</span>  <span class="o">-------------</span> <span class="n">CRASHED</span>
+<span class="n">Page</span> <span class="mi">4</span> <span class="n">Disk</span> <span class="mi">4</span><span class="p">:</span>  <span class="mi">10011000</span>
+<span class="n">Page</span>   <span class="n">Parity</span><span class="p">:</span>  <span class="mi">11100000</span>
+</pre></div>
+</div>
+<p>Page X of Disk 3 can be reconstructed by computing the parity of all
+the readable data.</p>
+<p>Reads are slower when operating with a missing disk. All data is
+lost in case of a second disk failure.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="raid-5">
+<h3>RAID-5<a class="headerlink" href="#raid-5" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Same as RAID-4, for each page compute a parity page, but change how
+parity is stored.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Disk</span> <span class="mi">1</span>       <span class="n">Disk</span> <span class="mi">2</span>       <span class="n">Disk</span> <span class="mi">3</span>        <span class="n">Disk</span> <span class="mi">4</span>       <span class="n">Disk</span> <span class="mi">5</span>
+<span class="o">-----------</span>  <span class="o">-----------</span>  <span class="o">------------</span>  <span class="o">-----------</span>  <span class="o">------------</span>
+<span class="n">Page</span> <span class="mi">1</span>       <span class="n">Page</span> <span class="mi">2</span>       <span class="n">Page</span> <span class="mi">3</span>        <span class="n">Page</span> <span class="mi">4</span>       <span class="n">Parity</span> <span class="mi">1</span><span class="o">-</span><span class="mi">4</span>
+<span class="n">Parity</span> <span class="mi">5</span><span class="o">-</span><span class="mi">8</span>   <span class="n">Page</span> <span class="mi">5</span>       <span class="n">Page</span> <span class="mi">6</span>        <span class="n">Page</span> <span class="mi">7</span>       <span class="n">Page</span> <span class="mi">8</span>
+<span class="n">Page</span> <span class="mi">9</span>       <span class="n">Parity</span> <span class="mi">9</span><span class="o">-</span><span class="mi">12</span>  <span class="n">Page</span> <span class="mi">10</span>       <span class="n">Page</span> <span class="mi">11</span>      <span class="n">Page</span> <span class="mi">12</span>
+<span class="n">Page</span> <span class="mi">13</span>      <span class="n">Page</span> <span class="mi">14</span>      <span class="n">Parity</span> <span class="mi">13</span><span class="o">-</span><span class="mi">16</span>  <span class="n">Page</span> <span class="mi">15</span>      <span class="n">Page</span> <span class="mi">16</span>
+</pre></div>
+</div>
+</li>
+<li><p>Reads are the same as RAID-4. Redundancy is the same as RAID-4.</p></li>
+<li><p>Writes are faster because the parity disk changes depending on the
+page being written. The parity disk does not become a bottleneck as
+in RAID-4.</p></li>
+</ul>
+</div>
+<div class="section" id="raid-6">
+<h3>RAID-6+<a class="headerlink" href="#raid-6" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Higher levels of RAID use other parity methods, such as a 2-bit
+Hamming-code parity stored in 2 redundant disks.</p>
+<p>Such methods can handle up to two disk failures without loosing data
+with increased read performance similar to lower levels of RAID.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="tuple-storage-on-disk">
+<h2>Tuple storage on disk<a class="headerlink" href="#tuple-storage-on-disk" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A disk page typically stores multiple tuples.</p>
+<p>Large tuples may span multiple disk pages.</p>
+<p>Many different organizations exist.</p>
+</li>
+<li><p>The number of tuples that can fit in a page is determined by the
+number of attributes and the types of attributes the relation has.</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/other_images/tuple_on_disk.png"><img alt="spring2016/course_notes/other_images/tuple_on_disk.png" class="align-center" src="spring2016/course_notes/other_images/tuple_on_disk.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Header information contains LOG data: when the data on that page
+was updated (as well as other control information).</p></li>
+<li><p>The offset information can tell where each field in the tuple
+start for variable length attributes.</p></li>
+</ul>
+</div>
+<div class="section" id="tuple-addresses">
+<h2>Tuple Addresses<a class="headerlink" href="#tuple-addresses" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A disk page typically stores one or more tuples.</p></li>
+<li><p>Tuples have a physical address which contains the relevant subset of:</p>
+<p>Host name/Disk number/Surface No/ Track No/Sector No</p>
+<ul class="simple">
+<li><p>Physical address tends to be long</p></li>
+<li><p>Tuples are also given a logical address in the relation,</p></li>
+<li><p>A map table stored on disk contains the mapping from the logical
+address to physical address</p></li>
+</ul>
+</li>
+<li><p>When tuples are brought from disk to memory, its current address
+becomes a memory address</p></li>
+<li><p>Pointer swizzling is the act of changing physical address to the
+memory address in the map table for pages in memory</p></li>
+</ul>
+</div>
+<div class="section" id="indices-as-secondary-access-methods">
+<h2>Indices as Secondary Access Methods<a class="headerlink" href="#indices-as-secondary-access-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A table is a primary access method. To find a tuple in the table, we
+need to search the whole table.</p></li>
+<li><p>An index is a secondary access method, allowing us to search the
+table for a search key.</p>
+<p>The search key can consist of multiple attribute</p>
+</li>
+<li><p>The index contains pointers to tuples (logical address)</p></li>
+<li><p>The index itself is also packed into pages and stored on disk.</p>
+<p>Notice the big difference between a data structure you may have
+seen in other classes:</p>
+<ol class="arabic simple">
+<li><p>Indices allow a new access method to the same data</p></li>
+<li><p>Indices are stored on disk, not memory.</p></li>
+<li><p>Indices need to be brought to memory to be used as well.</p></li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="dense-vs-sparse-indices">
+<h2>Dense vs. Sparse Indices<a class="headerlink" href="#dense-vs-sparse-indices" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The index is called dense if it contains an entry for each tuple in
+the relation.</p></li>
+<li><p>An index is called sparse if it does not contain an entry for each
+tuple.</p></li>
+<li><p>A sparse index is possible if the addressed relation is sorted with
+respect to the index key.</p></li>
+</ul>
+</div>
+<div class="section" id="dense-index-example">
+<h2>Dense Index Example<a class="headerlink" href="#dense-index-example" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Suppose table T(A,B) is stored in two pages:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Table</span> <span class="n">T</span> <span class="n">P1</span><span class="p">:</span>  <span class="p">(</span><span class="n">t1</span><span class="p">:[</span><span class="mi">21</span><span class="p">,</span><span class="n">a</span><span class="p">],</span> <span class="n">t2</span><span class="p">:[</span><span class="mi">12</span><span class="p">,</span><span class="n">b</span><span class="p">],</span> <span class="n">t3</span><span class="p">:[</span><span class="mi">8</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="n">t4</span><span class="p">:[</span><span class="mi">4</span><span class="p">,</span><span class="n">d</span><span class="p">])</span>
+<span class="n">Table</span> <span class="n">T</span> <span class="n">P2</span><span class="p">:</span>  <span class="p">(</span><span class="n">t5</span><span class="p">:[</span><span class="mi">31</span><span class="p">,</span><span class="n">e</span><span class="p">],</span> <span class="n">t6</span><span class="p">:[</span><span class="mi">35</span><span class="p">,</span><span class="n">f</span><span class="p">],</span> <span class="n">t7</span><span class="p">:[</span><span class="mi">10</span><span class="p">,</span><span class="n">g</span><span class="p">],</span> <span class="n">t8</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="n">h</span><span class="p">])</span>
+</pre></div>
+</div>
+</li>
+<li><p>Suppose we create an index I1 on T(A) which is also stored in two
+pages:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Index</span> <span class="n">I1</span> <span class="n">PX</span><span class="p">:</span>  <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">t8</span><span class="o">/</span><span class="n">P2</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="n">t4</span><span class="o">/</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">t3</span><span class="o">/</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">t7</span><span class="o">/</span><span class="n">P2</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="n">t2</span><span class="o">/</span><span class="n">P1</span><span class="p">)</span>
+<span class="n">Index</span> <span class="n">I1</span> <span class="n">PY</span><span class="p">:</span>  <span class="p">(</span><span class="mi">21</span><span class="p">,</span><span class="n">t1</span><span class="o">/</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="mi">31</span><span class="p">,</span><span class="n">t5</span><span class="o">/</span><span class="n">P2</span><span class="p">),</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span><span class="n">t6</span><span class="o">/</span><span class="n">P2</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note the following:</p>
+<ul>
+<li><p>The index may be able to store more information in each page
+because it only stores the search key and the pointer to tuple.</p></li>
+<li><p>If we were to search for a B value, the index is not useful.</p></li>
+<li><p>If we search for an A value but return B, then the index is
+partially useful:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">B</span> <span class="n">FROM</span> <span class="n">T</span> <span class="n">WHERE</span> <span class="n">A</span><span class="o">=</span><span class="mi">4</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>To answer this query, we can search the index to find that
+this value is stored in tuple t4. Then, we need to read t4 to
+read and return the B value.</p>
+<p>Cost involves the cost of scanning the index and then reading the
+relevant data pages from the relation.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="sparse-index-example">
+<h2>Sparse Index Example<a class="headerlink" href="#sparse-index-example" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Suppose the above table T is stored in sorted order of B explicitly.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Table</span> <span class="n">T</span> <span class="n">P1</span><span class="p">:</span>  <span class="p">(</span><span class="n">t1</span><span class="p">:[</span><span class="mi">21</span><span class="p">,</span><span class="n">a</span><span class="p">],</span> <span class="n">t2</span><span class="p">:[</span><span class="mi">12</span><span class="p">,</span><span class="n">b</span><span class="p">],</span> <span class="n">t3</span><span class="p">:[</span><span class="mi">8</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="n">t4</span><span class="p">:[</span><span class="mi">4</span><span class="p">,</span><span class="n">d</span><span class="p">])</span>
+<span class="n">Table</span> <span class="n">T</span> <span class="n">P2</span><span class="p">:</span>  <span class="p">(</span><span class="n">t5</span><span class="p">:[</span><span class="mi">31</span><span class="p">,</span><span class="n">e</span><span class="p">],</span> <span class="n">t6</span><span class="p">:[</span><span class="mi">35</span><span class="p">,</span><span class="n">f</span><span class="p">],</span> <span class="n">t7</span><span class="p">:[</span><span class="mi">10</span><span class="p">,</span><span class="n">g</span><span class="p">],</span> <span class="n">t8</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="n">h</span><span class="p">])</span>
+</pre></div>
+</div>
+</li>
+<li><p>We can create a different type index I2 on T(B):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Index</span> <span class="n">I2</span> <span class="n">Page</span> <span class="n">P5</span><span class="p">:</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">P2</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>This index says that to find values less than e for B, go to page
+P1. Otherwise go to P2.</p></li>
+<li><p>We will not necessarily know if a B value is stored by simply
+looking at the index.</p></li>
+<li><p>However, the index is much smaller, making it less costly to search.</p></li>
+</ul>
+</div>
+<div class="section" id="multi-level-indices">
+<h2>Multi-level Indices<a class="headerlink" href="#multi-level-indices" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>You can build multi-level indices:</p>
+<ul class="simple">
+<li><p>Lowest level is the index pages pointing to tuples (dense or sparse)</p></li>
+<li><p>Upper levels point to the lower level index pages (often sparse
+given the index is sorted by the search key)</p></li>
+</ul>
+</li>
+<li><p>We will convert the above index I1 to a multi-level index.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Index</span> <span class="n">I1</span> <span class="n">PX</span><span class="p">:</span>  <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">t8</span><span class="o">/</span><span class="n">P2</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="n">t4</span><span class="o">/</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="n">t3</span><span class="o">/</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">t7</span><span class="o">/</span><span class="n">P2</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="n">t2</span><span class="o">/</span><span class="n">P1</span><span class="p">)</span>
+<span class="n">Index</span> <span class="n">I1</span> <span class="n">PY</span><span class="p">:</span>  <span class="p">(</span><span class="mi">21</span><span class="p">,</span><span class="n">t1</span><span class="o">/</span><span class="n">P1</span><span class="p">),</span> <span class="p">(</span><span class="mi">31</span><span class="p">,</span><span class="n">t5</span><span class="o">/</span><span class="n">P2</span><span class="p">),</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span><span class="n">t6</span><span class="o">/</span><span class="n">P2</span><span class="p">)</span>
+
+<span class="n">Index</span> <span class="n">I1</span> <span class="n">PZ</span><span class="p">:</span>  <span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">PX</span><span class="p">),</span> <span class="p">(</span><span class="mi">21</span><span class="p">,</span><span class="n">PY</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>To search this index, we start at the top level of the index (page
+PZ), which tells us which index page at the lower level to go to.
+Then, we find the necessary tuple and read the tuple from disk if
+necessary.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">B</span> <span class="n">FROM</span> <span class="n">R</span> <span class="n">WHERE</span> <span class="n">A</span><span class="o">=</span><span class="mi">31</span>
+
+<span class="n">Read</span> <span class="n">index</span> <span class="n">page</span> <span class="n">PZ</span><span class="p">:</span> <span class="n">Decide</span> <span class="n">we</span> <span class="n">must</span> <span class="n">read</span> <span class="n">index</span> <span class="n">page</span> <span class="n">PY</span>
+<span class="n">Read</span> <span class="n">index</span> <span class="n">page</span> <span class="n">PY</span><span class="p">:</span> <span class="n">Decide</span> <span class="n">we</span> <span class="n">must</span> <span class="n">data</span> <span class="n">page</span> <span class="n">P2</span>
+<span class="n">Read</span> <span class="n">data</span> <span class="n">page</span> <span class="n">P2</span><span class="p">:</span> <span class="n">Find</span> <span class="nb">tuple</span> <span class="n">t5</span><span class="p">,</span> <span class="k">return</span> <span class="n">the</span> <span class="n">B</span> <span class="n">value</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="other-types-of-indices">
+<h2>Other types of indices<a class="headerlink" href="#other-types-of-indices" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>An index organized table is an index that also stores the data.</p>
+<ul>
+<li><p>Index organized tables in Oracle and clusters in Postgresql.</p></li>
+</ul>
+</li>
+<li><p>This type of index is often sparse. It can be multi-level depending
+on the type of index.</p></li>
+</ul>
+</div>
+<div class="section" id="b-tress">
+<h2>B-tress<a class="headerlink" href="#b-tress" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Note while we are going to use the term B-trees, the type of B-trees
+we will use are often referred to as B+-trees in other places.</p></li>
+<li><p>B-trees are like binary search trees, except instead of 2 (binary),
+they have often between n/2 to n entries.</p></li>
+</ul>
+<div class="section" id="basic-properties-of-b-trees">
+<h3>Basic properties of B-trees<a class="headerlink" href="#basic-properties-of-b-trees" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Each node on a B-tree is mapped to a disk page</p></li>
+<li><p>A B-tree is of order n (but n may change depending on different properties)</p></li>
+<li><p>Leaf nodes:</p>
+<ul>
+<li><p>Leaf nodes point to the next node in the leaf, called a sibling
+node.</p></li>
+<li><p>A leaf node can contain at most n tuples (key values and pointers)
+and 1 additional pointer to the sibling node.</p></li>
+<li><p>A leaf node must contain at least floor((n+1)/2) tuples (plus one
+additional pointer to the next sibling node.</p></li>
+</ul>
+</li>
+<li><p>Internal nodes:</p>
+<ul>
+<li><p>An internal node can contain at most n+1 pointers and n key values.</p></li>
+<li><p>An internal node must contain at least floor((n+1)/2) pointers
+(and one less key value), except the root which can contain a
+single key value and 2 pointers.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide01.png"><img alt="spring2016/course_notes/btree_images/Slide01.png" class="align-center" src="spring2016/course_notes/btree_images/Slide01.png" style="width: 200px;" /></a>
+<ul class="simple">
+<li><p>A B-tree created on a search key A will have (dense) leaf nodes
+sorted by A. The internal nodes will be sparse indices to the lower
+levels.</p>
+<ul>
+<li><p>Often B-trees are secondary structures, so we will assume so. It
+is possible that they are used as part of an index organized
+table, but we will not go into details in the discussion below.</p></li>
+</ul>
+</li>
+<li><p>Example B-tree:</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide02.png"><img alt="spring2016/course_notes/btree_images/Slide02.png" class="align-center" src="spring2016/course_notes/btree_images/Slide02.png" style="width: 600px;" /></a>
+</div>
+<div class="section" id="b-tree-example">
+<h3>B-tree example<a class="headerlink" href="#b-tree-example" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Suppose n = 3</p>
+<ul>
+<li><p>Each leaf node will have at least 2 and at most 3 tuples.</p></li>
+<li><p>Each internal node will point to at least 2 and at most 4 nodes
+below (and hence will have between 1 and 2 key values).</p></li>
+</ul>
+</li>
+<li><p>Suppose n = 99</p>
+<ul>
+<li><p>Each leaf node will have at least 50 and at most 99 tuples.</p></li>
+<li><p>Each internal node will point to at least 50 and at most 100 nodes
+below (and hence will have between 49 and 99 key values).</p></li>
+<li><p>The root can have 2 pointers and 1 key value in the least.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="searching-in-b-trees">
+<h2>Searching in B-trees<a class="headerlink" href="#searching-in-b-trees" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="index-on-a-single-attribute-a">
+<h3>Index on a single attribute A<a class="headerlink" href="#index-on-a-single-attribute-a" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Search for equality (A=x)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Given</span> <span class="n">an</span> <span class="n">index</span> <span class="n">on</span> <span class="n">attribute</span> <span class="n">A</span> <span class="n">find</span> <span class="nb">all</span> <span class="n">tuples</span> <span class="k">with</span> <span class="n">A</span> <span class="o">=</span> <span class="n">x</span>
+
+<span class="n">Start</span> <span class="n">at</span> <span class="n">root</span>
+
+<span class="n">Repeat</span> <span class="n">until</span> <span class="n">leaf</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">reached</span><span class="p">:</span>
+  <span class="n">Find</span> <span class="n">the</span> <span class="n">first</span> <span class="n">key</span> <span class="n">value</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">greater</span> <span class="n">than</span> <span class="n">x</span>
+  <span class="n">Follow</span> <span class="n">the</span> <span class="n">pointer</span> <span class="n">just</span> <span class="n">before</span> <span class="n">this</span> <span class="n">key</span> <span class="n">value</span>
+
+<span class="n">Find</span> <span class="k">if</span> <span class="n">leaf</span> <span class="n">node</span> <span class="n">contains</span> <span class="n">the</span> <span class="n">key</span> <span class="n">value</span> <span class="n">x</span> <span class="p">(</span><span class="k">if</span> <span class="ow">not</span><span class="p">,</span> <span class="k">return</span> <span class="n">empty</span><span class="p">)</span>
+
+<span class="n">Find</span> <span class="ow">and</span> <span class="k">return</span> <span class="n">the</span> <span class="nb">tuple</span> <span class="nb">id</span>
+</pre></div>
+</div>
+</li>
+<li><p>Search for range:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Given</span> <span class="n">an</span> <span class="n">index</span> <span class="n">on</span> <span class="n">attribute</span> <span class="n">A</span> <span class="n">find</span> <span class="nb">all</span> <span class="n">tuples</span> <span class="ow">in</span> <span class="n">the</span> <span class="nb">range</span> <span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">A</span> <span class="o">&lt;=</span> <span class="n">x2</span><span class="p">:</span>
+
+<span class="n">Start</span> <span class="n">at</span> <span class="n">root</span>
+
+<span class="n">Repeat</span> <span class="n">until</span> <span class="n">leaf</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">reached</span><span class="p">:</span>
+   <span class="n">Find</span> <span class="n">the</span> <span class="n">first</span> <span class="n">key</span> <span class="n">value</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">greater</span> <span class="n">than</span> <span class="n">x1</span> <span class="ow">and</span> <span class="n">less</span> <span class="n">than</span> <span class="n">x</span>
+   <span class="n">Follow</span> <span class="n">the</span> <span class="n">pointer</span> <span class="n">just</span> <span class="n">before</span> <span class="n">this</span> <span class="n">key</span> <span class="n">value</span>
+
+<span class="n">Repeat</span> <span class="n">until</span> <span class="n">leaf</span> <span class="n">node</span> <span class="n">contain</span> <span class="n">values</span> <span class="n">greater</span> <span class="n">than</span> <span class="n">x2</span><span class="p">:</span>
+   <span class="n">Find</span> <span class="nb">all</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">leaf</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">given</span> <span class="nb">range</span>
+   <span class="n">Retrieve</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">leaf</span> <span class="n">node</span> <span class="p">(</span><span class="n">sibling</span> <span class="n">pointer</span><span class="p">)</span> <span class="ow">and</span> <span class="k">continue</span>
+
+<span class="n">Return</span> <span class="nb">all</span> <span class="n">found</span> <span class="nb">tuple</span> <span class="n">ids</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="index-on-multiple-attributes-a-b">
+<h3>Index on multiple attributes A,B<a class="headerlink" href="#index-on-multiple-attributes-a-b" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>An index on multiple attributes like A,B will sort tuples first by A
+and then by B</p></li>
+<li><p>Queries:</p>
+<ul>
+<li><p>A = x AND B = y:  same as searching A=x for index on A</p></li>
+<li><p>A = x AND y1 &lt;= B &lt;= y2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">search</span> <span class="k">for</span> <span class="n">first</span> <span class="n">value</span> <span class="k">with</span> <span class="n">A</span><span class="o">=</span><span class="n">x</span> <span class="ow">and</span> <span class="n">y1</span> <span class="o">&lt;=</span> <span class="n">B</span> <span class="o">&lt;=</span> <span class="n">y2</span><span class="p">:</span>
+<span class="n">scan</span> <span class="n">leaf</span> <span class="n">nodes</span> <span class="n">to</span> <span class="n">the</span> <span class="n">right</span> <span class="n">following</span> <span class="n">sibling</span> <span class="n">nodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>A = x</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">search</span> <span class="k">for</span> <span class="n">first</span> <span class="n">value</span> <span class="k">with</span> <span class="n">A</span><span class="o">=</span><span class="n">x</span> <span class="p">(</span><span class="n">regardless</span> <span class="n">of</span> <span class="n">B</span><span class="p">)</span>
+<span class="n">scan</span> <span class="n">leaf</span> <span class="n">nodes</span> <span class="n">to</span> <span class="n">the</span> <span class="n">right</span> <span class="n">following</span> <span class="n">sibling</span> <span class="n">nodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>x1 &lt;= A &lt;= x2   AND B = y</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">search</span> <span class="n">only</span> <span class="k">for</span> <span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">A</span>
+<span class="n">scan</span> <span class="n">leaf</span> <span class="n">nodes</span> <span class="k">for</span> <span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">A</span> <span class="o">&lt;=</span> <span class="n">x2</span> <span class="n">following</span> <span class="n">sibling</span> <span class="n">nodes</span>
+<span class="k">for</span> <span class="n">the</span> <span class="n">nodes</span> <span class="n">that</span> <span class="n">I</span> <span class="n">find</span><span class="p">,</span> <span class="n">check</span> <span class="k">if</span> <span class="n">B</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="ow">and</span> <span class="k">if</span> <span class="n">so</span><span class="p">,</span>
+<span class="n">put</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">output</span>
+</pre></div>
+</div>
+</li>
+<li><p>B = y</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">find</span> <span class="n">the</span> <span class="n">first</span> <span class="n">leaf</span> <span class="n">node</span><span class="p">,</span> <span class="n">scan</span> <span class="nb">all</span> <span class="n">leaf</span> <span class="n">nodes</span> <span class="n">following</span>
+<span class="n">sibling</span> <span class="n">nodes</span><span class="p">,</span> <span class="k">for</span> <span class="n">each</span> <span class="nb">tuple</span><span class="p">,</span> <span class="k">if</span> <span class="n">B</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">add</span> <span class="n">to</span> <span class="n">the</span> <span class="n">output</span>
+<span class="p">[</span><span class="n">index</span> <span class="n">only</span> <span class="n">scan</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>Notice that B-trees allow many different types of search on equality
+and range. However, ranges in the second attribute are not useful
+unless an equality in the first attribute is given.</p></li>
+</ul>
+</div>
+<div class="section" id="index-only-search">
+<h3>Index only search<a class="headerlink" href="#index-only-search" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Given</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">A</span> <span class="kn">from</span> <span class="nn">R</span> <span class="n">where</span> <span class="n">A</span> <span class="o">&lt;</span> <span class="mi">120</span>  <span class="ow">and</span> <span class="n">A</span> <span class="o">&gt;</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>and an index on R.A:</p>
+<p>Scan the index for matching tuples as before and return the found A
+values (no need to read the tuples from disk)</p>
+</li>
+</ul>
+</div>
+<div class="section" id="index-partial-match">
+<h3>Index partial match<a class="headerlink" href="#index-partial-match" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Given an index on R(A,B) (index is sorted on A first and then on B)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">C</span><span class="p">,</span><span class="n">D</span> <span class="kn">from</span> <span class="nn">R</span> <span class="n">where</span> <span class="n">A</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="ow">and</span> <span class="n">A</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="ow">and</span> <span class="n">B</span><span class="o">=</span><span class="mi">2</span>
+</pre></div>
+</div>
+</li>
+<li><p>Scan index for the range A &gt; 10 and A &lt; 100, and for each matching
+tuple check the B value, read matched tuples from disk for C,D
+attributes</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="b-trees-with-duplicate-values">
+<h2>B-trees with duplicate values<a class="headerlink" href="#b-trees-with-duplicate-values" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>If the B-tree is built on a key value that may contain duplicates,
+build the index in an identical way, except:</p>
+<ul>
+<li><p>The non-leaf node pointing to leaf node contains the key value of
+the first node that is not repeating from the previous sibling</p></li>
+<li><p>If there is no such key, then a null value is stored at this
+location.</p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide03.png"><img alt="spring2016/course_notes/btree_images/Slide03.png" class="align-center" src="spring2016/course_notes/btree_images/Slide03.png" style="width: 600px;" /></a>
+</div>
+<div class="section" id="insertion">
+<h2>Insertion<a class="headerlink" href="#insertion" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Insertion involves two steps:</p>
+<ul class="simple">
+<li><p>Insert starting from the root</p></li>
+<li><p>Then check if the insertion resulted in the root being split</p></li>
+</ul>
+</li>
+<li><p>If insertion of a node that causes the node to be over full (with
+more than n key values for leaf or n+1 pointers for internal nodes),
+then split the node.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Insertion</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">newval</span><span class="p">)</span>
+
+   <span class="n">node</span> <span class="o">=</span> <span class="n">leaf</span> <span class="n">node</span> <span class="n">to</span> <span class="n">insert</span> <span class="n">the</span> <span class="n">newval</span> <span class="n">starting</span> <span class="k">with</span> <span class="n">root</span>
+   <span class="n">result</span> <span class="o">=</span> <span class="n">insertion_helper</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">newval</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">null</span> <span class="p">:</span> <span class="c1">##the root was split</span>
+      <span class="n">newroot</span> <span class="o">=</span> <span class="n">new_node</span>
+      <span class="n">point</span> <span class="kn">from</span> <span class="nn">newroot</span> <span class="n">to</span> <span class="n">root</span>
+      <span class="n">point</span> <span class="kn">from</span> <span class="nn">newroot</span> <span class="n">to</span> <span class="n">result</span>
+      <span class="n">root</span> <span class="o">=</span> <span class="n">newroot</span>
+   <span class="k">return</span> <span class="n">root</span>
+
+<span class="n">Insertion_helper</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">newval</span><span class="p">)</span>
+
+   <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">space</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">node</span>
+      <span class="n">Insert</span> <span class="ow">and</span> <span class="k">return</span> <span class="n">null</span>
+   <span class="n">Else</span>
+      <span class="n">Create</span> <span class="n">a</span> <span class="n">new</span> <span class="n">node</span> <span class="p">(</span><span class="n">a</span> <span class="n">new</span> <span class="n">disk</span> <span class="n">page</span><span class="p">)</span>
+      <span class="n">Distribute</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">the</span> <span class="n">current</span> <span class="n">node</span> <span class="n">to</span> <span class="n">the</span> <span class="n">two</span> <span class="n">nodes</span> <span class="n">evenly</span>
+
+      <span class="n">recursively</span> <span class="n">insert</span> <span class="n">a</span> <span class="n">pointer</span> <span class="n">to</span> <span class="n">the</span> <span class="n">new</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">the</span>
+      <span class="n">parent</span> <span class="n">node</span>
+
+      <span class="k">if</span> <span class="n">the</span> <span class="n">parent</span> <span class="ow">is</span> <span class="n">full</span><span class="p">,</span> <span class="n">then</span> <span class="n">split</span> <span class="n">the</span> <span class="n">parent</span> <span class="p">(</span><span class="n">distribute</span>
+      <span class="n">pointers</span> <span class="ow">and</span> <span class="n">key</span> <span class="n">value</span> <span class="n">evenly</span><span class="p">)</span> <span class="ow">and</span> <span class="n">recursively</span> <span class="n">insert</span> <span class="n">to</span>
+      <span class="n">parent</span>
+
+      <span class="k">if</span> <span class="n">root</span> <span class="n">has</span> <span class="n">split</span><span class="p">,</span> <span class="k">return</span> <span class="n">the</span> <span class="n">new</span> <span class="n">node</span> <span class="n">created</span>
+</pre></div>
+</div>
+</li>
+<li><p>Insertion example:</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide04.png"><img alt="spring2016/course_notes/btree_images/Slide04.png" class="align-center" src="spring2016/course_notes/btree_images/Slide04.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Insert 57:</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide05.png"><img alt="spring2016/course_notes/btree_images/Slide05.png" class="align-center" src="spring2016/course_notes/btree_images/Slide05.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>There is space in the node, we are done!</p></li>
+<li><p>Insert 65:</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide06.png"><img alt="spring2016/course_notes/btree_images/Slide06.png" class="align-center" src="spring2016/course_notes/btree_images/Slide06.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide07.png"><img alt="spring2016/course_notes/btree_images/Slide07.png" class="align-center" src="spring2016/course_notes/btree_images/Slide07.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Insert 70 and 94, one more node split:</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide08.png"><img alt="spring2016/course_notes/btree_images/Slide08.png" class="align-center" src="spring2016/course_notes/btree_images/Slide08.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Finally, insert 90 which will cause the parent to split.</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide09.png"><img alt="spring2016/course_notes/btree_images/Slide09.png" class="align-center" src="spring2016/course_notes/btree_images/Slide09.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide10.png"><img alt="spring2016/course_notes/btree_images/Slide10.png" class="align-center" src="spring2016/course_notes/btree_images/Slide10.png" style="width: 600px;" /></a>
+</div>
+<div class="section" id="deletion">
+<h2>Deletion<a class="headerlink" href="#deletion" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Deletion works in reverse. If after removing a key value/pointer,
+the node is less than half full, then we try to borrow from a sibling.</p>
+<p>If this is not possible, then we merge with a sibling node.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Call</span> <span class="n">deletion</span> <span class="n">helper</span> <span class="kn">from</span> <span class="nn">root</span>
+<span class="n">If</span> <span class="n">root</span> <span class="n">now</span> <span class="n">points</span> <span class="n">to</span> <span class="n">a</span> <span class="n">single</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">level</span><span class="p">,</span>
+<span class="n">delete</span> <span class="n">root</span> <span class="ow">and</span> <span class="n">make</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">node</span> <span class="n">the</span> <span class="n">new</span> <span class="n">root</span>
+
+<span class="n">Deletion</span> <span class="n">helper</span><span class="p">:</span>
+
+   <span class="n">Find</span> <span class="n">the</span> <span class="n">key</span> <span class="n">value</span> <span class="n">to</span> <span class="n">be</span> <span class="n">deleted</span> <span class="ow">and</span> <span class="k">if</span> <span class="n">it</span> <span class="n">exists</span> <span class="n">delete</span> <span class="n">it</span>
+   <span class="ow">and</span> <span class="n">update</span> <span class="n">the</span> <span class="n">parent</span> <span class="n">node</span> <span class="n">key</span> <span class="n">value</span> <span class="k">if</span> <span class="n">necessary</span><span class="o">.</span>
+
+   <span class="n">If</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">less</span> <span class="n">than</span> <span class="n">half</span> <span class="n">full</span>
+      <span class="k">if</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">possible</span> <span class="n">to</span> <span class="n">borrow</span> <span class="n">a</span> <span class="n">key</span> <span class="n">value</span> <span class="p">(</span><span class="n">leaf</span>
+      <span class="n">nodes</span> <span class="p">)</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">pointer</span> <span class="p">(</span><span class="k">for</span> <span class="n">internal</span> <span class="n">nodes</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">sibling</span><span class="p">:</span>
+         <span class="n">Borrow</span> <span class="ow">and</span> <span class="n">adjust</span> <span class="n">key</span> <span class="n">values</span> <span class="ow">and</span> <span class="n">done</span><span class="o">.</span>
+   <span class="n">Else</span><span class="p">:</span>
+      <span class="n">merge</span> <span class="k">with</span> <span class="n">one</span> <span class="n">of</span> <span class="n">the</span> <span class="n">siblings</span> <span class="ow">and</span>
+      <span class="n">delete</span> <span class="n">a</span> <span class="n">pointer</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">parent</span> <span class="n">recursively</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide11.png"><img alt="spring2016/course_notes/btree_images/Slide11.png" class="align-center" src="spring2016/course_notes/btree_images/Slide11.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Delete key 30.</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide12.png"><img alt="spring2016/course_notes/btree_images/Slide12.png" class="align-center" src="spring2016/course_notes/btree_images/Slide12.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide13.png"><img alt="spring2016/course_notes/btree_images/Slide13.png" class="align-center" src="spring2016/course_notes/btree_images/Slide13.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide14.png"><img alt="spring2016/course_notes/btree_images/Slide14.png" class="align-center" src="spring2016/course_notes/btree_images/Slide14.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Delete key 93.</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide15.png"><img alt="spring2016/course_notes/btree_images/Slide15.png" class="align-center" src="spring2016/course_notes/btree_images/Slide15.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide16.png"><img alt="spring2016/course_notes/btree_images/Slide16.png" class="align-center" src="spring2016/course_notes/btree_images/Slide16.png" style="width: 600px;" /></a>
+<ul class="simple">
+<li><p>Results in deletion of the root node.</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide17.png"><img alt="spring2016/course_notes/btree_images/Slide17.png" class="align-center" src="spring2016/course_notes/btree_images/Slide17.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide18.png"><img alt="spring2016/course_notes/btree_images/Slide18.png" class="align-center" src="spring2016/course_notes/btree_images/Slide18.png" style="width: 600px;" /></a>
+</div>
+<div class="section" id="id2">
+<h2>B-tree example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given:
+- disk page has capacity of 4K bytes
+- each tuple address takes 6 bytes and each key value takes 2 bytes
+- each node is 70% full
+- need to store 1 million tuples</p></li>
+<li><p>Leaf node capacity
+- each (key value, tuple address) pair takes 8 bytes
+- disk page capacity is 4K, so (4*1024)/8 = 512 (key value, rowid)</p>
+<blockquote>
+<div><p>pairs per leaf page</p>
+<p>in reality there are extra headers and pointers that we will ignore</p>
+</div></blockquote>
+</li>
+<li><p>Hence, the maximum number of points for the tree is about 256 (and
+255 key values)</p></li>
+<li><p>If all pages are 70% full, each page has about 512*0.7 = 359 pointers</p></li>
+<li><p>To store 1 million tuples, requires</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">,</span><span class="mi">000</span><span class="p">,</span><span class="mi">000</span> <span class="o">/</span> <span class="mi">359</span> <span class="o">=</span> <span class="mi">2786</span> <span class="n">pages</span> <span class="n">at</span> <span class="n">the</span> <span class="n">leaf</span> <span class="n">level</span>
+<span class="mi">2789</span> <span class="o">/</span> <span class="mi">359</span> <span class="o">=</span> <span class="mi">8</span> <span class="n">pages</span> <span class="n">at</span> <span class="nb">next</span> <span class="n">level</span> <span class="n">up</span>
+<span class="mi">1</span> <span class="n">root</span> <span class="n">page</span> <span class="n">pointing</span> <span class="n">to</span> <span class="n">those</span> <span class="mi">8</span> <span class="n">pages</span>
+</pre></div>
+</div>
+</li>
+<li><p>Hence, we have a B-tree with 3 levels</p></li>
+</ul>
+</div>
+<div class="section" id="b-trees-vs-r-trees">
+<h2>B-trees vs. R-trees<a class="headerlink" href="#b-trees-vs-r-trees" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>B-trees are useful for range searches, but not for searches along
+two axes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">A</span> <span class="o">&lt;=</span> <span class="n">x2</span> <span class="ow">and</span> <span class="n">y1</span> <span class="o">&lt;=</span> <span class="n">B</span> <span class="o">&lt;=</span> <span class="n">y2</span>
+</pre></div>
+</div>
+</li>
+<li><p>In this case, the second range is not useful in limiting the number
+of nodes searched.</p></li>
+<li><p>When searching for spatial data, a common query is finding all
+points (x,y) values in a range as the one above.</p></li>
+<li><p>To facilitate such searches (as well as other special queries like
+nearest neighbor searches), R-trees are introduced.</p></li>
+<li><p>An R-tree is similar to a B-tree except each key value in an
+internal node is a rectangle and contains a pointer to values and
+rectangles within that rectangle.</p>
+<ul class="simple">
+<li><p>Postgresql GIST structures allows you to implement R-trees.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="bitmaps-and-inverted-indices">
+<h2>Bitmaps and Inverted Indices<a class="headerlink" href="#bitmaps-and-inverted-indices" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>When indexing text valued attributes, it is necessary to first
+preprocess the text fields to find all words within.</p></li>
+<li><p>Then, a listing file for each word is created:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">word</span><span class="o">-&gt;</span> <span class="p">(</span><span class="n">tupleid</span><span class="p">,</span> <span class="n">location</span> <span class="n">within</span> <span class="nb">tuple</span><span class="p">),</span> <span class="o">...</span>
+
+<span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span>
+
+<span class="n">pizza</span> <span class="o">-&gt;</span> <span class="n">t1</span><span class="p">,</span><span class="mi">2</span> <span class="n">t1</span><span class="p">,</span><span class="mi">5</span> <span class="n">t3</span><span class="p">,</span><span class="mi">4</span> <span class="n">t5</span><span class="p">,</span><span class="mi">12</span>
+</pre></div>
+</div>
+</li>
+<li><p>Then each inverted listing is compressed for storage.</p></li>
+<li><p>A Boolean keyword query is processed by bitmap operations (bitwise
+AND, bitwise OR) over these vectors.</p>
+<ul class="simple">
+<li><p>Postgresql GIN structures are used for this purpose and text querying.</p></li>
+<li><p>Other open source implementations of inverted files such as Apache
+Lucene project exist.</p></li>
+<li><p>Google main index is a distributed and replicated inverted index
+over the Web documents.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="primary-vs-secondary-indices">
+<h2>Primary vs Secondary Indices<a class="headerlink" href="#primary-vs-secondary-indices" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>As mentioned earlier, an index structure can be secondary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="n">pages</span> <span class="n">containing</span> <span class="n">a</span> <span class="n">table</span>
+
+<span class="n">index</span> <span class="n">pages</span> <span class="n">containing</span> <span class="n">pointers</span> <span class="n">to</span> <span class="n">tuples</span>
+<span class="ow">in</span> <span class="n">these</span> <span class="n">data</span> <span class="n">pages</span> <span class="n">at</span> <span class="n">leaf</span> <span class="n">level</span>
+</pre></div>
+</div>
+</li>
+<li><p>Primary B-tree indices are also possible</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">internal</span> <span class="n">nodes</span> <span class="n">contain</span> <span class="n">pointers</span> <span class="n">to</span> <span class="n">levels</span> <span class="n">below</span>
+
+<span class="n">leaf</span> <span class="n">level</span> <span class="n">contains</span> <span class="n">data</span> <span class="n">pages</span> <span class="k">for</span> <span class="n">the</span> <span class="n">table</span>
+</pre></div>
+</div>
+</li>
+<li><p>There can only be a single primary index.</p>
+<ul class="simple">
+<li><p>Use clusters in Postgresql to generate primary indices.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="hashing">
+<h2>Hashing<a class="headerlink" href="#hashing" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Hashing is often a primary index method.</p></li>
+<li><p>Given a hash function h with K values and an attribute A</p>
+<ul>
+<li><p>Allocate a number of disk blocks M to each bucket</p></li>
+<li><p>For each tuple t, apply the hash function h(t.A)=x.</p>
+<p>Store t in the blocks allocated for bucket x.</p>
+</li>
+</ul>
+</li>
+<li><p>To search on attribute A (select * from r where r.a=c)</p>
+<ul>
+<li><p>Apply hash function, h(c)=y.</p>
+<p>Read the buckets for y to find value c.</p>
+<p>Search half the pages for that bucket in the average and all the
+pages in the worst case (M/2 pages in the average)</p>
+</li>
+</ul>
+</li>
+<li><p>Search on another attribute:</p>
+<ul class="simple">
+<li><p>Hash does not help, search all the disk pages</p></li>
+</ul>
+</li>
+<li><p>Insertion cost: 1 read and 1 write (find the last page in the
+appropriate bucket and store)</p></li>
+<li><p>Deletion/Update cost:  M/2 (search cost) + 1 to update</p></li>
+<li><p>If a bucket has too many tuples, than the allocated M pages may not
+be sufficient</p>
+<ul class="simple">
+<li><p>Allocate additional overflow area</p></li>
+<li><p>If the overflow area is large, the benefit of the hash is lost</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="extensible-hashing">
+<h2>Extensible hashing<a class="headerlink" href="#extensible-hashing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The address space of the hash (K) can be adjusted to the number of
+tuples in the relation</p></li>
+<li><p>Use a hash function h</p></li>
+<li><p>But, use only first  z bits of the hashed value to address the tuples</p></li>
+<li><p>If a bucket overflows, split the hash directory and use z+1 bits to address</p></li>
+<li><p>Example: using a single bit to address:</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide19.png"><img alt="spring2016/course_notes/btree_images/Slide19.png" class="align-center" src="spring2016/course_notes/btree_images/Slide19.png" style="width: 400px;" /></a>
+<ul class="simple">
+<li><p>Double the directory</p></li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide20.png"><img alt="spring2016/course_notes/btree_images/Slide20.png" class="align-center" src="spring2016/course_notes/btree_images/Slide20.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide21.png"><img alt="spring2016/course_notes/btree_images/Slide21.png" class="align-center" src="spring2016/course_notes/btree_images/Slide21.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide22.png"><img alt="spring2016/course_notes/btree_images/Slide22.png" class="align-center" src="spring2016/course_notes/btree_images/Slide22.png" style="width: 400px;" /></a>
+</div>
+<div class="section" id="linear-hashing">
+<h2>Linear hashing<a class="headerlink" href="#linear-hashing" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The addressing is the same, but we allow overflows</p></li>
+<li><p>We decide to split based on a global rule</p>
+<ul class="simple">
+<li><p>Example: if number of pages/number of tuples &gt; k %</p></li>
+</ul>
+</li>
+<li><p>Split one bucket at a time</p>
+<p>The bucket split is the next one in sequence
+it may not be the one that has overflow pages
+eventually all buckets will be split</p>
+</li>
+</ul>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide23.png"><img alt="spring2016/course_notes/btree_images/Slide23.png" class="align-center" src="spring2016/course_notes/btree_images/Slide23.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="spring2016/course_notes/btree_images/Slide24.png"><img alt="spring2016/course_notes/btree_images/Slide24.png" class="align-center" src="spring2016/course_notes/btree_images/Slide24.png" style="width: 600px;" /></a>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,707 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Embedded SQL Programming &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="SQL - Object-Relational Frameworks" href="or_frameworks.html" />
+    <link rel="prev" title="SQL - Procedural Programming" href="sql_procedural.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">CSCI 4380 Database Systems - Fall 2020</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../course_notes.html">Course notes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction to Relational Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dbs_example.html">Example Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="relational_algebra.html">Relational Model and Algebra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="normalization.html">Normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="er.html">Entity-Relationship (ER) Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_basics.html">SQL - Part 1: Basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_advanced.html">SQL - Part 2: Advanced Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_dmlddl.html">SQL - Part 3: Data Definition and Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural.html">SQL - Procedural Programming</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SQL - Embedded SQL Programming</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esql">ESQL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connections">Connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#variables-in-esql">Variables in ESQL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#executing-sql-commands">Executing SQL commands</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Executing SQL commands</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dealing-with-strings">Dealing with Strings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#status-processing">Status Processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Status processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transactions">Transactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esql-cursor-operations">ESQL - Cursor Operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cursors-and-snapshots">Cursors and snapshots</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cursors-for-update">Cursors for update</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constraints">Constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamic-sql">Dynamic SQL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sqlda">SQLDA</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="or_frameworks.html">SQL - Object-Relational Frameworks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_otherfeatures.html">SQL - Other Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_objectrelational.html">SQL - Object-Relational Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="secondary_storage.html">Secondary Storage and Indexing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="query_processing.html">Query Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../schedule.html">Detailed course schedule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recordings.html">Lecture Recordings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#external-links">External links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#review-sessions-and-office-hours">Review Sessions and Office Hours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#teaching-staff">Teaching Staff</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">CSCI 4380 Database Systems - Fall 2020</a> &raquo;</li>
+        
+          <li><a href="../course_notes.html">Course Notes - Fall 2020</a> &raquo;</li>
+        
+      <li>SQL - Embedded SQL Programming</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2020/course_notes/sql_procedural2.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-embedded-sql-programming">
+<h1>SQL - Embedded SQL Programming<a class="headerlink" href="#sql-embedded-sql-programming" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>In this section, we will look at a different paradigm
+for writing programs that incorporate SQL queries.</p></li>
+<li><p>The main distinction between this model and others is that the
+program is written in a host language like C, but contains
+constructs that are foreign to the host language.</p></li>
+<li><p>One thing you will notice that it requires programmers to work on
+very low level details of communication with the database.</p></li>
+<li><p>To be able to compile these programs, we must first precompile using
+a special program, which will rewrite the program code by replacing
+pieces of it.</p></li>
+<li><p>Once precompilation is finished, we compile the remaining code.</p></li>
+<li><p>Embedded SQL, ESQL is an industry standard language.</p></li>
+</ul>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Embedded SQL is an SQL standard for writing a program in a host
+language (like C) with SQL statements starting with the string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span>
+</pre></div>
+</div>
+<p>and ending with semicolon (;).</p>
+</li>
+<li><p>In addition, all variables to be used by the program as input/output
+to a query must be declared within a declare section.</p></li>
+<li><p>Often type conversion for preliminary data types between the
+programming language and SQL is done by hand.</p></li>
+<li><p>Proc in Oracle, ECPG in Postgresql implements the C embeddings for
+SQL.</p></li>
+<li><p>Note that the following notes are based on Oracle embedded SQL
+language (slight differences are possible for postgresql)</p></li>
+<li><p>Example program:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">include</span> <span class="n">sqlca</span><span class="p">;</span>
+
+<span class="n">char</span> <span class="n">user_prompt</span><span class="p">[]</span> <span class="o">=</span> <span class="s2">&quot;Please enter username and password:  &quot;</span><span class="p">;</span>
+<span class="n">char</span> <span class="n">cid_prompt</span><span class="p">[]</span> <span class="o">=</span> <span class="s2">&quot;Please enter customer ID:  &quot;</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">exec</span> <span class="n">sql</span> <span class="n">begin</span> <span class="n">declare</span> <span class="n">section</span><span class="p">;</span>       <span class="o">/*</span> <span class="n">declare</span> <span class="n">SQL</span> <span class="n">host</span> <span class="n">variables</span>    <span class="o">*/</span>
+        <span class="n">char</span> <span class="n">cust_id</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+        <span class="n">char</span> <span class="n">cust_name</span><span class="p">[</span><span class="mi">14</span><span class="p">];</span>
+        <span class="nb">float</span> <span class="n">cust_discnt</span><span class="p">;</span>                  <span class="o">/*</span> <span class="n">host</span> <span class="n">var</span> <span class="k">for</span> <span class="n">discnt</span> <span class="n">value</span>    <span class="o">*/</span>
+        <span class="n">char</span> <span class="n">user_name</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
+    <span class="n">exec</span> <span class="n">sql</span> <span class="n">end</span> <span class="n">declare</span> <span class="n">section</span><span class="p">;</span>
+
+    <span class="n">exec</span> <span class="n">sql</span> <span class="n">whenever</span> <span class="n">sqlerror</span> <span class="n">goto</span> <span class="n">report_error</span><span class="p">;</span> <span class="o">/*</span> <span class="n">error</span> <span class="n">trap</span> <span class="n">condition</span>     <span class="o">*/</span>
+    <span class="n">exec</span> <span class="n">sql</span> <span class="n">whenever</span> <span class="ow">not</span> <span class="n">found</span> <span class="n">goto</span> <span class="n">notfound</span><span class="p">;</span> <span class="o">/*</span> <span class="ow">not</span> <span class="n">found</span> <span class="n">condition</span>      <span class="o">*/</span>
+
+    <span class="n">exec</span> <span class="n">sql</span> <span class="n">unix</span><span class="p">:</span><span class="n">postgresql</span><span class="p">:</span><span class="o">//</span><span class="n">csc4380</span><span class="o">.</span><span class="n">cs</span><span class="o">.</span><span class="n">rpi</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">sibel</span> <span class="n">AS</span> <span class="n">myconnection</span> <span class="n">USER</span> <span class="p">:</span><span class="n">user_name</span><span class="p">;</span>
+    <span class="o">/*</span> <span class="n">ORACLE</span> <span class="nb">format</span><span class="p">:</span> <span class="n">connect</span>  <span class="o">*/</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="n">prompt</span><span class="p">(</span><span class="n">cid_prompt</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cust_id</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">exec</span> <span class="n">sql</span> <span class="n">select</span> <span class="n">cname</span><span class="p">,</span> <span class="n">discnt</span>
+                <span class="n">into</span> <span class="p">:</span><span class="n">cust_name</span><span class="p">,</span> <span class="p">:</span><span class="n">cust_discnt</span>   <span class="o">/*</span> <span class="n">retrieve</span> <span class="n">cname</span><span class="p">,</span> <span class="n">discnt</span>   <span class="o">*/</span>
+                <span class="kn">from</span> <span class="nn">customers</span> <span class="n">where</span> <span class="n">cid</span> <span class="o">=</span> <span class="p">:</span><span class="n">cust_id</span><span class="p">;</span>
+        <span class="n">exec</span> <span class="n">sql</span> <span class="n">commit</span> <span class="n">work</span><span class="p">;</span>                     <span class="o">/*</span> <span class="n">release</span> <span class="n">read</span> <span class="n">lock</span> <span class="n">on</span> <span class="n">row</span> <span class="o">*/</span>
+
+        <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;CUSTOMER&#39;S NAME IS  </span><span class="si">%s</span><span class="s2"> AND DISCNT IS  </span><span class="si">%5.1f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+             <span class="n">cust_name</span><span class="p">,</span> <span class="n">cust_discnt</span><span class="p">);</span>            <span class="o">/*</span> <span class="n">NOTE</span><span class="p">,</span> <span class="p">(:)</span> <span class="ow">not</span> <span class="n">used</span> <span class="n">here</span>  <span class="o">*/</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="esql">
+<h2>ESQL<a class="headerlink" href="#esql" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Each ESQL statement starts with EXEC SQL keyword and ends with a
+semicolon ;</p></li>
+<li><p>A pre-compiler will scan a program file and only read the statements
+enclosed within EXEC SQL statements and disregard everything else.</p></li>
+<li><p>SQLCA is a specific data structure for storing status codes of all SQL operations</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span> <span class="n">always</span> <span class="n">have</span> <span class="n">this</span> <span class="k">for</span> <span class="n">error</span> <span class="n">handling</span><span class="o">*/</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">include</span> <span class="n">sqlca</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="connections">
+<h2>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>To be able to perform any operations, we must open a connection to the database.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">CONNECT</span> <span class="n">TO</span> <span class="n">target</span> <span class="p">[</span><span class="n">AS</span> <span class="n">connection</span><span class="o">-</span><span class="n">name</span><span class="p">]</span> <span class="p">[</span><span class="n">USER</span> <span class="n">user</span><span class="o">-</span><span class="n">name</span><span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p>Many connection can be opened in a program, but generally one
+connection per database is sufficient.</p></li>
+<li><p>Different databases can be used in a single program.</p></li>
+<li><p>Close all connections before the program exists:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">DISCONNECT</span> <span class="p">[</span><span class="n">connection</span><span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p>Change between multiple open connections with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">SET</span> <span class="n">CONNECTION</span> <span class="n">connection</span><span class="o">-</span><span class="n">name</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="variables-in-esql">
+<h2>Variables in ESQL<a class="headerlink" href="#variables-in-esql" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>All variables that will be used in an SQL statement must be declared
+using an ESQL declaration and data type</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">BEGIN</span> <span class="n">DECLARE</span> <span class="n">SECTION</span> <span class="p">;</span>
+<span class="n">VARCHAR</span>    <span class="n">e_name</span><span class="p">[</span><span class="mi">30</span><span class="p">],</span> <span class="n">username</span><span class="p">[</span><span class="mi">30</span><span class="p">]</span> <span class="p">;</span>
+<span class="n">INTEGER</span>     <span class="n">e_ssn</span><span class="p">,</span> <span class="n">e_dept_id</span> <span class="p">;</span>
+<span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">END</span> <span class="n">DECLARE</span> <span class="n">SECTION</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can use almost any SQL command in ESQL as long as proper input
+to these commands are provided in the form of program variables.</p></li>
+</ul>
+</div>
+<div class="section" id="executing-sql-commands">
+<h2>Executing SQL commands<a class="headerlink" href="#executing-sql-commands" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Suppose we want to find the name of an employee given his/her SSN
+(input by the user of the program):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">select</span> <span class="n">name</span><span class="p">,</span> <span class="n">dept_id</span> <span class="n">into</span> <span class="p">:</span><span class="n">e_name</span><span class="p">,</span> <span class="p">:</span><span class="n">e_dept_id</span>
+<span class="kn">from</span> <span class="nn">employee</span>
+<span class="n">where</span> <span class="n">ssn</span> <span class="o">=</span> <span class="p">:</span><span class="n">e_ssn</span> <span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Program variables are preceded by “:”, i.e. :e_ssn.</p></li>
+</ul>
+</li>
+<li><dl class="simple">
+<dt>Read the value of the variable “e_ssn” and execute the SQL statement</dt><dd><p>using this value, store the returned values of columns “name” and
+“dept_id” in the program variables “e_name” and “e_dept_id”.</p>
+</dd>
+</dl>
+</li>
+<li><p>Compare the above query with the expression below. What is the difference?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">select</span> <span class="n">name</span><span class="p">,</span> <span class="n">dept_id</span>
+<span class="kn">from</span> <span class="nn">employee</span>  <span class="n">where</span> <span class="n">ssn</span> <span class="o">=</span> <span class="n">e_ssn</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h2>Executing SQL commands<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>We are able to write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">select</span> <span class="n">name</span><span class="p">,</span> <span class="n">dept_id</span> <span class="n">into</span> <span class="p">:</span><span class="n">e_name</span><span class="p">,</span> <span class="p">:</span><span class="n">e_dept_id</span>
+         <span class="kn">from</span> <span class="nn">employee</span>
+         <span class="n">where</span> <span class="n">ssn</span> <span class="o">=</span> <span class="p">:</span><span class="n">e_ssn</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Since this query returns a single tuple. For this tuple, we read the
+returned values.</p></li>
+<li><p>We will see how to handle queries that return multiple tuples in a minute.</p></li>
+</ul>
+</div>
+<div class="section" id="dealing-with-strings">
+<h2>Dealing with Strings<a class="headerlink" href="#dealing-with-strings" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>There is a mismatch between the definition of a string in Oracle and in C/C++.</p></li>
+<li><p>In C, the end of a string is identified by the null character
+‘0’. Hence, “Sibel” would be stored as characters
+‘S’,’i’,’b’,’e’,’l’,’0’.</p></li>
+<li><p>In Oracle, the length of a string is stored together with the string
+and there is no special end of string character.</p></li>
+<li><p>If you convert a data string from Oracle to C, you must pad it with
+‘0’ manually!</p></li>
+<li><p>The data type VARCHAR e_name[30] is translated by the pre-compiler
+to the following structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="p">{</span>
+    <span class="n">unsigned</span> <span class="n">short</span> <span class="nb">len</span>
+    <span class="n">unsigned</span> <span class="n">char</span> <span class="n">arr</span><span class="p">[</span><span class="mi">30</span><span class="p">]</span>
+<span class="p">}</span> <span class="n">e_name</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Putting the pieces together:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>strcpy(username.arr, “Sibel Adali&quot;) ;
+username.len = strlen(“Sibel Adali&quot;) ;
+strcpy(passwd.arr, “tweety-bird&quot;) ;
+passwd.len = strlen(“tweety-bird&quot;) ;
+exec sql   connect :username  identified by :passwd ;
+scanf(“%d&quot;, &amp;e_ssn) ;
+exec sql   select name, dept_id into :e_name, :e_dept_id
+           from employee where ssn = :e_ssn ;
+e_name.arr[e_name.len] = &#39;\0&#39; ;   /* so can use string in C*/
+printf(“%s&quot;, e_name.arr) ;
+exec sql commit work ;  /* make any changes permanent */
+exec sql disconnect ;     /* disconnect from the database */
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="status-processing">
+<h2>Status Processing<a class="headerlink" href="#status-processing" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>SQL Communications area is a data structure that contains information about</p>
+<ul class="simple">
+<li><p>Error codes (might be more detailed than SQLSTATE)</p></li>
+<li><p>Warning flags</p></li>
+<li><p>Event information</p></li>
+<li><p>Rows-processed count</p></li>
+<li><p>Diagnostics for all processed SQL statements.</p></li>
+</ul>
+</li>
+<li><p>Included in the program using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">INCLUDE</span> <span class="n">SQLCA</span><span class="p">;</span> <span class="ow">or</span> <span class="c1">#include &lt;sqlca.h&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>It is possible to get the full text of error messages and other
+detailed status information.</p></li>
+<li><p>Whenever an SQL statement is executed, its status is returned in a
+variable named <code class="docutils literal notranslate"><span class="pre">&quot;SQLSTATE&quot;</span></code></p></li>
+<li><p>This variable must be defined in the variable section, but it is
+populated with values automatically</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">BEGIN</span> <span class="n">DECLARE</span> <span class="n">SECTION</span><span class="p">;</span>
+  <span class="n">char</span>    <span class="n">SQLSTATE</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="p">;</span>
+<span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">END</span> <span class="n">DECLARE</span> <span class="n">SECTION</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Different errors and conditions have values that might be vendor specific.</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h2>Status processing<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sqlca</span></code> covers both warnings and errors. If multiple warnings or
+errors occur during the execution of a statement, then sqlca will
+only contain information about the last one.</p></li>
+<li><p>If no error occurred in the last SQL statement, sqlca.sqlcode will
+be 0 and sqlca.sqlstate will be “00000”.</p></li>
+<li><p>If a warning or error occurred, then sqlca.sqlcode will be negative
+and sqlca.sqlstate will be different from “00000”.</p></li>
+<li><p>If the last SQL statement was successful, then sqlca.sqlerrd[1]
+contains the OID of the processed row, if applicable, and
+sqlca.sqlerrd[2] contains the number of processed or returned rows,
+if applicable to the command.</p></li>
+<li><p>The code can be checked after each statement and error handling code
+can be written</p>
+<ul class="simple">
+<li><p>Commit, rollback</p></li>
+<li><p>Exit program, etc.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">SQLSTATE</span><span class="p">,</span> <span class="s2">&quot;000000&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+     <span class="n">rollback</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>It is also possible to use trap conditions that remain active
+throughout the program.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">WHENEVER</span> <span class="o">&lt;</span><span class="n">condition</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">action</span><span class="o">&gt;</span> <span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Conditions: <code class="docutils literal notranslate"><span class="pre">SQLERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">SQLWARNING</span></code>, <code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">FOUND</span></code></p></li>
+<li><p>Actions: <code class="docutils literal notranslate"><span class="pre">DO</span> <span class="pre">function</span></code>, <code class="docutils literal notranslate"><span class="pre">DO</span> <span class="pre">break</span></code>, <code class="docutils literal notranslate"><span class="pre">GOTO</span> <span class="pre">label</span></code>,
+<code class="docutils literal notranslate"><span class="pre">CONTINUE</span></code>, <code class="docutils literal notranslate"><span class="pre">STOP</span></code></p></li>
+</ul>
+</li>
+<li><p>Because WHENEVER is a declarative statement, its scope is
+positional, not logical. That is, it tests all executable SQL
+statements that physically follow it in the source file, not in the
+flow of program logic.</p></li>
+<li><p>A WHENEVER directive stays in effect until superseded by another
+WHENEVER directive checking for the same condition.</p></li>
+</ul>
+</div>
+<div class="section" id="transactions">
+<h2>Transactions<a class="headerlink" href="#transactions" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Transactions start with the logically start with the first SQL
+statement and end with either a COMMIT or ROLLBACK statement</p></li>
+<li><p>It is possible to set boundaries of transactions with the SQL statement:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BEGIN</span> <span class="p">;</span>
+<span class="n">SET</span> <span class="n">TRANSACTION</span> <span class="n">READ</span> <span class="n">ONLY</span>
+    <span class="n">ISOLATION</span> <span class="n">LEVEL</span> <span class="n">READ</span> <span class="n">COMMITTED</span>
+    <span class="n">DIAGNOSTICS</span> <span class="n">SIZE</span> <span class="mi">6</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Diagnostics size is the number of exception conditions that can be
+described at one time in the status.</p></li>
+<li><p>READ ONLY, READ/WRITE transactions allow the programmer to define
+the type of the transaction</p></li>
+<li><p>Isolation level allows the programmer to define the desired level of
+consistency</p></li>
+</ul>
+</div>
+<div class="section" id="esql-cursor-operations">
+<h2>ESQL - Cursor Operations<a class="headerlink" href="#esql-cursor-operations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Declare a cursor using a regular SQL query (no “into”).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">DECLARE</span> <span class="n">emps_dept</span> <span class="n">CURSOR</span> <span class="n">FOR</span>
+      <span class="n">select</span> <span class="n">ssn</span><span class="p">,</span> <span class="n">name</span> <span class="kn">from</span> <span class="nn">employee</span>
+      <span class="n">where</span> <span class="n">dept_id</span> <span class="o">=</span> <span class="p">:</span><span class="n">e_dept_id</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Open a cursor: means the corresponding SQL query is executed, the
+results are written to a file (or a data structure) and the cursor
+is pointing to the first row.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">OPEN</span> <span class="n">emps_dept</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Read the current row pointed to by the cursor using “fetch”. At the
+end of fetch, the cursor is moved to point to the next tuple.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">FETCH</span> <span class="n">emps_dept</span> <span class="n">INTO</span> <span class="p">:</span><span class="n">e_ssn</span><span class="p">,</span> <span class="p">:</span><span class="n">e_name</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>How do we know when we reach the end of a cursor?</p>
+<ul>
+<li><p>Check the “sqlcode” to see if the end of a cursor is reached (its
+expected value depends on the system).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>if (sqlca.sqlcode == -1) { … }
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>Error handling statements</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="n">SQL</span> <span class="n">WHENEVER</span> <span class="n">NOT</span> <span class="n">FOUND</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="cursors-and-snapshots">
+<h2>Cursors and snapshots<a class="headerlink" href="#cursors-and-snapshots" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>If a cursor is declared as “INSENSITIVE”, the contents of the cursor
+is computed once when the cursor is opened, and remains the same
+until the cursor is closed, even if the underlying data tables
+change during the this time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DECLARE</span> <span class="n">cursor</span><span class="o">-</span><span class="n">name</span> <span class="n">CURSOR</span> <span class="n">INSENSITIVE</span> <span class="n">CURSOR</span> <span class="n">FOR</span> <span class="n">table</span><span class="o">-</span><span class="n">expression</span>
+</pre></div>
+</div>
+</li>
+<li><p>This type of cursor is a snapshot of the database, a view of it at a
+specific time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DECLARE</span> <span class="n">cursor_name</span> <span class="p">[</span><span class="n">INSENSITIVE</span><span class="p">][</span><span class="n">SCROLL</span><span class="p">]</span> <span class="n">CURSOR</span> <span class="n">FOR</span>
+  <span class="n">table_expression</span>
+  <span class="p">[</span><span class="n">ORDER</span> <span class="n">BY</span> <span class="n">order</span><span class="o">-</span><span class="n">item</span><span class="o">-</span><span class="n">comma</span><span class="o">-</span><span class="nb">list</span><span class="p">]</span>
+  <span class="p">[</span> <span class="n">FOR</span> <span class="p">[</span><span class="n">READ</span> <span class="n">ONLY</span> <span class="o">|</span> <span class="n">UPDATE</span> <span class="o">|</span> <span class="n">OF</span> <span class="n">column</span><span class="o">-</span><span class="n">commalist</span><span class="p">]</span> <span class="p">]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="cursors-for-update">
+<h2>Cursors for update<a class="headerlink" href="#cursors-for-update" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>If a cursor is declared for update, then updates can be performed on
+the current tuple.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DECLARE</span> <span class="n">CURSOR</span> <span class="n">cursor</span><span class="o">-</span><span class="n">name</span> <span class="n">CURSOR</span> <span class="n">FOR</span> <span class="n">table</span><span class="o">-</span><span class="n">expression</span>
+            <span class="n">FOR</span> <span class="n">UPDATE</span> <span class="n">OF</span> <span class="n">column</span><span class="o">-</span><span class="nb">list</span>
+
+<span class="n">UPDATE</span> <span class="n">table</span><span class="o">-</span><span class="n">name</span> <span class="n">SET</span> <span class="n">assignment</span><span class="o">-</span><span class="nb">list</span>
+           <span class="n">WHERE</span> <span class="n">CURRENT</span> <span class="n">OF</span> <span class="n">cursor</span><span class="o">-</span><span class="n">name</span>
+
+<span class="n">DELETE</span> <span class="n">FROM</span> <span class="n">table</span><span class="o">-</span><span class="n">name</span> <span class="n">WHERE</span> <span class="n">CURRENT</span> <span class="n">OF</span> <span class="n">cursor</span><span class="o">-</span><span class="n">name</span>
+</pre></div>
+</div>
+</li>
+<li><p>For these updates to have an effect, the cursor must not be
+INSENSITIVE.</p></li>
+</ul>
+</div>
+<div class="section" id="constraints">
+<h2>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>When constraints are violated, they cause an exception (or sqlerror)
+to be thrown.</p></li>
+<li><p>When are constraints violated?</p>
+<ul>
+<li><p>If constraint checking for a constraint is immediate, as soon as
+an SQL statement causes the constraint to become false, it is
+rolled back.</p></li>
+<li><p>If a constraint is defined to be deferrable, then the constraint
+is not checked until a transaction tries to commit. Then, if it is
+violated, the whole transaction is rolled back.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>CONSTRAINT name CHECK … DEFERRABLE
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="dynamic-sql">
+<h2>Dynamic SQL<a class="headerlink" href="#dynamic-sql" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>In Dynamic SQL, embedded SQL statements are created on the fly using
+strings!</p></li>
+<li><p>these strings are fed to an exec sql statement</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">exec</span> <span class="n">sql</span> <span class="n">execute</span> <span class="n">immediate</span> <span class="p">:</span><span class="n">sql_string</span>
+</pre></div>
+</div>
+</li>
+<li><p>Since dynamic SQL statements are not known to the pre-compiler at
+compile/initiation time, they must be optimized at run time!</p></li>
+<li><p>Create a query once using a prepare statement and run it multiple
+times using the execute statement.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">strcopy</span><span class="p">(</span><span class="n">sqltext</span><span class="o">.</span><span class="n">arr</span><span class="p">,</span> <span class="s2">&quot;delete from employee where ssn = ?&quot;</span><span class="p">)</span> <span class="p">;</span>
+<span class="n">sqltext</span><span class="o">.</span><span class="n">len</span><span class="o">=</span><span class="nb">str</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">sqltext</span><span class="o">.</span><span class="n">arr</span><span class="p">)</span> <span class="p">;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">prepare</span> <span class="n">del_emp</span> <span class="kn">from</span> <span class="p">:</span><span class="n">sqltext</span> <span class="p">;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">execute</span> <span class="n">del_emp</span> <span class="n">using</span> <span class="p">:</span><span class="n">cust_id</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="sqlda">
+<h2>SQLDA<a class="headerlink" href="#sqlda" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>When we execute a dynamic SQL statement, we do not know which
+columns will be returned and how many columns will be returned.</p></li>
+<li><p>The SQLDA descriptor definition allows us to find the number of
+columns and the value for each column.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">exec</span> <span class="n">sql</span> <span class="n">include</span> <span class="n">sqlda</span> <span class="p">;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">declare</span> <span class="n">sel_curs</span> <span class="n">cursor</span> <span class="k">for</span> <span class="n">sel_emps</span> <span class="p">;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">prepare</span> <span class="n">sel_emps</span> <span class="kn">from</span> <span class="p">:</span><span class="n">sqltext</span> <span class="p">;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">describe</span> <span class="n">sel_emps</span> <span class="n">into</span> <span class="n">sqlda</span> <span class="p">;</span>
+
+<span class="n">exec</span> <span class="n">sql</span> <span class="nb">open</span> <span class="n">sel_curs</span> <span class="p">;</span>
+<span class="n">exec</span> <span class="n">sql</span> <span class="n">fetch</span> <span class="n">sel_curs</span> <span class="n">using</span> <span class="n">descriptor</span> <span class="n">sqlda</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="or_frameworks.html" class="btn btn-neutral float-right" title="SQL - Object-Relational Frameworks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sql_procedural.html" class="btn btn-neutral float-left" title="SQL - Procedural Programming" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

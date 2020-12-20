@@ -1,0 +1,715 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Database Tuning &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Database Tuning</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/spring2016/course_notes/dbs_tuning.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="database-tuning">
+<h1>Database Tuning<a class="headerlink" href="#database-tuning" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p>Tuning is the act of changing an application and DBMS environment to
+improve system performance</p></li>
+<li><p>Performance is usually measured in terms of response time</p>
+<ul class="simple">
+<li><p>Time to get the first tuple</p></li>
+<li><p>Time to get all the tuples to a query</p></li>
+</ul>
+</li>
+<li><p>A workload consists of various operations performed by the system
+and their frequency</p>
+<ul class="simple">
+<li><p>It is important to tune to improve workload, not just a single query</p></li>
+<li><p>Some queries are bottlenecks: performed frequently and/or are very
+expensive</p></li>
+</ul>
+</li>
+<li><p>Remember: when you improve the performance of one operation, other
+operations may slow down</p>
+<p>For example, creating an index to speed up a query will slow down
+insert/update operations</p>
+</li>
+</ul>
+<div class="section" id="database-tuning-steps">
+<h2>Database Tuning Steps<a class="headerlink" href="#database-tuning-steps" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Step 1: buy more or faster hardware</p>
+<p>memory is crucial for buffering query operations and caches for
+various operations</p>
+<p>hard disk speed is crucial, buy faster and more disks to improve the
+parallelism</p>
+</li>
+<li><p>Step 2: tune the system installation</p>
+<p>databases provide a large number of tunable parameters, read database
+administration books</p>
+<p>learn about making better use of multiple CPUs</p>
+</li>
+</ul>
+<div class="section" id="disk-caches">
+<h3>Disk caches<a class="headerlink" href="#disk-caches" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>A cache is a set of buffer pages maintained by the DBMS for a
+specific purpose</p></li>
+<li><p>Data cache for reading pages containing the index or the relation</p></li>
+<li><p>Procedure cache for storing previously constructed query plans</p></li>
+<li><p>Caches are usually shared between concurrent users</p></li>
+<li><p>Any requested item must be brought to cache from disk to read/modified</p></li>
+<li><p>If it is already in the cache, then the cache has a hit, otherwise
+the cache has a miss</p></li>
+<li><p>Since each hit is a savings in time, hit ratio must be maximized
+(some application designers seek 90% hit ratio)</p></li>
+</ul>
+</div>
+<div class="section" id="cache-replacement-algorithms">
+<h3>Cache replacement algorithms<a class="headerlink" href="#cache-replacement-algorithms" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>If a new item has to be inserted into the cache, another item might
+need to be removed.</p></li>
+<li><p>Cache replacement algorithm decides what should be removed, LRU
+(least recently used), MRU (most recently used)</p>
+<ul>
+<li><p>A recently used page may be used for an update in near future (LRU)</p></li>
+<li><p>A page read in table scan is no longer needed (MRU)</p></li>
+<li><p>Sophisticated caches may take the algorithm using the database into
+account</p></li>
+<li><p>How would  you use the cache for an index page?</p></li>
+</ul>
+</li>
+<li><p>A dirty page is a page modified by an uncommitted transaction -if
+this page is moved out of cache, it must be written back to disk</p></li>
+</ul>
+</div>
+<div class="section" id="tuning-the-cache">
+<h3>Tuning the cache<a class="headerlink" href="#tuning-the-cache" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Divide the cache and bind a specific item to a cache (different
+tables may be cached in different caches)</p></li>
+<li><p>Divide the cache into pools of varied size, 2K, 4K, 8K, etc.</p>
+<ul class="simple">
+<li><p>The query processor can choose the best available cache for a query
+(retrieve large sequences for table scans, even prefetch disk pages
+that are expected to be requested next)</p></li>
+</ul>
+</li>
+<li><p>Procedure cache may use previously optimized query plans</p>
+<p>Hint: use program variables to increase possible reuse</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">P</span><span class="o">.</span><span class="n">name</span> <span class="n">FROM</span> <span class="n">Professor</span> <span class="n">P</span> <span class="n">WHERE</span> <span class="n">P</span><span class="o">.</span><span class="n">deptId</span> <span class="o">=</span> <span class="p">:</span><span class="n">deptid</span>
+</pre></div>
+</div>
+<p>When you use prepared statements such as this, query and parameters
+are sent separately, allowing the same query for different
+parameters to use the same query plan.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="partitioning">
+<h2>Partitioning<a class="headerlink" href="#partitioning" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Step 3: partition your data</p></li>
+<li><p>Vertical partitioning divides the attributes in the relation and
+distributes them to different disks or tablespaces</p>
+<p>Frequently queried attributes could be separated from infrequently
+queried attributes.</p>
+</li>
+<li><p>Horizontal partitioning divides the tuples in the relation to
+multiple disks</p>
+<p>Allows parallelism in reading data from disk</p>
+<p>Some optimizers are able to concentrate on a single partition given
+a specific query</p>
+</li>
+</ul>
+</div>
+<div class="section" id="denormalization">
+<h2>Denormalization<a class="headerlink" href="#denormalization" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Step 4: change your data model</p></li>
+<li><p>Normalization reduces redundancy and null values</p>
+<ul>
+<li><p>Lower storage requirements, simple queries and updates will be
+faster</p></li>
+<li><p>Results in more tables, hence complex queries need more joins</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">FAN</span><span class="o">.</span><span class="n">Title</span>
+<span class="n">FROM</span>
+    <span class="n">Films</span> <span class="n">F</span>
+    <span class="p">,</span> <span class="n">FilmAlternateNames</span> <span class="n">FAN</span>
+<span class="n">WHERE</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">filmid</span> <span class="o">=</span> <span class="n">FAN</span><span class="o">.</span><span class="n">filmid</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>Denormalization stores relations in a non-optimal manner</p></li>
+</ul>
+<div class="section" id="examples-of-denormalization">
+<h3>Examples of denormalization<a class="headerlink" href="#examples-of-denormalization" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Store alternate names in a string and use application code to update
+and print the alternate names</p></li>
+<li><p>Add extra columns for frequently accessed information</p>
+<p>Example: number of movies per actor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">a</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">surname</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="n">distinct</span> <span class="n">mr</span><span class="o">.</span><span class="n">movieid</span><span class="p">)</span>
+<span class="n">FROM</span>
+   <span class="n">actors</span> <span class="n">a</span>
+   <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+<span class="n">WHERE</span>
+   <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">mr</span><span class="o">.</span><span class="n">actorid</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">a</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">surname</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add a column “NumMovies” instead for each actor, no join or
+group by is needed.</p>
+<p>This column must be updated in the application anytime an update
+is made to the casts relation. If updates are not frequent, then
+this could be acceptable.</p>
+</li>
+<li><p>Certain attributes might be duplicated if they are used often</p>
+<ul>
+<li><p>Example: Store stagename attribute in the casts relation</p>
+<p>Queries involving this attribute are now fully answered from
+casts (avoiding a costly join)</p>
+<p>Attributes other than stagename might be queried rarely but take a lot
+of space causing the stagename to take up a lot of space</p>
+<p>Anytime a new actor is added or stagename is changed, the
+changes must be reflected to the casts relation by updating</p>
+<blockquote>
+<div><p>multiple tuples (this may be rare compared to the queries)</p>
+</div></blockquote>
+<p>The CASTS relation now stores redundant information and is
+larger in size</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="query-restructuring">
+<h2>Query Restructuring<a class="headerlink" href="#query-restructuring" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Step 5: Rewrite queries to improve their speed, avoid nested
+queries, use joins whenever possible</p></li>
+<li><p>Nested queries are hard to optimize.</p></li>
+<li><p>Inner and outer expressions are optimized separately.</p></li>
+<li><p>For correlated expressions, inner query is executed many times for
+each tuple in the outer expression.</p></li>
+<li><p>Certain possible optimizations could be missed with a nested query
+(suppose an index for casts on (actorid, filmid) existed)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">DISTINCT</span>
+     <span class="n">m</span><span class="o">.</span><span class="n">title</span>
+<span class="n">FROM</span>
+     <span class="n">movies</span> <span class="n">m</span>
+     <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+<span class="n">WHERE</span>
+     <span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">mr</span><span class="o">.</span><span class="n">movieid</span>
+     <span class="ow">and</span> <span class="n">exists</span> <span class="p">(</span>
+         <span class="n">select</span>
+           <span class="o">*</span>
+         <span class="kn">from</span>
+           <span class="nn">actors</span> <span class="n">a</span>
+         <span class="n">where</span>
+           <span class="n">a</span><span class="o">.</span><span class="n">surname</span> <span class="n">like</span> <span class="s1">&#39;%Bacon&#39;</span>
+           <span class="ow">and</span>  <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">mr</span><span class="o">.</span><span class="n">actorid</span><span class="p">);</span>
+</pre></div>
+</div>
+<ul>
+<li><p>All queries below are equivalent to the above one</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span> <span class="n">uncorrelated</span> <span class="n">query</span> <span class="ow">is</span> <span class="n">better</span>
+<span class="n">SELECT</span> <span class="n">DISTINCT</span>
+   <span class="n">m</span><span class="o">.</span><span class="n">title</span>
+<span class="n">FROM</span>
+   <span class="n">movies</span> <span class="n">m</span>
+   <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+<span class="n">WHERE</span>
+   <span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">mr</span><span class="o">.</span><span class="n">movieid</span>
+   <span class="ow">and</span> <span class="n">mr</span><span class="o">.</span><span class="n">actorid</span> <span class="ow">in</span> <span class="p">(</span>
+       <span class="n">select</span>
+         <span class="n">a</span><span class="o">.</span><span class="n">id</span>
+       <span class="kn">from</span>
+         <span class="nn">actors</span> <span class="n">a</span>
+       <span class="n">where</span>
+         <span class="n">a</span><span class="o">.</span><span class="n">surname</span> <span class="n">like</span> <span class="s1">&#39;%Bacon&#39;</span><span class="p">);</span>
+
+<span class="o">--</span> <span class="n">join</span> <span class="n">query</span> <span class="ow">is</span> <span class="n">even</span> <span class="n">better</span>
+<span class="n">SELECT</span> <span class="n">DISTINCT</span>
+   <span class="n">m</span><span class="o">.</span><span class="n">title</span>
+<span class="n">FROM</span>
+   <span class="n">movies</span> <span class="n">m</span>
+   <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+   <span class="p">,</span> <span class="n">actors</span> <span class="n">a</span>
+<span class="n">WHERE</span>
+   <span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">mr</span><span class="o">.</span><span class="n">movieid</span>
+   <span class="ow">and</span> <span class="n">mr</span><span class="o">.</span><span class="n">actorid</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">id</span>
+   <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">surname</span> <span class="n">like</span> <span class="s1">&#39;%Bacon&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="drops-of-wisdom">
+<h3>Drops of wisdom<a class="headerlink" href="#drops-of-wisdom" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Avoid sorts (distinct, order by, group by, union, except) if
+possible, they are costly</p></li>
+<li><p>Some queries do not need a distinct or can be rewritten to avoid sorts</p></li>
+<li><p>Avoid full table scans</p>
+<ul class="simple">
+<li><p>A search on a condition like A &lt;&gt; 3 or A like ‘%Bacon’ might
+result in a table scan</p></li>
+<li><p>A search like A in (1,2,4) might be preferable (depending on the
+availability of statistics)</p></li>
+</ul>
+</li>
+<li><p>Avoid retrieving tuples into application code, use stored procedures
+and even complicated queries might be preferable to the added
+communication cost</p></li>
+<li><p>Use views wisely</p>
+<ul>
+<li><p>Even though views are useful in application development, use a
+view in an application that is useful for the given query</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">VIEW</span> <span class="n">together</span><span class="p">(</span><span class="n">actorid1</span><span class="p">,</span> <span class="n">stagename1</span><span class="p">,</span> <span class="n">actorid2</span><span class="p">,</span> <span class="n">stagename2</span><span class="p">)</span> <span class="n">AS</span>
+<span class="n">SELECT</span> <span class="n">a1</span><span class="o">.</span><span class="n">actorid</span><span class="p">,</span> <span class="n">a1</span><span class="o">.</span><span class="n">stagename</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">actorid</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">stagename</span>
+<span class="n">FROM</span>
+    <span class="n">actors</span> <span class="n">a1</span>
+    <span class="p">,</span> <span class="n">actors</span> <span class="n">a2</span>
+    <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr1</span>
+    <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr2</span>
+<span class="n">WHERE</span>
+    <span class="n">a1</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">mr1</span><span class="o">.</span><span class="n">actorid</span>
+    <span class="ow">and</span> <span class="n">mr1</span><span class="o">.</span><span class="n">movieid</span><span class="o">=</span><span class="n">mr2</span><span class="o">.</span><span class="n">movieid</span>
+    <span class="ow">and</span> <span class="n">a2</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">mr2</span><span class="o">.</span><span class="n">actorid</span>
+    <span class="ow">and</span> <span class="n">a1</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;&gt;</span> <span class="n">a2</span><span class="o">.</span><span class="n">id</span> <span class="p">;</span>
+
+<span class="n">SELECT</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">actorid1</span>
+<span class="n">FROM</span>
+    <span class="n">together</span> <span class="n">t</span>
+<span class="n">WHERE</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Kevin&#39;</span>
+    <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">surname</span> <span class="o">=</span> <span class="s1">&#39;Bacon&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>None of the joins are necessary to answer this query. The
+optimizer might miss some faster query plans</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="the-use-of-indices">
+<h3>The use of indices<a class="headerlink" href="#the-use-of-indices" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Indices speed up query, but slow down insert/delete/update operations</p></li>
+<li><p>A clustered index allows fast access to a range query</p>
+<ul>
+<li><p>There is only one clustered index per relation</p></li>
+<li><p>Databases usually create one for the primary key by default</p></li>
+<li><p>Reconstruction of clustered indices is costly</p></li>
+</ul>
+</li>
+<li><p>Step 6: choose the most useful indices</p>
+<ul>
+<li><p>Find the most useful clusters and use them if they are very useful
+for a range of queries and supported by the database</p></li>
+<li><p>Next, find the most selective indices to add</p>
+<ul>
+<li><p>Finally, find indices that might help with index only scans</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="clustered-indices">
+<h3>Clustered Indices<a class="headerlink" href="#clustered-indices" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>We can create clustered indices in Postgresql by using an index:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create</span> <span class="n">index</span> <span class="n">mr_idx</span> <span class="n">on</span> <span class="n">movieroles</span><span class="p">(</span><span class="n">movieid</span><span class="p">,</span><span class="n">actorid</span><span class="p">)</span> <span class="p">;</span>
+<span class="n">cluster</span> <span class="n">movieroles</span> <span class="n">using</span> <span class="n">mr_idx</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Clusters are generated once and are not modified incrementally</p></li>
+<li><p>You need to recluster periodically if there are frequent updates:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cluster</span> <span class="n">movieroles</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>The reorganization may be too costly for very large tables.</p></li>
+<li><p>Create a clustered index for attributes frequently queried with a
+range or has multiple matching attributes for a value</p>
+<p>Above cluster is very useful for finding actors in a movie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span>
+   <span class="n">a</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">surname</span>
+<span class="kn">from</span>
+   <span class="nn">movies</span> <span class="n">m</span>
+   <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+   <span class="p">,</span> <span class="n">actors</span> <span class="n">a</span>
+<span class="n">where</span>
+   <span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Harry Potter and the Goblet of Fire&#39;</span>
+   <span class="ow">and</span> <span class="n">m</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">mr</span><span class="o">.</span><span class="n">movieid</span>
+   <span class="ow">and</span> <span class="n">mr</span><span class="o">.</span><span class="n">actorid</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Clustered indices also provide a sorted order to the relation</p></li>
+<li><p>Create unclustered indices on attributes with high selectivity</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">A</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">surname</span> <span class="n">FROM</span> <span class="n">Actors</span> <span class="n">A</span> <span class="n">WHERE</span> <span class="n">A</span><span class="o">.</span><span class="n">gender</span> <span class="o">=</span> <span class="s1">&#39;F&#39;</span><span class="p">;</span>
+
+<span class="n">SELECT</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">firstname</span>
+    <span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">lastname</span>
+<span class="n">FROM</span>
+    <span class="n">Actors</span> <span class="n">A</span>
+<span class="n">WHERE</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Kevin&#39;</span>
+    <span class="ow">and</span> <span class="n">A</span><span class="o">.</span><span class="n">surname</span> <span class="o">=</span><span class="s1">&#39;Bacon&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Gender is not a selective condition, but name and surname are.</p></li>
+</ul>
+</li>
+<li><p>Index nested loop join is also beneficial when there is a highly
+selective index</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">mr</span><span class="o">.</span><span class="n">movieid</span>
+<span class="n">FROM</span>
+   <span class="n">actors</span> <span class="n">a</span><span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+<span class="n">WHERE</span>
+   <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Kevin&#39;</span>
+   <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">surname</span> <span class="o">=</span> <span class="s1">&#39;Bacon&#39;</span>
+   <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">mr</span><span class="o">.</span><span class="n">actorid</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>For frequently asked queries, indices might be created to allow
+index only searches.</p>
+<p>For example, given (name, surname, id) for actors, answering a
+query like one below now requires only an index search for actors.</p>
+<dl class="simple">
+<dt>::</dt><dd><dl class="simple">
+<dt>SELECT</dt><dd><p>mr.movieid</p>
+</dd>
+<dt>FROM</dt><dd><p>actors a
+, movieroles mr</p>
+</dd>
+<dt>WHERE</dt><dd><p>a.name = ‘Kevin’
+and a.surname = ‘Bacon’
+and a.id = mr.actorid;</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<ul class="simple">
+<li><p>This is in effect a type of vertical partitioning.</p></li>
+</ul>
+</li>
+<li><p>For example, given a query like the one below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">a2</span><span class="o">.</span><span class="n">name</span>
+    <span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">surname</span>
+<span class="n">FROM</span>
+    <span class="n">actors</span> <span class="n">a1</span>
+    <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr1</span>
+    <span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr2</span>
+    <span class="p">,</span> <span class="n">actors</span> <span class="n">a2</span>
+<span class="n">WHERE</span>
+    <span class="n">a1</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Kevin&#39;</span>
+    <span class="ow">and</span> <span class="n">a1</span><span class="o">.</span><span class="n">surname</span> <span class="o">=</span> <span class="s1">&#39;Bacon&#39;</span>
+    <span class="ow">and</span> <span class="n">a1</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">mr1</span><span class="o">.</span><span class="n">actorid</span>
+    <span class="ow">and</span> <span class="n">mr1</span><span class="o">.</span><span class="n">movieid</span> <span class="o">=</span> <span class="n">mr2</span><span class="o">.</span><span class="n">movieid</span>
+    <span class="ow">and</span> <span class="n">a2</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">mr2</span><span class="o">.</span><span class="n">actorid</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>for A1, the index is searched in the usual way.</p>
+<p>For A2, the index on(stagename, actorid) can be searched fully
+instead of the relation to speed up the query.</p>
+</li>
+<li><p>Indices do not always help reduce the cost of queries:</p>
+<ul class="simple">
+<li><p>they must be selective</p></li>
+<li><p>they must be significantly smaller in size than the relation they
+are indexing</p></li>
+<li><p>they must be used often in queries where they make a difference</p></li>
+</ul>
+</li>
+<li><p>Foreign keys introduce hidden costs to updates since they must be
+checked for all updates that relate to them</p></li>
+<li><p>Count queries can be answered using indices on attributes with a
+“NOT NULL”” constraint (check if the index indices null values)</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="other-hints">
+<h2>Other hints<a class="headerlink" href="#other-hints" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Partition data to multiple disks</p>
+<ul>
+<li><p>Place data that is accessed sequentially on its own disk</p></li>
+</ul>
+</li>
+<li><p>Invoke parallel query processing when multiple CPUs are available</p></li>
+<li><p>Create more detailed statistics (histograms)</p></li>
+<li><p>Recompute statistics periodically as needed</p></li>
+<li><p>Examine the query plans generated by the system and influence them
+as necessary</p></li>
+</ul>
+</div>
+<div class="section" id="postgresql-optimizer">
+<h2>Postgresql Optimizer<a class="headerlink" href="#postgresql-optimizer" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Postgresql’s CBO (cost-based-optimizer) relies heavily on table
+statistics being available for all tables used in a query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">analyze</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>will recompute the statistics for all the tables in a database.</p>
+<p>Must be run periodically for updated statistics.</p>
+</li>
+<li><p>You can ask the optimizer to give you the query plan for a query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXPLAIN</span> <span class="n">query</span> <span class="p">;</span>
+
+<span class="n">EXPLAIN</span>
+<span class="n">SELECT</span>
+   <span class="n">mr</span><span class="o">.</span><span class="n">movieid</span>
+<span class="n">FROM</span>
+   <span class="n">actors</span> <span class="n">a</span><span class="p">,</span> <span class="n">movieroles</span> <span class="n">mr</span>
+<span class="n">WHERE</span>
+   <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Kevin&#39;</span>
+   <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">surname</span> <span class="o">=</span> <span class="s1">&#39;Bacon&#39;</span>
+   <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">mr</span><span class="o">.</span><span class="n">actorid</span><span class="p">;</span>
+
+                                          <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="o">----------------------------------------------------------------------------------------------</span>
+ <span class="n">Hash</span> <span class="n">Join</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mf">3302.62</span><span class="o">..</span><span class="mf">8991.86</span> <span class="n">rows</span><span class="o">=</span><span class="mi">2</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+   <span class="n">Hash</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">(</span><span class="n">mr</span><span class="o">.</span><span class="n">actorid</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="n">on</span> <span class="n">movieroles</span> <span class="n">mr</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mf">0.00</span><span class="o">..</span><span class="mf">4695.07</span> <span class="n">rows</span><span class="o">=</span><span class="mi">265107</span> <span class="n">width</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+   <span class="o">-&gt;</span>  <span class="n">Hash</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mf">3302.61</span><span class="o">..</span><span class="mf">3302.61</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+         <span class="o">-&gt;</span>  <span class="n">Seq</span> <span class="n">Scan</span> <span class="n">on</span> <span class="n">actors</span> <span class="n">a</span>  <span class="p">(</span><span class="n">cost</span><span class="o">=</span><span class="mf">0.00</span><span class="o">..</span><span class="mf">3302.61</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span> <span class="n">width</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+               <span class="n">Filter</span><span class="p">:</span> <span class="p">(((</span><span class="n">name</span><span class="p">)::</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Kevin&#39;</span><span class="p">::</span><span class="n">text</span><span class="p">)</span> <span class="n">AND</span> <span class="p">((</span><span class="n">surname</span><span class="p">)::</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Bacon&#39;</span><span class="p">::</span><span class="n">text</span><span class="p">))</span>
+<span class="p">(</span><span class="mi">6</span> <span class="n">rows</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>There are many methods from changing data model, queries and storage
+methods to improve performance.</p></li>
+<li><p>Performance must be improved for the whole workload. Compute the
+total cost of all queries multiplied by their frequency before and
+after tuning.</p></li>
+<li><p>Tuning is a complex optimization problem due to dependencies between
+different actions. Concentrate on queries that contribute most to
+the workload.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

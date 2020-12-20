@@ -1,0 +1,586 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Object-Relational Extensions &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Secondary Storage and Indexing" href="secondary_storage.html" />
+    <link rel="prev" title="SQL - Other Features" href="sql_otherfeatures.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">CSCI 4380 Database Systems - Fall 2020</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../course_notes.html">Course notes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction to Relational Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dbs_example.html">Example Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="relational_algebra.html">Relational Model and Algebra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="normalization.html">Normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="er.html">Entity-Relationship (ER) Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_basics.html">SQL - Part 1: Basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_advanced.html">SQL - Part 2: Advanced Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_dmlddl.html">SQL - Part 3: Data Definition and Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural.html">SQL - Procedural Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural2.html">SQL - Embedded SQL Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="or_frameworks.html">SQL - Object-Relational Frameworks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_otherfeatures.html">SQL - Other Features</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SQL - Object-Relational Extensions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#semantic-hierarchies-inheritance">Semantic Hierarchies - Inheritance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#complex-objects">Complex objects</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="secondary_storage.html">Secondary Storage and Indexing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="query_processing.html">Query Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../schedule.html">Detailed course schedule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recordings.html">Lecture Recordings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#external-links">External links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#review-sessions-and-office-hours">Review Sessions and Office Hours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#teaching-staff">Teaching Staff</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">CSCI 4380 Database Systems - Fall 2020</a> &raquo;</li>
+        
+          <li><a href="../course_notes.html">Course Notes - Fall 2020</a> &raquo;</li>
+        
+      <li>SQL - Object-Relational Extensions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2020/course_notes/sql_objectrelational.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-object-relational-extensions">
+<h1>SQL - Object-Relational Extensions<a class="headerlink" href="#sql-object-relational-extensions" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Postgresql and many other databases actually have many extensions
+that go well beyond the relational data model.</p></li>
+<li><p>As these extensions violate relational data model, think about
+what you are giving up and use them sparingly!</p>
+<ul>
+<li><p>Simplicity of data model and queries</p></li>
+<li><p>Optimizations may not be as easy to perform</p></li>
+</ul>
+</li>
+<li><p>We will go through some of these here, using Postgresql as an
+example.</p></li>
+</ul>
+<div class="section" id="semantic-hierarchies-inheritance">
+<h2>Semantic Hierarchies - Inheritance<a class="headerlink" href="#semantic-hierarchies-inheritance" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Recall in E-R diagrams, we talked about ISA
+relationships.</p>
+<ul class="simple">
+<li><p>A isa B, meaning A inherits all the
+attributes of B (and adds some more)</p></li>
+</ul>
+</li>
+<li><p>Postgresql allows you to define class hierarchies:</p>
+<p>See <code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">database</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">used</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">cities</span> <span class="p">(</span>
+     <span class="n">name</span>            <span class="n">text</span>
+     <span class="p">,</span> <span class="n">population</span>      <span class="nb">float</span>
+     <span class="p">,</span> <span class="n">altitude</span>        <span class="nb">int</span>     <span class="o">--</span> <span class="ow">in</span> <span class="n">feet</span>
+<span class="p">);</span>
+
+<span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">capitals</span> <span class="p">(</span>
+     <span class="n">state</span>           <span class="n">char</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="p">)</span> <span class="n">INHERITS</span> <span class="p">(</span><span class="n">cities</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>Querying subtables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">name</span>
+   <span class="p">,</span> <span class="n">altitude</span>
+<span class="n">FROM</span>
+   <span class="n">cities</span>
+<span class="n">WHERE</span>
+   <span class="n">altitude</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Includes all cities, i.e. capitals as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">name</span>
+   <span class="p">,</span> <span class="n">altitude</span>
+<span class="n">FROM</span> <span class="n">ONLY</span>
+   <span class="n">cities</span>
+<span class="n">WHERE</span>
+   <span class="n">altitude</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Includes only cities, not capitals.</p>
+</li>
+<li><p>To find out which table a row comes from:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">relname</span>
+    <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span>
+    <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">altitude</span>
+<span class="n">FROM</span>
+    <span class="n">cities</span> <span class="n">c</span>
+    <span class="p">,</span> <span class="n">pg_class</span> <span class="n">p</span>
+<span class="n">WHERE</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">altitude</span> <span class="o">&gt;</span> <span class="mi">50</span>
+    <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">tableoid</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">oid</span><span class="p">;</span>
+
+<span class="n">Output</span><span class="p">:</span>
+<span class="n">relname</span>   <span class="o">|</span>   <span class="n">name</span>    <span class="o">|</span> <span class="n">altitude</span>
+<span class="o">----------+-----------+----------</span>
+<span class="n">cities</span>    <span class="o">|</span> <span class="n">Las</span> <span class="n">Vegas</span> <span class="o">|</span>     <span class="mi">2174</span>
+<span class="n">cities</span>    <span class="o">|</span> <span class="n">Mariposa</span>  <span class="o">|</span>     <span class="mi">1953</span>
+<span class="n">capitals</span>  <span class="o">|</span> <span class="n">Madison</span>   <span class="o">|</span>      <span class="mi">84</span>
+</pre></div>
+</div>
+</li>
+<li><p>Semantic hierarchies about sets of objects and their relationship
+to each other.</p>
+<ul class="simple">
+<li><p>A type of object (capital) is a special type of city.</p></li>
+<li><p>All cities include the capitals.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="complex-objects">
+<h2>Complex objects<a class="headerlink" href="#complex-objects" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>You can create user defined types</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create</span> <span class="nb">type</span> <span class="n">phone_type</span> <span class="k">as</span> <span class="p">(</span>
+     <span class="n">num</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+     <span class="p">,</span> <span class="nb">type</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="n">create</span> <span class="n">table</span> <span class="n">person</span> <span class="p">(</span>
+     <span class="nb">id</span> <span class="nb">int</span>
+     <span class="p">,</span> <span class="n">name</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+     <span class="p">,</span> <span class="n">phone</span> <span class="n">phone_type</span>
+<span class="p">)</span> <span class="p">;</span>
+
+<span class="n">insert</span> <span class="n">into</span> <span class="n">person</span> <span class="n">values</span><span class="p">(</span>
+     <span class="mi">1</span>
+     <span class="p">,</span> <span class="s1">&#39;Kara Danvers&#39;</span>
+     <span class="p">,</span> <span class="p">(</span><span class="s1">&#39;555-1234&#39;</span><span class="p">,</span><span class="s1">&#39;work&#39;</span><span class="p">)::</span><span class="n">phone_type</span>
+<span class="p">)</span> <span class="p">;</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">person</span> <span class="p">;</span>
+
+ <span class="nb">id</span> <span class="o">|</span>     <span class="n">name</span>     <span class="o">|</span>      <span class="n">phone</span>
+<span class="o">----+--------------+-----------------</span>
+ <span class="mi">1</span> <span class="o">|</span> <span class="n">Kara</span> <span class="n">Danvers</span> <span class="o">|</span> <span class="p">(</span><span class="mi">555</span><span class="o">-</span><span class="mi">1234</span><span class="p">,</span><span class="n">work</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>These complex types really go against the first normal form: that
+all values should be atomic. But, they allow multiple related values
+to be encapsulated.</p></li>
+<li><p>You can access the types using dot notation</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">person</span> <span class="n">where</span> <span class="p">(</span><span class="n">phone</span><span class="p">)</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;work&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Technically you should store the both attributes for phone separately,
+but this way, you can tell that they belong together.</p></li>
+<li><p>You can also define user defined types to be restricted domains
+of values and then use in multiple places.</p></li>
+</ul>
+<div class="section" id="collection-of-values">
+<h3>Collection of Values<a class="headerlink" href="#collection-of-values" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>In addition to records (like the one above), you can also define
+collection of values.</p></li>
+<li><p>Arrays:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>CREATE TABLE tictactoe (
+    squares   integer[3][3]
+);
+
+INSERT INTO tictactoe VALUES(&#39;{{1,2,3},{4,5,6},{7,8,9}}&#39;);
+
+SELECT squares[3][2] FROM tictactoe; --not zero indexed
+
+squares
+---------
+8
+(1 row)
+
+
+CREATE TABLE messages (
+     msg  text[]
+) ;
+
+INSERT INTO messages VALUES (&#39;{&quot;hello&quot;, &quot;world&quot;}&#39;) ;
+INSERT INTO messages VALUES (&#39;{&quot;I&quot;, &quot;feel&quot;, &quot;so&quot;, &quot;free&quot;}&#39;) ;
+
+SELECT msg[2] FROM messages ;
+msg
+-------
+world
+feel
+(2 rows)
+
+SELECT msg[2:3] FROM messages; --slicing, really?
+
+msg
+-----------
+{world}
+{feel,so}
+(2 rows)
+</pre></div>
+</div>
+</li>
+<li><p>The best of use complex types is to write procedures/functions
+using pl/pgsql or a programming language like C.</p></li>
+</ul>
+</div>
+<div class="section" id="typed-objects-and-methods">
+<h3>Typed objects and methods<a class="headerlink" href="#typed-objects-and-methods" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>The main use of typed objects is to create extensions for handling
+specific types of data.</p></li>
+<li><p>For each data type, there are specific methods that apply to them,
+like an object-oriented programming language!</p></li>
+<li><p>Some really useful examples:</p>
+<ul>
+<li><p>Geographic data: points (geo locations), polygons (state, city
+boundaries), line segments (roads, rivers)</p></li>
+<li><p>Text data: vectors of words and weights for each word</p></li>
+<li><p>JSON</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SELECT &#39;{&quot;foo&quot;: {&quot;bar&quot;: &quot;baz&quot;}}&#39;::jsonb;
+
+jsonb
+-------------------------
+{&quot;foo&quot;: {&quot;bar&quot;: &quot;baz&quot;}}
+
+SELECT &#39;{&quot;foo&quot;: {&quot;bar&quot;: &quot;baz&quot;}}&#39;::jsonb-&gt;&#39;foo&#39;;
+
+?column?
+----------------
+{&quot;bar&quot;: &quot;baz&quot;}
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="geographic-data">
+<h3>Geographic Data<a class="headerlink" href="#geographic-data" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>PostGIS is an extension for supporting geographic data
+with many useful data types of functions.</p></li>
+<li><p>First install postgis and create the extension from a superuser:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create</span> <span class="n">extension</span> <span class="n">postgis</span><span class="p">;</span>
+<span class="n">create</span> <span class="n">database</span> <span class="n">geodb</span> <span class="n">owner</span> <span class="n">sibeladali</span> <span class="n">template</span> <span class="n">template_postgis</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Now you can use all the data types and methods available in postgis.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">bwithloc</span> <span class="p">(</span>
+     <span class="n">name</span>  <span class="n">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+     <span class="p">,</span> <span class="n">location</span> <span class="n">geography</span><span class="p">(</span><span class="n">POINT</span><span class="p">,</span><span class="mi">4326</span><span class="p">)</span>
+<span class="p">)</span> <span class="p">;</span>
+
+<span class="n">insert</span> <span class="n">into</span> <span class="n">bwithloc</span> <span class="n">values</span><span class="p">(</span><span class="s1">&#39;Rensselaer Polytechnic Institute&#39;</span><span class="p">,</span>
+     <span class="n">ST_GeographyFromText</span><span class="p">(</span><span class="s1">&#39;SRID=4326;POINT(42.7308634 -73.6816793)&#39;</span><span class="p">));</span>
+
+<span class="n">insert</span> <span class="n">into</span> <span class="n">bwithloc</span> <span class="n">values</span><span class="p">(</span><span class="s1">&#39;Shalimar Restaurant&#39;</span><span class="p">,</span>
+     <span class="n">ST_GeographyFromText</span><span class="p">(</span><span class="s1">&#39;SRID=4326;POINT(42.732293 -73.688473)&#39;</span><span class="p">));</span>
+
+<span class="n">insert</span> <span class="n">into</span> <span class="n">bwithloc</span> <span class="n">values</span><span class="p">(</span><span class="s1">&#39;The Placid Baker&#39;</span><span class="p">,</span>
+     <span class="n">ST_GeographyFromText</span><span class="p">(</span><span class="s1">&#39;SRID=4326;POINT(42.7313916 -73.690868)&#39;</span><span class="p">));</span>
+</pre></div>
+</div>
+</li>
+<li><p>SRID shows the projection used to compute the latitude and longitude.</p></li>
+<li><p>You can also enter polygons as arrays of points, line segments are arrays
+of lines, etc.</p></li>
+<li><p>Many geography functions are available (distance is in meters):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">b1</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">b2</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">ST_DISTANCE</span><span class="p">(</span><span class="n">b1</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">b2</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+<span class="n">FROM</span>
+   <span class="n">bwithloc</span> <span class="n">b1</span>
+   <span class="p">,</span> <span class="n">bwithloc</span> <span class="n">b2</span>
+<span class="n">WHERE</span>
+   <span class="n">b1</span><span class="o">.</span><span class="n">name</span> <span class="o">&lt;</span> <span class="n">b2</span><span class="o">.</span><span class="n">name</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Other examples:</p>
+<ul class="simple">
+<li><p>Check whether a point is inside a polygon (which city is this
+restaurant in)?</p></li>
+<li><p>Check the length of a line segment</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="text-querying">
+<h3>Text Querying<a class="headerlink" href="#text-querying" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>The text queries we have seen so far very simplistic: find if
+the text contains a specific word.</p></li>
+<li><p>More sophisticated approaches treat text as a collection of
+words or tokens.</p>
+<ul class="simple">
+<li><p>If you want to learn more, information retrieval is a field
+that studies this!</p></li>
+</ul>
+</li>
+<li><p>Postgresql supports text processing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;fat cats ate fat rats&#39;</span><span class="p">);</span>
+
+<span class="n">to_tsvector</span>
+<span class="o">-----------------------------------</span>
+<span class="s1">&#39;ate&#39;</span><span class="p">:</span><span class="mi">3</span> <span class="s1">&#39;cat&#39;</span><span class="p">:</span><span class="mi">2</span> <span class="s1">&#39;fat&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span> <span class="s1">&#39;rat&#39;</span><span class="p">:</span><span class="mi">5</span>
+</pre></div>
+</div>
+<p>numbers show the location of the keyword in the text.</p>
+</li>
+<li><p>Text queries will consist of boolean connection of keywords,
+tokenized and stop words removed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;The &amp; Fat &amp; Rats&#39;</span><span class="p">);</span>
+<span class="n">to_tsquery</span>
+<span class="o">---------------</span>
+<span class="s1">&#39;fat&#39;</span> <span class="o">&amp;</span> <span class="s1">&#39;rat&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can search a keyword query in a document by relevance. The
+number of times a word appears will increase the relevance of the
+text to the query.</p>
+<p>We will use the Yelp database as an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">b</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">ts_rank_cd</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">review_text</span><span class="p">),</span> <span class="n">query</span><span class="p">)</span> <span class="n">AS</span> <span class="n">rank</span>
+<span class="n">FROM</span>
+   <span class="n">reviews</span> <span class="n">r</span>
+   <span class="p">,</span> <span class="n">businesses</span> <span class="n">b</span>
+   <span class="p">,</span> <span class="n">to_tsquery</span><span class="p">(</span><span class="s1">&#39;pizza &amp; (crust | sauce) &amp; (delicious|tasty)&#39;</span><span class="p">)</span> <span class="n">query</span>
+<span class="n">WHERE</span>
+   <span class="n">b</span><span class="o">.</span><span class="n">business_id</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">business_id</span>
+   <span class="ow">and</span> <span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">review_text</span><span class="p">)</span> <span class="o">@@</span> <span class="n">query</span>
+<span class="n">ORDER</span> <span class="n">BY</span>
+   <span class="n">rank</span> <span class="n">DESC</span>
+<span class="n">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+
+            <span class="n">name</span>            <span class="o">|</span>   <span class="n">rank</span>
+<span class="o">----------------------------+-----------</span>
+ <span class="n">DeFazio</span><span class="s1">&#39;s Pizzeria         |      0.05</span>
+ <span class="n">Little</span> <span class="n">Bites</span> <span class="ow">and</span> <span class="n">More</span>      <span class="o">|</span>      <span class="mf">0.05</span>
+ <span class="n">Notty</span> <span class="n">Pine</span> <span class="n">Tavern</span>          <span class="o">|</span> <span class="mf">0.0366667</span>
+ <span class="n">Red</span> <span class="n">Front</span> <span class="n">Restrnt</span> <span class="o">&amp;</span> <span class="n">Tavern</span> <span class="o">|</span> <span class="mf">0.0285714</span>
+ <span class="n">New</span> <span class="n">York</span> <span class="n">Style</span> <span class="n">Pizza</span>       <span class="o">|</span>     <span class="mf">0.025</span>
+ <span class="n">Milano</span> <span class="n">Restaurant</span>          <span class="o">|</span> <span class="mf">0.0218698</span>
+ <span class="n">DeFazio</span><span class="s1">&#39;s Pizzeria         | 0.0202986</span>
+ <span class="n">The</span> <span class="n">Fresh</span> <span class="n">Market</span>           <span class="o">|</span>      <span class="mf">0.02</span>
+ <span class="n">Dante</span><span class="s1">&#39;s Pizzeria           | 0.0192982</span>
+ <span class="n">Labella</span> <span class="n">Pizza</span>              <span class="o">|</span> <span class="mf">0.0155556</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Postgresql extensible with many new data types and
+associated methods.</p></li>
+<li><p>We will also see how it is possible to create the appropriate
+indices for these data types.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="secondary_storage.html" class="btn btn-neutral float-right" title="Secondary Storage and Indexing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sql_otherfeatures.html" class="btn btn-neutral float-left" title="SQL - Other Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

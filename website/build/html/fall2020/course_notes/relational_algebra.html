@@ -1,0 +1,1033 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Relational Model and Algebra &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Normalization" href="normalization.html" />
+    <link rel="prev" title="Example Database" href="dbs_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">CSCI 4380 Database Systems - Fall 2020</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../course_notes.html">Course notes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction to Relational Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dbs_example.html">Example Database</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Relational Model and Algebra</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relational-algebra-overview">Relational Algebra Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#set-operators">Set operators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#set-operation-examples">Set Operation Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rename">Rename</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#selection">Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#projection">Projection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cartesian-product">Cartesian Product</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cartesian-product-example">Cartesian Product Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#theta-join-or-simply-join">Theta-Join (or simply Join)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#natural-join">Natural Join</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exercises">Exercises:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="normalization.html">Normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="er.html">Entity-Relationship (ER) Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_basics.html">SQL - Part 1: Basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_advanced.html">SQL - Part 2: Advanced Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_dmlddl.html">SQL - Part 3: Data Definition and Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural.html">SQL - Procedural Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural2.html">SQL - Embedded SQL Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="or_frameworks.html">SQL - Object-Relational Frameworks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_otherfeatures.html">SQL - Other Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_objectrelational.html">SQL - Object-Relational Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="secondary_storage.html">Secondary Storage and Indexing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="query_processing.html">Query Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../schedule.html">Detailed course schedule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recordings.html">Lecture Recordings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#external-links">External links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#review-sessions-and-office-hours">Review Sessions and Office Hours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#teaching-staff">Teaching Staff</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">CSCI 4380 Database Systems - Fall 2020</a> &raquo;</li>
+        
+          <li><a href="../course_notes.html">Course Notes - Fall 2020</a> &raquo;</li>
+        
+      <li>Relational Model and Algebra</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2020/course_notes/relational_algebra.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="relational-model-and-algebra">
+<h1>Relational Model and Algebra<a class="headerlink" href="#relational-model-and-algebra" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Relational algebra is a mathematical query language for relations.</p></li>
+<li><p>It is a set based query language:</p>
+<ul>
+<li><p>The input to each operator is one or more relations, sets of tuples.</p></li>
+<li><p>The output of each operator is a relation: a set of tuples.</p></li>
+</ul>
+</li>
+<li><p>Relational algebra is based on a minimal set of operators that can
+be combined to write complex queries.</p></li>
+<li><p>The meaning (semantics) of other query languages, i.e. SQL, are
+defined in terms of relational algebra.</p></li>
+<li><p>SQL queries are translated to relational algebra.</p></li>
+<li><p>Databases implement relational algebra operators to execute SQL queries.</p>
+<ul>
+<li><p>Caveat: we will see a bag version of these operators for SQL later in the semester.</p></li>
+</ul>
+</li>
+<li><p>Mathematical definition of database design (normalization) uses
+relational algebra.</p></li>
+</ul>
+</div>
+<div class="section" id="relational-algebra-overview">
+<h2>Relational Algebra Overview<a class="headerlink" href="#relational-algebra-overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Crucial operators (complete set):</p>
+<ul>
+<li><p>Union</p></li>
+<li><p>Set difference</p></li>
+<li><p>Selection</p></li>
+<li><p>Projection</p></li>
+<li><p>Cartesian Product</p></li>
+<li><p>Renaming</p></li>
+</ul>
+</li>
+<li><p>Derived operators (added for convenience):</p>
+<ul>
+<li><p>Theta join</p></li>
+<li><p>Natural join</p></li>
+<li><p>Set intersection</p></li>
+</ul>
+</li>
+<li><p>Each operator has a Greek symbol that starts with the
+same letter as the operator: Select-sigma, Project-Pi, etc.</p></li>
+</ul>
+</div>
+<div class="section" id="set-operators">
+<h2>Set operators<a class="headerlink" href="#set-operators" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>We use the term
+<strong>union compatible</strong>
+to mean that two relations have the same schema: exactly same attributes
+drawn from the same domain.</p></li>
+<li><p>Given two relations R and S that are union compatible:</p>
+<ul>
+<li><p>Union:</p>
+<div class="math notranslate nohighlight">
+\[R \cup S = \{ \mbox{the set of all tuples that are either in R or S} \}\]</div>
+</li>
+<li><p>Intersection:</p>
+<div class="math notranslate nohighlight">
+\[R \cap S = \{ \mbox{the set of all tuples are both in R and S} \}\]</div>
+</li>
+<li><p>Set difference:</p>
+<div class="math notranslate nohighlight">
+\[R - S = \{ \mbox{the set of all tuples that are in R but not in S} \}\]</div>
+</li>
+</ul>
+</li>
+<li><p>The result is a relation with same schema as R (and S).</p></li>
+<li><p>If two relations are not union compatible, the set operation is not
+defined.</p></li>
+<li><p>Note that set intersection is not technically necessary as it can
+driven from other operations:</p>
+<div class="math notranslate nohighlight">
+\[R \,\cap\, S = (R\,\cup\,S)- ((R-S)\,\cup\,(S-R))\]</div>
+</li>
+</ul>
+</div>
+<div class="section" id="set-operation-examples">
+<h2>Set Operation Examples<a class="headerlink" href="#set-operation-examples" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The relations MarvelHeroes, DCHeroes, TVHeros are compatible, they
+have the same attributes.</p></li>
+<li><p>The relations Movies and TVShows are not compatible, they have different
+attributes. Even if they had the same number of attributes, the name of
+attributes should match.</p></li>
+<li><p>Find all heroes in the database</p>
+<div class="math notranslate nohighlight">
+\[MarvelHeroes \,\cup\, DCHeroes\]</div>
+</li>
+<li><p>Find all heroes that are in both universes (which we know will be the
+empty set)</p>
+<div class="math notranslate nohighlight">
+\[MarvelHeroes \,\cap\, DCHeroes\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 41%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+<th class="head"><p>hero</p></th>
+<th class="head"><p>realname</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Find all DC comics heroes that are in a TV show</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[DCHeroes \,\cap\, TVHeroes\]</div>
+</div></blockquote>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 41%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+<th class="head"><p>hero</p></th>
+<th class="head"><p>realname</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h8</p></td>
+<td><p>Superman</p></td>
+<td><p>Clark Kent</p></td>
+</tr>
+<tr class="row-odd"><td><p>h9</p></td>
+<td><p>Batman</p></td>
+<td><p>Bruce Wayne</p></td>
+</tr>
+<tr class="row-even"><td><p>h10</p></td>
+<td><p>Supergirl</p></td>
+<td><p>Kara Danvers</p></td>
+</tr>
+<tr class="row-odd"><td><p>h11</p></td>
+<td><p>Flash</p></td>
+<td><p>Barry Allen</p></td>
+</tr>
+<tr class="row-even"><td><p>h12</p></td>
+<td><p>Arrow</p></td>
+<td><p>Oliver Queen</p></td>
+</tr>
+<tr class="row-odd"><td><p>h14</p></td>
+<td><p>Wonder Woman</p></td>
+<td><p>Diana Prince</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Find all Marvel Comics heroes that are not in a TV show</p>
+<div class="math notranslate nohighlight">
+\[MarvelHeroes \,-\, TVHeroes\]</div>
+</li>
+<li><p>Find all heroes that are not in a TV show (both solutions are equivalent)</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}(MarvelHeroes \,\cup\, DCHeroes) \,-\, TVHeroes\\(MarvelHeroes\,-\, TVHeroes) \,\cup\, (DCHeroes\,-\, TVHeroes)\end{aligned}\end{align} \]</div>
+</li>
+<li><p>Note that set subtraction is special, it is the only way to write
+negation (something that is NOT true for the whole relation)</p></li>
+</ul>
+</div>
+<div class="section" id="rename">
+<h2>Rename<a class="headerlink" href="#rename" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Rename operation renames the relation and the attributes in it.
+It does not change the contents of the relation.</p></li>
+<li><p>We can use any of two following notations for rename.</p></li>
+<li><p>Option 1.</p>
+<div class="math notranslate nohighlight">
+\[\rho_{S(A_1,A_2,\ldots,A_n)} \, R\]</div>
+</li>
+<li><p>Option 2.</p>
+<div class="math notranslate nohighlight">
+\[S(A_1,A_2,\ldots,A_n) := R\]</div>
+<p>If you did not list the attributes, you are simply changing the name
+of the relation:</p>
+<div class="math notranslate nohighlight">
+\[S := R\]</div>
+<p>This is used to give names to intermediate results of the relational
+algebra operations.</p>
+</li>
+<li><p>Example:</p>
+<div class="math notranslate nohighlight">
+\[X(id1, hero1, r1) := DCHeroes\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 41%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>id1</p></th>
+<th class="head"><p>hero1</p></th>
+<th class="head"><p>r1</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h8</p></td>
+<td><p>Superman</p></td>
+<td><p>Clark Kent</p></td>
+</tr>
+<tr class="row-odd"><td><p>h9</p></td>
+<td><p>Batman</p></td>
+<td><p>Bruce Wayne</p></td>
+</tr>
+<tr class="row-even"><td><p>h10</p></td>
+<td><p>Supergirl</p></td>
+<td><p>Kara Danvers</p></td>
+</tr>
+<tr class="row-odd"><td><p>h11</p></td>
+<td><p>Flash</p></td>
+<td><p>Barry Allen</p></td>
+</tr>
+<tr class="row-even"><td><p>h12</p></td>
+<td><p>Arrow</p></td>
+<td><p>Oliver Queen</p></td>
+</tr>
+<tr class="row-odd"><td><p>h13</p></td>
+<td><p>Green Lantern</p></td>
+<td><p>Hal Jordan</p></td>
+</tr>
+<tr class="row-even"><td><p>h14</p></td>
+<td><p>Wonder Woman</p></td>
+<td><p>Diana Prince</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="selection">
+<h2>Selection<a class="headerlink" href="#selection" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a relation R and a boolean condition C over the attributes of
+R, the selection is given by:</p>
+<div class="math notranslate nohighlight">
+\[\sigma_C\, R = \{ \mbox{the set of all tuples in R that satisfy the condition C}\}\]</div>
+<ul class="simple">
+<li><p>Selection returns a new relation with the same
+schema as R, but containing a subset of the tuples in R based on the
+condition C.</p></li>
+</ul>
+</li>
+<li><p>All movies made before 2010</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{year &lt; 2010}\, Movies\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 83%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>mid</p></th>
+<th class="head"><p>moviename</p></th>
+<th class="head"><p>year</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>m2</p></td>
+<td><p>Iron Man</p></td>
+<td><p>2008</p></td>
+</tr>
+<tr class="row-odd"><td><p>m4</p></td>
+<td><p>The Incredible Hulk</p></td>
+<td><p>2008</p></td>
+</tr>
+<tr class="row-even"><td><p>m13</p></td>
+<td><p>Superman Returns</p></td>
+<td><p>2006</p></td>
+</tr>
+<tr class="row-odd"><td><p>m14</p></td>
+<td><p>The Dark Knight</p></td>
+<td><p>2008</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>All heroes who do not have an alias</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{hero=realname} (MarvelHeroes \,\cup\, DCHeroes)\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 41%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+<th class="head"><p>hero</p></th>
+<th class="head"><p>realname</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h15</p></td>
+<td><p>Jessica Jones</p></td>
+<td><p>Jessica Jones</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>All TV shows that are still running and have started after 2012.</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{firstyear\geq 2013 \mbox{ and } ended=No}\, TVShows\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 27%" />
+<col style="width: 10%" />
+<col style="width: 14%" />
+<col style="width: 18%" />
+<col style="width: 16%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>sid</p></th>
+<th class="head"><p>showname</p></th>
+<th class="head"><p>hid</p></th>
+<th class="head"><p>Channel</p></th>
+<th class="head"><p>FirstYear</p></th>
+<th class="head"><p>LastYear</p></th>
+<th class="head"><p>Ended</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>s3</p></td>
+<td><p>Supergirl</p></td>
+<td><p>h10</p></td>
+<td><p>CBS</p></td>
+<td><p>2015</p></td>
+<td><p>2016</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>s4</p></td>
+<td><p>Gotham</p></td>
+<td><p>h9</p></td>
+<td><p>FOX</p></td>
+<td><p>2014</p></td>
+<td><p>2016</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>s5</p></td>
+<td><p>Jessica Jones</p></td>
+<td><p>h15</p></td>
+<td><p>Netflix</p></td>
+<td><p>2015</p></td>
+<td><p>2016</p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="projection">
+<h2>Projection<a class="headerlink" href="#projection" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Projection does not change the tuples in the relation, but the
+schema of the relation.</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{A_1,A_2,\ldots,A_n}\, R = \{\mbox{all tuples in R but only containing attributes} A_1,A_2,\ldots,A_n\}\]</div>
+</li>
+<li><p>As each operator returns a set of tuples, any duplicate values will be
+removed. As a result, the result of a projection may contain fewer
+tuples than the input relation.</p></li>
+<li><p>Find the real name of all heroes</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{realname} (MarvelHeroes \,\cup\, DCHeroes)\]</div>
+</li>
+<li><p>Find the id of all heroes in a TV show</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{hid} TVHeroes\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h3</p></td>
+</tr>
+<tr class="row-odd"><td><p>h8</p></td>
+</tr>
+<tr class="row-even"><td><p>h9</p></td>
+</tr>
+<tr class="row-odd"><td><p>h10</p></td>
+</tr>
+<tr class="row-even"><td><p>h11</p></td>
+</tr>
+<tr class="row-odd"><td><p>h12</p></td>
+</tr>
+<tr class="row-even"><td><p>h14</p></td>
+</tr>
+<tr class="row-odd"><td><p>h15</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Find all years in which a hero movie was made</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{year} Movies\]</div>
+</li>
+<li><p>Find the id of all heroes that were both in a movie and a tv show.</p>
+<div class="math notranslate nohighlight">
+\[(\Pi_{hid} TVShows) \,\cap\, (\Pi_{hid} HeroInMovie)\]</div>
+</li>
+</ul>
+<blockquote>
+<div><p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h12</p></td>
+</tr>
+<tr class="row-odd"><td><p>h11</p></td>
+</tr>
+<tr class="row-even"><td><p>h10</p></td>
+</tr>
+<tr class="row-odd"><td><p>h9</p></td>
+</tr>
+<tr class="row-even"><td><p>h15</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul>
+<li><p>Find the id of all movies with no heroes in them (according to our
+database instance)</p>
+<div class="math notranslate nohighlight">
+\[(\Pi_{mid} Movies) - (\Pi_{mid} HeroInMovie)\]</div>
+</li>
+</ul>
+<blockquote>
+<div><p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>mid</p></th>
+</tr>
+<tr class="row-even"></tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>m10</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul>
+<li><p>Find start and end year of all TV shows with name <cite>The Flash</cite>.</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{firstyear, lastyear} (\sigma_{showname=The Flash}\, TVShows)\]</div>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 53%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>FirstYear</p></th>
+<th class="head"><p>LastYear</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2012</p></td>
+<td><p>2016</p></td>
+</tr>
+<tr class="row-odd"><td><p>1990</p></td>
+<td><p>1991</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Projection is crucial for changing the schema of relations, especially
+before a set operation!</p></li>
+</ul>
+</div>
+<div class="section" id="cartesian-product">
+<h2>Cartesian Product<a class="headerlink" href="#cartesian-product" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given two relations R and S that have no attributes in common,</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}  R \times S = \{\mbox{tuples (r,s) for all tuples r in R and s in S}\}\\Note that (r,s) contains a value for attributes in R and all attributes
+in S.\end{aligned}\end{align} \]</div>
+</li>
+<li><p>The schema of RxS is the union of the attributes in R and S. As a result,
+the attributes in R and S must have unique names to distinguish them
+from each other.</p></li>
+<li><p>Cartesian product is a multiplication. If R has n tuples and S has
+m tuples, the Cartesian product will produce n*s tuples.</p></li>
+<li><p>Cartesian product is the only way to put tuples from two relations
+side by side.</p></li>
+</ul>
+</div>
+<div class="section" id="cartesian-product-example">
+<h2>Cartesian Product Example<a class="headerlink" href="#cartesian-product-example" title="Permalink to this headline">¶</a></h2>
+<p>Given the following smaller relation instances:</p>
+<p>HeroInMovie</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+<th class="head"><p>mid</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h1</p></td>
+<td><p>m1</p></td>
+</tr>
+<tr class="row-odd"><td><p>h2</p></td>
+<td><p>m2</p></td>
+</tr>
+</tbody>
+</table>
+<p>R1(h1, hero, realname) := MarvelHeroes</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 41%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>h1</p></th>
+<th class="head"><p>hero</p></th>
+<th class="head"><p>realname</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h1</p></td>
+<td><p>Captain America</p></td>
+<td><p>Steve Rogers</p></td>
+</tr>
+<tr class="row-odd"><td><p>h2</p></td>
+<td><p>Iron Man</p></td>
+<td><p>Tony Stark</p></td>
+</tr>
+<tr class="row-even"><td><p>h3</p></td>
+<td><p>Hulk</p></td>
+<td><p>Bruce Banner</p></td>
+</tr>
+</tbody>
+</table>
+<p>HeroInMovie x R1:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 9%" />
+<col style="width: 7%" />
+<col style="width: 34%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+<th class="head"><p>mid</p></th>
+<th class="head"><p>h1</p></th>
+<th class="head"><p>hero</p></th>
+<th class="head"><p>realname</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h1</p></td>
+<td><p>m1</p></td>
+<td><p>h1</p></td>
+<td><p>Captain America</p></td>
+<td><p>Steve Rogers</p></td>
+</tr>
+<tr class="row-odd"><td><p>h1</p></td>
+<td><p>m1</p></td>
+<td><p>h2</p></td>
+<td><p>Iron Man</p></td>
+<td><p>Tony Stark</p></td>
+</tr>
+<tr class="row-even"><td><p>h1</p></td>
+<td><p>m1</p></td>
+<td><p>h3</p></td>
+<td><p>Hulk</p></td>
+<td><p>Bruce Banner</p></td>
+</tr>
+<tr class="row-odd"><td><p>h2</p></td>
+<td><p>m2</p></td>
+<td><p>h1</p></td>
+<td><p>Captain America</p></td>
+<td><p>Steve Rogers</p></td>
+</tr>
+<tr class="row-even"><td><p>h2</p></td>
+<td><p>m2</p></td>
+<td><p>h2</p></td>
+<td><p>Iron Man</p></td>
+<td><p>Tony Stark</p></td>
+</tr>
+<tr class="row-odd"><td><p>h2</p></td>
+<td><p>m2</p></td>
+<td><p>h3</p></td>
+<td><p>Hulk</p></td>
+<td><p>Bruce Banner</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>Notice that we renamed the id attribute in MarvelHeroes to make
+sure the schema of the two relations had no attributes in common.</p></li>
+<li><p>If we wanted to return only the tuples with matching hero ids,
+we need to do a selection:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}R1(h1, hero, realname) := MarvelHeroes\\\Pi_{hero} (\sigma_{hid=h1}\, (HeroInMovie \times R1))\end{aligned}\end{align} \]</div>
+<p>This query returns the name of all Marvel heroes who have a
+movie in the database.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="theta-join-or-simply-join">
+<h2>Theta-Join (or simply Join)<a class="headerlink" href="#theta-join-or-simply-join" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Cartesian product is often (but not always) followed by a
+selection. We can define a short cut for this combination for
+simplicity:</p>
+<div class="math notranslate nohighlight">
+\[R \,\bowtie_C\, S\]</div>
+<p>which is read as R theta join S on join condition C.</p>
+</li>
+<li><p>Join is the same as a Cartesian product, followed by a selection:</p>
+<div class="math notranslate nohighlight">
+\[R \,\bowtie_C\, S = \sigma_C (R\times S)\]</div>
+</li>
+<li><p>A join condition must involve expressions that compare attributes
+from R to S.</p>
+<ul class="simple">
+<li><p>Given R(A,B) and S(C,D):</p>
+<ul>
+<li><p>(A=C or B&gt;D) is a join condition.</p></li>
+<li><p>A=5 or B=4 is not a join condition.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>We can rewrite the above query as:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}R1(h1, hero, realname) := MarvelHeroes\\\Pi_{hero} (HeroInMovie \bowtie_{hid=h1} R1))\end{aligned}\end{align} \]</div>
+</li>
+<li><p>Note that you equally have to rename attributes before using
+theta-join to make sure join conditions can be written unambiguously.</p></li>
+</ul>
+</div>
+<div class="section" id="natural-join">
+<h2>Natural Join<a class="headerlink" href="#natural-join" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Natural join of two relations R and S (R*S) is given by a join on
+the equality of all attributes in common. The common attributes
+are not repeated.</p></li>
+<li><p>For example:</p>
+<div class="math notranslate nohighlight">
+\[R := DCHeroes * HeroInMovie\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight">
+\[R := DCHeroes \bowtie HeroInMovie\]</div>
+</li>
+</ul>
+<p>will return a relation R with schema:</p>
+<blockquote>
+<div><p>R(hid, hero, realname, mid)</p>
+<p>such that</p>
+<ul class="simple">
+<li><p>R matches hero ids from DCHeroes and HeroInMovie</p></li>
+<li><p>R only contains heroes with a movie and movies with a matching hero</p></li>
+<li><p>hid is not repeated</p></li>
+</ul>
+<p>Output:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 41%" />
+<col style="width: 38%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hid</p></th>
+<th class="head"><p>hero</p></th>
+<th class="head"><p>realname</p></th>
+<th class="head"><p>mid</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h8</p></td>
+<td><p>Superman</p></td>
+<td><p>Clark Kent</p></td>
+<td><p>m13</p></td>
+</tr>
+<tr class="row-odd"><td><p>h9</p></td>
+<td><p>Batman</p></td>
+<td><p>Bruce Wayne</p></td>
+<td><p>m14</p></td>
+</tr>
+<tr class="row-even"><td><p>h13</p></td>
+<td><p>Green Lantern</p></td>
+<td><p>Hal Jordan</p></td>
+<td><p>m15</p></td>
+</tr>
+<tr class="row-odd"><td><p>h14</p></td>
+<td><p>Wonder Woman</p></td>
+<td><p>Diana Prince</p></td>
+<td><p>m16</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul>
+<li><p>Find the name of all movies with the hero whose real name is Tony
+Stark or Bruce Wayne.</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}R1 := (MarvelComics \,\cup\, DCComics) * HeroInMovie * Movies\\R2 := \sigma_{\mbox{realname = Tony Stark or realname=Bruce Wayne}} R\\R3 := \Pi_{moviename} R2\end{aligned}\end{align} \]</div>
+</li>
+</ul>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises:<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p>Write the following queries using relational algebra. Try
+the simplest possible expression possible. There may be multiple
+solutions to the same query.</p>
+<ol class="arabic">
+<li><p>Find the name of all movies that are released after 2014 and
+has a Marvel comic hero in them.</p></li>
+<li><p>Find pairs of heroes who have starred in the same movie. Return
+their aliases.</p>
+<p>Try to write this so that you only return each pair only once (do
+not return both a,b and b,a)</p>
+</li>
+<li><p>Find the name of all movies that has more than one comic hero
+in them.</p></li>
+<li><p>Find the name of all movies that has only one comic hero in
+them.</p></li>
+<li><p>Find the TV shows that star heroes who have also been in a movie.</p></li>
+</ol>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Observe that there are many ways to write the same query using
+different relational algebra operators or different ordering of
+the same operators.</p></li>
+<li><p>Logically equivalent operations may have different time complexity,
+that is what query optimization is about.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="normalization.html" class="btn btn-neutral float-right" title="Normalization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dbs_example.html" class="btn btn-neutral float-left" title="Example Database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

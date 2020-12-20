@@ -1,0 +1,299 @@
+
+SELECT 'Homework 4 Sample Answers' || E'\n' ||
+       'Generated on: ' || to_char(now(), 'MM-DD HH:MM PM') ||  E'\n' ||
+       'Always check for the latest version before testing against.';
+
+SELECT 'query1';
+
+SELECT
+    e.name
+    , e.etype
+FROM
+    events e
+    , sports s
+WHERE
+    e.sid = s.id
+    and s.discipline = 'Figure skating'
+ORDER BY
+    e.name
+    , e.etype;
+
+
+SELECT 'query 2';
+
+SELECT DISTINCT
+   c.code
+   , c.name
+FROM
+    olympics o
+    , winter_medals m
+    , athletes a
+    , countries c
+WHERE
+    m.oid = o.id
+    and m.aid = a.id
+    and a.country = c.code
+    and o.otype = 'winter'
+    and o.year = 1924
+    and o.city = 'Chamonix'
+ORDER BY
+    c.code
+    , c.name ;
+
+
+
+SELECT 'query 3';
+
+SELECT DISTINCT
+   o.year
+   , count(distinct a.country) as num_countries
+FROM
+    olympics o
+    , winter_medals m
+    , athletes a
+WHERE
+    m.oid = o.id
+    and m.aid = a.id
+    and o.otype = 'winter'
+GROUP BY
+    o.year
+ORDER BY
+    num_countries desc
+    , year desc;
+
+
+
+SELECT 'query 4';
+
+SELECT
+   o1.year as year1
+   , o1.city as city1
+   , o2.year as year2
+   , o2.city as city2
+   , a.name as athlete
+   , a.country
+   , e.name as event
+FROM
+    olympics o1
+    , olympics o2
+    , winter_medals m1
+    , winter_medals m2
+    , events e
+    , athletes a
+WHERE
+    o1.otype = 'winter'
+    and o2.otype = 'winter'
+    and o2.year >= o1.year + 12
+    and m1.oid = o1.id
+    and m2.oid = o2.id
+    and m1.eid = m2.eid
+    and m1.aid = m2.aid
+     and m1.medal = 'Gold'
+    and m2.medal = 'Gold'
+    and m2.eid = e.id
+    and m1.aid = a.id
+ORDER BY
+    year1, year2, athlete, event;
+
+
+SELECT 'query 5';
+
+SELECT
+    e.id
+    , e.name
+    , s.discipline
+FROM
+    events e
+    , sports s
+WHERE
+    e.sid = s.id
+    AND stype = 'winter'
+EXCEPT
+SELECT
+    e.id
+    , e.name
+    , s.discipline
+FROM
+    sports s
+    , events e
+    , winter_medals m
+    , olympics o
+WHERE
+    e.sid = s.id
+    and m.eid = e.id
+    and m.oid = o.id
+    and o.year >= 2000
+    and s.stype = 'winter'
+ORDER BY
+    name
+    , discipline;
+
+
+SELECT 'query 6';
+
+SELECT
+   a.id
+   , a.name
+   , a.country
+FROM
+   winter_medals m
+   , athletes a
+WHERE
+   m.aid = a.id
+   and m.medal = 'Gold'
+INTERSECT
+SELECT
+   a.id
+   , a.name
+   , a.country
+FROM
+   summer_medals m
+   , athletes a
+WHERE
+   m.aid = a.id
+   and m.medal = 'Gold'
+ORDER BY
+   name
+   , country;
+
+
+
+SELECT 'query 7';
+
+SELECT DISTINCT
+    a.id
+    , a.name
+    , a.country
+FROM
+    athletes a
+    , summer_medals m
+WHERE
+    a.id = m.aid
+    and m.medal = 'Gold'
+GROUP BY
+    a.id
+    , a.name
+    , m.oid
+HAVING
+    count(*) >= 6
+ORDER BY
+    a.name
+    , a.country;
+
+
+SELECT 'Query 8';
+
+SELECT
+    a.id
+    , a.name
+    , a.country
+FROM
+    athletes a
+    , summer_medals m
+WHERE
+    m.aid = a.id
+    and m.medal = 'Bronze'
+    and a.name like '%,%'
+    and a.country like '%U%'
+    and substring(a.name, position(',' in a.name)+2) like 'Z%'
+UNION
+SELECT
+    a.id
+    , a.name
+    , a.country
+FROM
+    athletes a
+    , winter_medals m
+WHERE
+    m.aid = a.id
+    and m.medal = 'Bronze'
+    and a.name like '%,%'
+    and a.country like '%U%'
+    and substring(a.name, position(',' in a.name)+2) like 'Z%'
+ORDER BY
+    name
+    , country;
+    
+    
+    
+select 'query 9';
+
+select distinct
+     c.code
+     , c.name
+     , count(*) as medalcount
+     , cast(c.gdp as numeric(8))
+     , cast(count(*)/c.gdp as numeric(4,2)) as investmentreturn
+from
+     summer_medals m
+     , athletes a
+     , countries c
+where
+     m.aid = a.id
+     and a.country = c.code
+     and c.gdp is not null
+group by
+     c.code
+order by
+      investmentreturn desc
+limit 10 ;   
+
+
+select 'query 10';
+
+select
+   a.name
+from
+   summer_medals m
+   , athletes a
+where
+   m.aid = a.id
+group by
+   a.name
+having
+   count(distinct a.country)>= 3
+   and count(distinct m.medal) = 3;
+
+
+select 'query 11';
+
+select
+    a1.name
+    , a2.name
+from
+    athletes a1
+    , athletes a2
+where
+    a1.name like '%,%'
+    and a2.name like '%,%'
+    and lower(substring(a1.name, position(',' in a1.name)+2)) =
+        lower(substring(a2.name, 0, position(',' in a2.name)))
+    and lower(substring(a2.name, position(',' in a2.name)+2)) =
+        lower(substring(a1.name, 0, position(',' in a1.name)))
+    and lower(substring(a1.name, position(',' in a1.name)+2)) <>
+        lower(substring(a1.name, 0, position(',' in a1.name)))
+    and a1.name < a2.name	
+order by
+   a1.name
+   , a2.name;
+     
+
+select 'query 12';
+
+select
+    a.id
+    , a.name
+    , a.country
+from
+    summer_medals m
+    , events e
+    , athletes a
+    , sports s
+where
+    m.eid = e.id
+    and m.aid = a.id
+    and e.sid = s.id
+group by 
+    a.id
+having
+    count(distinct s.name) >= 3;

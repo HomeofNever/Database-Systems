@@ -1,0 +1,697 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Logic for Relational Databases and Relational Algebra for Bags &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Logic for Relational Databases and Relational Algebra for Bags</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/spring2016/course_notes/logic_bagsemantics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="logic-for-relational-databases-and-relational-algebra-for-bags">
+<h1>Logic for Relational Databases and Relational Algebra for Bags<a class="headerlink" href="#logic-for-relational-databases-and-relational-algebra-for-bags" title="Permalink to this headline">¶</a></h1>
+<p>In this lecture, we will talk about the relationship between
+relational algebra, logic and real relational database
+implementations.</p>
+<ul class="simple">
+<li><p>Database queries have a solid foundation in logic. We will
+first explore the relationship.</p></li>
+<li><p>Relational databases do implement relational algebra, but
+with some differences.</p>
+<ul>
+<li><p>Relational databases implement bag semantics.</p></li>
+<li><p>We will also see some advanced operations that do
+not have logical correspondances but map to very useful
+SQL queries.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="logic-and-databases">
+<h2>Logic and Databases<a class="headerlink" href="#logic-and-databases" title="Permalink to this headline">¶</a></h2>
+<p>Relational data model is a logical model.</p>
+<ul>
+<li><p>A set of tuples can be considered a set of facts.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Schema</span><span class="p">:</span>
+<span class="n">heroes</span><span class="p">(</span><span class="n">hid</span><span class="p">,</span> <span class="n">hero</span><span class="p">,</span> <span class="n">realname</span><span class="p">)</span>
+<span class="n">movies</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="n">moviename</span><span class="p">)</span>
+<span class="n">heroinmovie</span><span class="p">(</span><span class="n">hid</span><span class="p">,</span> <span class="n">mid</span><span class="p">)</span>
+
+
+<span class="n">Facts</span><span class="p">:</span>
+
+<span class="n">heroes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Captain America&#39;</span><span class="p">,</span> <span class="s1">&#39;Steve Rogers&#39;</span><span class="p">)</span>
+<span class="n">heroes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Iron Man&#39;</span><span class="p">,</span> <span class="s1">&#39;Tony Stark&#39;</span><span class="p">)</span>
+<span class="n">heroes</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;Jessica Jones&#39;</span><span class="p">,</span> <span class="s1">&#39;Jessica Jones&#39;</span><span class="p">)</span>
+<span class="n">movies</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Captain America: The First Avenger&#39;</span><span class="p">)</span>
+<span class="n">movies</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Iron Man&#39;</span><span class="p">)</span>
+<span class="n">movies</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;The Avengers&#39;</span><span class="p">)</span>
+<span class="n">heroinmovie</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">heroinmovie</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">heroinmovie</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">heroinmovie</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This part of the database is considered the extensional part.
+What is true about this data model at this time.</p>
+</li>
+<li><p>Each query is considered a logic program that returns a new
+set of facts, derived from the extensional database. You can
+consider the queries defining new relations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inavengers</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">hero</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">),</span> <span class="n">movie</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="s1">&#39;The Avengers&#39;</span><span class="p">),</span>
+                   <span class="n">heroinmovie</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span>
+
+<span class="n">inmorethanonemovie</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">hero</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">),</span> <span class="n">heroinmovie</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y1</span><span class="p">),</span>
+                             <span class="n">heroinmovie</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y2</span><span class="p">),</span> <span class="n">Y1</span> <span class="o">&lt;&gt;</span> <span class="n">Y2</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>This type of logic used for queries called Datalog.</p>
+<ul class="simple">
+<li><p>Datalog is similar to Prolog, but it does not have functions in
+predicates (no inavengers( f(X) )!).</p></li>
+<li><p>Also, no cut or fail!</p></li>
+</ul>
+</li>
+<li><p>We can read this as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hero</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>is true for all instances of (X,Y,Z) that correspond to a tuple in
+the hero relation.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="datalog-vs-relational-algebra">
+<h2>Datalog vs Relational Algebra<a class="headerlink" href="#datalog-vs-relational-algebra" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Any query written by relational algebra can be represented using
+Datalog.</p></li>
+<li><p>Relational algebra (assume R(A,B,C) and S(D,E,F) are given):</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}R1  =  \sigma_{A=5}\, R\\R2  =  \Pi_{A,B}\, R\\R3  =  R \bowtie_{A=D} S\\R4(D,E,F)  =  R\\R5  =  R \cup S\\R6  =  R \cap S\\R7  =  R - S\end{aligned}\end{align} \]</div>
+</li>
+<li><p>Let’s write the same queries using logic:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">A</span><span class="o">=</span><span class="mi">5</span>
+
+<span class="n">R2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">_</span><span class="p">)</span>
+
+<span class="n">R3</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">S</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">),</span> <span class="n">A</span><span class="o">=</span><span class="n">D</span>
+
+<span class="n">R4</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+
+<span class="n">R5</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+<span class="n">R5</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">S</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>
+
+<span class="n">R6</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">S</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+
+<span class="n">R7</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">NOT</span> <span class="n">S</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="section" id="negation">
+<h3>Negation<a class="headerlink" href="#negation" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Negation, NOT, is defined using closed-world semantics. For
+constants a,b,c</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NOT</span> <span class="n">S</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>is true if there is no such tuple in S. The negation is not defined
+for a predicate with variables!</p>
+</li>
+<li><p>Negation has to be “safe”:</p>
+<ul class="simple">
+<li><p>If every every variable that appears in a negated atom of the
+form: NOT S also appears in a positive safe predicate in the same
+statement, then the
+negation is considered safe.</p></li>
+<li><p>All predicates
+corresponding to database predicates are considered safe.  If all the
+rules defining a new predicate P are safe, then P is also considered
+safe.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="recursion">
+<h3>Recursion<a class="headerlink" href="#recursion" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Note that you can write recursive queries in Datalog, but not in
+relational algebra.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sameuniverse</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">hero</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">),</span> <span class="n">hero</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">),</span> <span class="n">X</span><span class="o">&lt;&gt;</span><span class="n">Y</span><span class="p">,</span>
+                     <span class="n">heroinmovie</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Z</span><span class="p">),</span> <span class="n">heroinmovie</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">)</span><span class="o">.</span>
+<span class="n">sameuniverse</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span> <span class="p">:</span><span class="o">-</span> <span class="n">sameuniverse</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Z</span><span class="p">),</span> <span class="n">sameuniverse</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="n">Y</span><span class="p">),</span> <span class="n">X</span><span class="o">&lt;&gt;</span><span class="n">Y</span><span class="o">.</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>SQL contains recursion too, but it is not uniformly
+implemented. We will talk about it later in the semester.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="bag-relational-algebra">
+<h2>Bag Relational Algebra<a class="headerlink" href="#bag-relational-algebra" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Relational databases implement relational data model a bit
+differently.</p>
+<ul class="simple">
+<li><p>Relations do not have a key unless one is defined.</p></li>
+<li><p>Relations do not store sets of attributes if no key is defined.</p></li>
+</ul>
+</li>
+<li><p>A <strong>bag</strong> is a multi-set, a set that potentially contains multiple
+copies of the same tuple (depending on the schema).</p>
+<ul>
+<li><p>The following is a valid table:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>itemid</p></th>
+<th class="head"><p>purchase_date</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>2-21-2016</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>2-21-2016</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>2-25-2016</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>2-25-2016</p></td>
+</tr>
+</tbody>
+</table>
+<p>It just means that item 1 is bought twice. In set semantics,
+this would be identical to a relation storing only 3 tuples. Not
+in bag semantics.</p>
+</li>
+</ul>
+</li>
+<li><p>In short:</p>
+<p>For a set, {1,2,2,3} = {1,2,3}
+For a bag, {1,2,2,3} &lt;&gt; {1,2,3}</p>
+</li>
+<li><p>Queries written in SQL are translated to relational algebra
+before they are executed. But, this version of relational is
+slightly different than set algebra and does not have an equivalent
+logic representation.</p>
+<ul>
+<li><p>The operators take a bag of tuples as input and output a bag of
+tuples. We will discuss how operators change under bag semantics.</p></li>
+<li><p>It is not possible to count values in set based relational
+algebra, but it is a common database operation. So, new operations
+are needed.</p>
+<p>Note: In regular relational algebra, you can find if there are two
+tuples with a specific condition (using a join) or three tuples
+with a specific condition (using two joins).</p>
+<p>It is potentially possible for any k to find if there are k
+tuples using regular algebra operators. But you cannot count and
+return how many for an unknown count query. Furthermore, the join
+implementation quickly becomes too expensive.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="mapping-relational-algebra-operators-to-bags">
+<h2>Mapping relational algebra operators to bags<a class="headerlink" href="#mapping-relational-algebra-operators-to-bags" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Selection, projection, renaming, Cartesian product and join remain the same.</p>
+<ul>
+<li><p>If there are duplicate tuples before the operation, they will
+be maintained. This is especially true for projection. Duplicates
+are not removed.</p></li>
+</ul>
+</li>
+<li><p>Set operations are extended to bag operations as follows:</p>
+<ul>
+<li><p>Given a tuple t appears n times in R, m times in S</p>
+<ul>
+<li><p>t appears n+m times in R∪S</p></li>
+<li><p>t appears min(n,m) times in R∩S</p></li>
+<li><p>t appears min(0, n-m) times in R-S</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="new-operators">
+<h2>New Operators<a class="headerlink" href="#new-operators" title="Permalink to this headline">¶</a></h2>
+<p>We also include a number of new operators to increase the expressive
+power of relational algebra.</p>
+<div class="section" id="duplicate-elimination">
+<h3>Duplicate elimination<a class="headerlink" href="#duplicate-elimination" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Duplicate elimination (δ (R)) removes duplicate tuples</p></li>
+<li><p>Set projection now can be implemented as bag projection followed by
+duplicate elimination.</p></li>
+<li><p>All set operators can be implemented with a final duplicate
+elimination.</p></li>
+</ul>
+</div>
+<div class="section" id="extended-projection">
+<h3>Extended projection<a class="headerlink" href="#extended-projection" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Extended projection (π (R)) projects attributes in relation R in the
+usual way, but</p>
+<ul class="simple">
+<li><p>attributes can be repeated constant values which
+creates a new column where each tuple has the constant value for the
+new column</p></li>
+<li><p>arithmetic and string operations involving attributes in R are allowed, and</p></li>
+<li><p>attributes can be renamed with an arrow in place.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[X = \Pi_{A+C\rightarrow E, B|D\rightarrow F, 2\rightarrow G,D,D\rightarrow H}\, R\]</div>
+<ul class="simple">
+<li><p>E is the sum of values for attributes A and C</p></li>
+<li><p>F is the concatenation of values for attributes B and D</p></li>
+<li><p>G is a column with a constant value of 2</p></li>
+<li><p>values for column D is repeated twice, the second copy is
+called H.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="outer-join">
+<h3>Outer join<a class="headerlink" href="#outer-join" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Outer join (we will see this in detail for SQL): Return all tuples
+whether they join or not</p>
+<ul>
+<li><p>R outer join S will return:</p>
+<ol class="arabic simple">
+<li><p>all tuples in join of R and S</p></li>
+<li><p>all tuples in R that did not join with S</p></li>
+<li><p>all tuples in S that did not join with R</p></li>
+</ol>
+</li>
+<li><p>R left outer join S will return 1 and 2 above.</p></li>
+<li><p>R right outer join S will return 1 and 3 above.</p></li>
+<li><p>We can represent the outer join using logic loosely as follows
+(not bag semantic should hold even though we are using to
+represent this):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R_outer_join_S</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">S</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">),</span> <span class="n">A</span><span class="o">=</span><span class="n">D</span>
+<span class="n">R_outer_join_S</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">null</span><span class="p">,</span><span class="n">null</span><span class="p">,</span><span class="n">null</span><span class="p">)</span> <span class="o">=</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">NOT</span> <span class="n">S</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span>
+<span class="n">R_outer_join_S</span><span class="p">(</span><span class="n">null</span><span class="p">,</span><span class="n">null</span><span class="p">,</span><span class="n">null</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span> <span class="o">=</span> <span class="n">NOT</span> <span class="n">R</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">),</span> <span class="n">S</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>assuming a join on attributes R(A) and S(D).</p>
+<p>Note that for statements 2 and 3, missing values from one of the
+relations are filled with null.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="aggregation">
+<h3>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>It is possible to find</p>
+<ul class="simple">
+<li><p>sum, min, max, avg (and other functions) of all tuples for an
+attribute, or</p></li>
+<li><p>the result of an arithmetic/string operation over the attributes
+for all the tuples</p></li>
+</ul>
+</li>
+<li><p>Example:</p>
+<div class="math notranslate nohighlight">
+\[X = \gamma_{min(A)\rightarrow G, sum(B*C)\rightarrow H}\, R\]</div>
+</li>
+<li><p>Note that this operation will return a single tuple as a result!</p></li>
+</ul>
+</div>
+<div class="section" id="grouping-operator">
+<h3>Grouping operator<a class="headerlink" href="#grouping-operator" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Instead of computing the aggregate for all the tuples,
+we can compute it for groups of tuples</p>
+<ul class="simple">
+<li><p>Group by attributes</p></li>
+<li><p>Compute aggregates for each group</p></li>
+<li><p>Return a single tuple for each group</p></li>
+</ul>
+</li>
+<li><p>Example relation R:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>5</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>6</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>7</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>8</p></td>
+<td><p>1</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>9</p></td>
+<td><p>3</p></td>
+<td><p>4</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>We would like to compute the following aggregate:</p>
+<div class="math notranslate nohighlight">
+\[X = \gamma_{A, min(B)\rightarrow E, sum(C*D)\rightarrow F}\, R\]</div>
+</li>
+<li><p>Result of this operation is given as follows:</p>
+<p>First we compute three groups, one for each different value of A</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>5</p></td>
+<td><p>2</p></td>
+<td><p>3</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>6</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>7</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>8</p></td>
+<td><p>1</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>9</p></td>
+<td><p>3</p></td>
+<td><p>4</p></td>
+</tr>
+</tbody>
+</table>
+<p>Now, we compute the aggregates for each group. For example for A=2,
+min(B)=min(6,7)=6. sum(C*D)=sum(0*4+2*2)=4.</p>
+<p>We get the following result:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>E</p></th>
+<th class="head"><p>F</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>5</p></td>
+<td><p>6</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>6</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>8</p></td>
+<td><p>17</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

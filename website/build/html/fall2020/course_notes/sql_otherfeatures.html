@@ -1,0 +1,1005 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Other Features &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="SQL - Object-Relational Extensions" href="sql_objectrelational.html" />
+    <link rel="prev" title="SQL - Object-Relational Frameworks" href="or_frameworks.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">CSCI 4380 Database Systems - Fall 2020</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../course_notes.html">Course notes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction to Relational Databases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dbs_example.html">Example Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="relational_algebra.html">Relational Model and Algebra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="normalization.html">Normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="er.html">Entity-Relationship (ER) Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_basics.html">SQL - Part 1: Basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_advanced.html">SQL - Part 2: Advanced Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_dmlddl.html">SQL - Part 3: Data Definition and Manipulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural.html">SQL - Procedural Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sql_procedural2.html">SQL - Embedded SQL Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="or_frameworks.html">SQL - Object-Relational Frameworks</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SQL - Other Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#triggers">Triggers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#views">Views</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#views-not-anonymous">Views (not anonymous)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-views-in-queries">Using views in queries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#why-use-views">Why use views?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#why-not-use-views">Why not use views?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#indexing">Indexing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#access-structure">Access Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schema">Schema</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#search-path">Search path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#security">Security</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#role-creation-and-inheritance">Role creation and inheritance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-objects">Database Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#privileges">Privileges</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grant-option">Grant option</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grant-diagrams">Grant diagrams</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#system-tables">System Tables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#case-statements-in-select">Case Statements in SELECT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#group-by-extended">Group by extended</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#window-functions">Window Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#group-by-with-filter">Group by with Filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#recursive-queries">Recursive Queries</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sql_objectrelational.html">SQL - Object-Relational Extensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="secondary_storage.html">Secondary Storage and Indexing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="query_processing.html">Query Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../schedule.html">Detailed course schedule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recordings.html">Lecture Recordings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#external-links">External links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#review-sessions-and-office-hours">Review Sessions and Office Hours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#teaching-staff">Teaching Staff</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">CSCI 4380 Database Systems - Fall 2020</a> &raquo;</li>
+        
+          <li><a href="../course_notes.html">Course Notes - Fall 2020</a> &raquo;</li>
+        
+      <li>SQL - Other Features</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2020/course_notes/sql_otherfeatures.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-other-features">
+<h1>SQL - Other Features<a class="headerlink" href="#sql-other-features" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>In this section, we will review triggers, views and indices as well
+as some more advanced features of SQL.</p></li>
+</ul>
+</div>
+<div class="section" id="triggers">
+<h2>Triggers<a class="headerlink" href="#triggers" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A trigger has:</p>
+<ul>
+<li><p>a database event that must be true for the trigger to be activated</p>
+<p>Example: insert of class</p>
+</li>
+<li><p>a condition that must be true for the trigger to be executed</p>
+<p>Example: when the new tuple has code CSCI</p>
+</li>
+<li><p>a method of execution
+- for each row that is being changed (inserted/updated/deleted)
+- for each statement (for a given transaction)</p></li>
+<li><p>a triggering time
+- BEFORE the triggering event makes the updates</p>
+<blockquote>
+<div><p>executed before the triggering change is even executed (and recorded)</p>
+</div></blockquote>
+<ul>
+<li><p>AFTER the triggering event makes the updates</p>
+<p>executed after the triggering change is recorded</p>
+</li>
+<li><p>INSTEAD OF the triggering event</p></li>
+</ul>
+</li>
+<li><p>a statement body:</p>
+<p>a procedure that contains possibly multiple statements</p>
+</li>
+</ul>
+</li>
+<li><p>Triggers become part of the transaction that triggered them.</p></li>
+</ul>
+<div class="section" id="trigger-access-to-changes">
+<h3>Trigger access to changes<a class="headerlink" href="#trigger-access-to-changes" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>For each update that changes a database, the tuple before and after
+the change can be accessed in a trigger
+- OLD: the tuple before an update
+- NEW: the tuple after the update</p></li>
+<li><p>Inserts have no OLD, deletes have no NEW:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TRIGGER</span> <span class="n">fix_favorites</span>
+<span class="n">AFTER</span> <span class="n">INSERT</span> <span class="n">OR</span> <span class="n">UPDATE</span> <span class="n">OF</span> <span class="n">results</span>
+<span class="n">REFERENCING</span>
+  <span class="n">NEW</span> <span class="n">ROW</span> <span class="n">AS</span> <span class="n">newt</span>
+<span class="n">FOR</span> <span class="n">EACH</span> <span class="n">ROW</span>
+  <span class="n">WHEN</span> <span class="p">(</span><span class="n">newt</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;star baker&#39;</span><span class="p">)</span>
+      <span class="n">DELETE</span> <span class="n">FROM</span> <span class="n">favorites</span>
+      <span class="n">WHERE</span> <span class="n">baker</span> <span class="o">=</span> <span class="n">NEW</span><span class="o">.</span><span class="n">baker</span> <span class="n">AND</span> <span class="n">episodeid</span> <span class="o">=</span> <span class="n">NEW</span><span class="o">.</span><span class="n">episodeid</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Postgresql syntax is a bit different for triggers.
+Define first a function that returns a trigger, then define a trigger.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>CREATE FUNCTION fix_favorites () RETURNS trigger AS $$
+BEGIN
+    IF NEW.result = &#39;star baker&#39; THEN
+       DELETE FROM favorites
+       WHERE baker = NEW.baker AND episodeid = NEW.episodeid ;
+    END IF ;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fix_favorites AFTER INSERT OR UPDATE ON results
+  FOR EACH ROW EXECUTE FUNCTION fix_favorites();
+
+CREATE FUNCTION fix_baker () RETURNS trigger AS $$
+BEGIN
+  NEW.baker = initcap(trim(NEW.baker));
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fix_baker BEFORE INSERT OR UPDATE ON bakers
+FOR EACH ROW EXECUTE FUNCTION fix_baker();
+</pre></div>
+</div>
+</li>
+<li><p>Triggers can be defined on tables or views.</p></li>
+<li><p>Triggers can be executed for each row being changed or a the whole
+statement.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="views">
+<h2>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A view is a query.</p></li>
+<li><p>Views can be anonymous</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span>
+<span class="n">FROM</span>
+   <span class="p">(</span><span class="n">SELECT</span> <span class="n">baker</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">age</span>
+    <span class="n">FROM</span> <span class="n">bakers</span>
+    <span class="n">WHERE</span> <span class="n">baker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">select</span> <span class="n">baker</span>
+                        <span class="kn">from</span> <span class="nn">results</span>
+                        <span class="n">where</span> <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;eliminated&#39;</span><span class="p">)</span>
+   <span class="p">)</span> <span class="k">as</span> <span class="n">noteliminated</span>
+<span class="n">WHERE</span> <span class="n">noteliminated</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">45</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>The relation noteliminated above is an anonymous view (it is not
+known outside of this query).</p></li>
+<li><p>This query is combined with the remaining query to
+find the optimal query plan.</p></li>
+<li><p>For example, the above query after optimization may become:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">baker</span>
+   <span class="p">,</span> <span class="n">fullname</span>
+   <span class="p">,</span> <span class="n">age</span>
+<span class="n">FROM</span>
+   <span class="n">bakers</span>
+<span class="n">WHERE</span>
+   <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">45</span>
+   <span class="ow">and</span> <span class="n">baker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">select</span> <span class="n">baker</span> <span class="kn">from</span> <span class="nn">results</span> <span class="n">where</span> <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;eliminated&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>When to use anonymous views:</p>
+<ul class="simple">
+<li><p>It is best to use an anonymous view if the query cannot be written
+without it or it provides a savings that is missed by the optimizer.</p></li>
+<li><p>Otherwise, the optimizer may miss some optimizations and rewritings
+of the query when views are used.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="views-not-anonymous">
+<h2>Views (not anonymous)<a class="headerlink" href="#views-not-anonymous" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Views can also be given a name. This allows them to be used in many
+different queries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">VIEW</span> <span class="n">noteliminated</span><span class="p">(</span><span class="n">baker</span><span class="p">,</span> <span class="n">fullnamename</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
+<span class="n">AS</span>
+<span class="n">SELECT</span> <span class="n">baker</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">age</span>
+<span class="n">FROM</span> <span class="n">bakers</span>
+<span class="n">WHERE</span> <span class="n">baker</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">select</span> <span class="n">baker</span>
+                    <span class="kn">from</span> <span class="nn">results</span>
+                    <span class="n">where</span> <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;eliminated&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="using-views-in-queries">
+<h2>Using views in queries<a class="headerlink" href="#using-views-in-queries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Views can be used in any query as if they were a table.</p></li>
+<li><p>Remember, views are just queries. No tuples are stored for them.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span>
+<span class="n">FROM</span> <span class="n">noteliminated</span>
+<span class="n">WHERE</span> <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">45</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>When executing this query, the query processor first takes the query
+definition and replaces the query name with its definition. Then,
+the query is optimized.</p></li>
+</ul>
+</div>
+<div class="section" id="why-use-views">
+<h2>Why use views?<a class="headerlink" href="#why-use-views" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Creating views allows the system designer to customize the
+application code so that:</p>
+<ul>
+<li><p>The functionality for different users can be built on top of views.</p>
+<p>For example, faculty cannot access financial information of
+students and can only the information about the students who are
+currently taking a course from them.</p>
+<p>Solution: Create a view for the students in a specific class which
+only includes the relevant attributes. The application code will
+be built on top of this view.</p>
+</li>
+</ul>
+</li>
+<li><p>Views can also be used to insert/update/delete tuples instead of the
+table they are based on.</p>
+<ul class="simple">
+<li><p>This builds on the philosophy of building functionality based on views.</p></li>
+<li><p>However, this is only possible for a very restricted subset of
+views, called updatable views.</p></li>
+<li><p>Updatable views are such that each tuple in the view maps to one
+and only one tuple in the table it is based on.</p></li>
+</ul>
+</li>
+<li><p>Using views to create functionality hides data complexity from developers.</p>
+<p>Also, if the data model changes, the application code does not have
+to change as long as the new model can be mapped to the same view.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="why-not-use-views">
+<h2>Why not use views?<a class="headerlink" href="#why-not-use-views" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Writing a query using views may hide some optimizations from the
+database, creating sub optimal query plans.</p></li>
+</ul>
+<div class="section" id="updatable-views">
+<h3>Updatable views<a class="headerlink" href="#updatable-views" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>A view is updatable if:</p>
+<ul class="simple">
+<li><p>It has only one table T in its from clause</p></li>
+<li><p>It contains all attributes from T that cannot be null</p></li>
+<li><p>It does not have any distinct, group by statements (one to one
+correspondence between a tuple in the view and a tuple in the
+table)</p></li>
+</ul>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">VIEW</span> <span class="n">lt40</span><span class="p">(</span><span class="n">baker</span><span class="p">,</span> <span class="n">fullnamename</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
+<span class="n">AS</span>
+<span class="n">SELECT</span> <span class="n">baker</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">age</span>
+<span class="n">FROM</span> <span class="n">bakers</span>
+<span class="n">WHERE</span> <span class="n">age</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">;</span>
+
+<span class="n">UPDATE</span> <span class="n">lt40</span> <span class="n">SET</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">40</span> <span class="n">WHERE</span> <span class="n">baker</span> <span class="o">=</span> <span class="s1">&#39;Manon&#39;</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note: lt40 does not store any tuples. This expression
+allows only those tuples of bakers that are accessible through view
+to be updated.</p></li>
+<li><p>Furthermore, after the update, the resulting tuple may not even be
+in the view (unless the view is created with the CHECK OPTION):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UPDATE</span> <span class="n">lt40</span> <span class="n">SET</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">40</span> <span class="n">WHERE</span> <span class="n">baker</span> <span class="o">=</span> <span class="s1">&#39;Manon&#39;</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>Since now Manon is not younger than 40, she will not be returned by
+the view.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indexing">
+<h2>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Views do not improve performance, sometimes they may even cause a
+loss of performance.</p></li>
+<li><p>One way to improve performance is store (cache) the result of some
+queries in the database.</p></li>
+<li><p>Indexes are exactly that, cached results of queries.</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">episodeid</span>
+ <span class="n">FROM</span>
+    <span class="n">technicals</span>
+ <span class="n">WHERE</span>
+    <span class="n">baker</span> <span class="o">=</span> <span class="s1">&#39;Kim-Joy&#39;</span>
+    <span class="ow">and</span> <span class="n">rank</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Answering this query requires reading all of technicals relation
+from disk to find the matching tuples to return. Note that the
+matching tuples will be very few compared to all the tuples in the
+technicals table.</p></li>
+</ul>
+<div class="section" id="cost-analysis">
+<h3>Cost Analysis<a class="headerlink" href="#cost-analysis" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Let us some basic cost analysis, but let us consider a much larger
+table X and a query that returns a few tuples as answer.</p></li>
+<li><p>Suppose X is stored on disk in 100 disk pages. Then, answering this
+query requires reading all 100 disk pages.</p></li>
+<li><p>Suppose instead we had an index that allowed us to find all the
+matching tuples.</p></li>
+<li><p>Example: Index on Technicals (baker) for the above query, or a
+similar index for relation X</p>
+<p>Then, answering this query will cost:</p>
+<p>Finding the tuples from index,  reading them from disk to fetch the grade.</p>
+<p>Cost: at most 4-5 pages.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="indexing-as-views">
+<h3>Indexing as views<a class="headerlink" href="#indexing-as-views" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Indexes are just query results stored explicitly.</p></li>
+<li><p>They are also stored on disk, but can be cheaper to use because:</p>
+<ul>
+<li><p>They have fewer disk pages as they store only a subset of the
+attributes in the relation.</p></li>
+<li><p>They are stored in a way to make it easy to find queries on specific
+values in the index (we will see how).</p></li>
+</ul>
+</li>
+<li><p>For now, we can assume that querying the index has a small cost as
+long as the query returns a few (1-3) tuples.</p></li>
+</ul>
+</div>
+<div class="section" id="index-cost-benefit-analysis">
+<h3>Index cost/benefit analysis<a class="headerlink" href="#index-cost-benefit-analysis" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Indices are good if</p>
+<ul>
+<li><p>they reduce the cost of frequently asked queries</p></li>
+<li><p>the reduction is considerable</p></li>
+</ul>
+</li>
+<li><p>Indices must be kept up to date when the tables change</p></li>
+<li><p>Indices increase the cost insert/update/delete operations (at least
+one extra disk page access for each index created)</p></li>
+</ul>
+</div>
+<div class="section" id="what-are-good-indices">
+<h3>What are good indices<a class="headerlink" href="#what-are-good-indices" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>A good index will reduce the total number of matching tuples to 1 or a few</p>
+<p>Example: attributes in a key</p>
+<p>An index on students(id) will greatly improve queries like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">bakers</span> <span class="n">WHERE</span> <span class="n">baker</span> <span class="o">=</span> <span class="s1">&#39;Rahul&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Almost all databases will create an index on the primary key.</p>
+</li>
+<li><p>If the underlying relation is sorted with respect to some attribute,
+then an index on that attribute will help performance.</p>
+<ul>
+<li><p>Suppose, technicals tuples are sorted by baker and rank.</p></li>
+<li><p>Create an index on Technicals(baker, rank)</p></li>
+<li><p>Given the query:</p>
+<dl>
+<dt>SELECT</dt><dd><blockquote>
+<div><p>episodeid</p>
+</div></blockquote>
+<dl class="simple">
+<dt>FROM</dt><dd><p>technicals</p>
+</dd>
+<dt>WHERE</dt><dd><p>baker = ‘Kim-Joy’
+and rank = 1;</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+</ul>
+<p>use the index to find the first tuple for baker ‘Kim-Joy’, and then
+scan the technicals relation starting from that point.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="access-structure">
+<h2>Access Structure<a class="headerlink" href="#access-structure" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A postgresql database cluster is organized into databases.</p></li>
+<li><p>No data can be shared across databases.</p></li>
+<li><p>Information in a database can be clustered into logical units called
+schema</p></li>
+</ul>
+</div>
+<div class="section" id="schema">
+<h2>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Create a schema with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">SCHEMA</span> <span class="n">myschema</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Access/create tables in the schema with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="o">.</span><span class="n">table</span>
+</pre></div>
+</div>
+</li>
+<li><p>To delete a schema and all the objects in it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DROP</span> <span class="n">SCHEMA</span> <span class="n">myschema</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>To create a schema owned by someone else:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">SCHEMA</span> <span class="n">schemaname</span> <span class="n">AUTHORIZATION</span> <span class="n">username</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="search-path">
+<h2>Search path<a class="headerlink" href="#search-path" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Whenever a table name is used, the database tries to find the
+correct instance</p></li>
+<li><p>The search path is usually</p>
+<ul class="simple">
+<li><p>first: $user: a schema with the same name as
+the current user</p></li>
+<li><p>second: public: any information that is open to
+public, i.e. all users.</p></li>
+</ul>
+</li>
+<li><p>The search path can be changed by:</p>
+<p>set  search_path to ….</p>
+</li>
+</ul>
+</div>
+<div class="section" id="security">
+<h2>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Postgresql allows the creation of roles</p></li>
+<li><p>A role is like a user, but more general</p></li>
+<li><p>A role with a login privilege is considered a user</p></li>
+<li><p>A role can be given the right to create databases
+and/or create other roles.</p></li>
+<li><p>A role with superuser privileges can bypass all
+security checks</p></li>
+</ul>
+</div>
+<div class="section" id="role-creation-and-inheritance">
+<h2>Role creation and inheritance<a class="headerlink" href="#role-creation-and-inheritance" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Inherit allows the role to inherit all the privileges given to
+that role.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">ROLE</span> <span class="n">joe</span> <span class="n">LOGIN</span> <span class="n">INHERIT</span><span class="p">;</span>
+<span class="n">CREATE</span> <span class="n">ROLE</span> <span class="n">admin</span> <span class="n">NOINHERIT</span><span class="p">;</span>
+<span class="n">CREATE</span> <span class="n">ROLE</span> <span class="n">wheel</span> <span class="n">NOINHERIT</span><span class="p">;</span>
+<span class="n">GRANT</span> <span class="n">admin</span> <span class="n">TO</span> <span class="n">joe</span><span class="p">;</span>
+<span class="n">GRANT</span> <span class="n">wheel</span> <span class="n">TO</span> <span class="n">admin</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Joe has privileges of admin upon login because user Joe inherits from its
+roles. However, admin does not have the privileges assigned to wheel because
+it does not inherit (it is not inherited).</p></li>
+<li><p>As a role connects to the database, it has all the rights
+given to that role (login role). For other privileges that are
+not inherited, the user must explicitly set itself to that role:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SET</span> <span class="n">ROLE</span> <span class="n">admin</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="database-objects">
+<h2>Database Objects<a class="headerlink" href="#database-objects" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>All database objects (database, tables, indices,
+procedures, triggers, etc.) have an owner, the role
+that created them.</p></li>
+<li><p>Owner has all the access rights on the objects they
+create.</p></li>
+<li><p>Other roles can be given explicit privileges on these
+objects:</p>
+<p>SELECT, INSERT, UPDATE, DELETE, TRUNCATE,
+REFERENCES, TRIGGER, CREATE, CONNECT,
+TEMPORARY, EXECUTE, and USAGE.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="privileges">
+<h2>Privileges<a class="headerlink" href="#privileges" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>SELECT, INSERT, DELETE, UPDATE are the privileges to
+query (select) and change the data of some other role.</p>
+<ul>
+<li><p>Can be specific: SELECT(name)</p></li>
+<li><p>REFERENCES is the right to refer to a relation in an
+integrity constraint</p></li>
+<li><p>USAGE is the right to use a schema element in relations,
+assertions, etc.</p></li>
+<li><p>TRIGGER is the right to define triggers.</p></li>
+<li><p>UNDER is the right create subtypes</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="grant-option">
+<h2>Grant option<a class="headerlink" href="#grant-option" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Users/roles can pass a privilege to another
+user/role is they have the grant option.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GRANT</span> <span class="n">select</span> <span class="n">ON</span> <span class="n">users</span> <span class="n">TO</span> <span class="n">spock</span>
+<span class="n">WITH</span> <span class="n">GRANT</span> <span class="n">OPTION</span>
+</pre></div>
+</div>
+</li>
+<li><p>Only a role that has a grant option can grant
+the grant option to the others.</p></li>
+</ul>
+</div>
+<div class="section" id="grant-diagrams">
+<h2>Grant diagrams<a class="headerlink" href="#grant-diagrams" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Nodes represent a user and a privilege</p></li>
+<li><p>Two different privileges of the same person should be
+put in two different nodes</p></li>
+<li><p>If one privilege for a user is the more general version
+of another, they should both be included.</p></li>
+<li><p>Example: select, select(name)</p></li>
+<li><p>Each grant generates a path in the grant diagram</p>
+<ul>
+<li><p>Nodes are marked by:</p>
+<p>** for owners</p>
+<p>* for users who have grant option</p>
+<p>nothing for all other users</p>
+</li>
+</ul>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/grant_graph.png"><img alt="fall2020/course_notes/other_images/grant_graph.png" class="align-center" src="fall2020/course_notes/other_images/grant_graph.png" style="width: 400px;" /></a>
+</li>
+</ul>
+<div class="section" id="adding-privileges">
+<h3>Adding privileges<a class="headerlink" href="#adding-privileges" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>When a new privilege X is given from role A to role B</p></li>
+<li><p>If there are no nodes for (A,X) and (B,X), then
+create them.</p></li>
+<li><p>Add all the necessary links</p></li>
+</ul>
+</div>
+<div class="section" id="revoking-privileges">
+<h3>Revoking privileges<a class="headerlink" href="#revoking-privileges" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Revoke &lt;privileges&gt; on &lt;database element&gt;
+from &lt;role list&gt;</p>
+<p>will remove the listed privileges.</p>
+</li>
+<li><p>Cascade: will remove any privileges that are
+granted only because of the removed
+privileges.</p></li>
+<li><p>Restrict: will fail if the revoked privileges were
+passed on to other roles previously.</p></li>
+<li><p>Delete any edges corresponding to the deleted
+privileges.</p></li>
+<li><p>If there are any nodes not reachable from a
+double starred role, then they should be
+removed together with all the edges coming
+out of them.</p></li>
+<li><p>Continue this process until all the nodes are
+reacheable from a doubly starred node.</p></li>
+<li><p>Example 1: revoke select on movies from janeway cascade</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke1.png"><img alt="fall2020/course_notes/other_images/revoke1.png" class="align-center" src="fall2020/course_notes/other_images/revoke1.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke2.png"><img alt="fall2020/course_notes/other_images/revoke2.png" class="align-center" src="fall2020/course_notes/other_images/revoke2.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke3.png"><img alt="fall2020/course_notes/other_images/revoke3.png" class="align-center" src="fall2020/course_notes/other_images/revoke3.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke4.png"><img alt="fall2020/course_notes/other_images/revoke4.png" class="align-center" src="fall2020/course_notes/other_images/revoke4.png" style="width: 400px;" /></a>
+<ul class="simple">
+<li><p>Example 2: revoke grant option on movies from janeway cascade</p></li>
+</ul>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke5.png"><img alt="fall2020/course_notes/other_images/revoke5.png" class="align-center" src="fall2020/course_notes/other_images/revoke5.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke6.png"><img alt="fall2020/course_notes/other_images/revoke6.png" class="align-center" src="fall2020/course_notes/other_images/revoke6.png" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="fall2020/course_notes/other_images/revoke7.png"><img alt="fall2020/course_notes/other_images/revoke7.png" class="align-center" src="fall2020/course_notes/other_images/revoke7.png" style="width: 400px;" /></a>
+</div>
+</div>
+<div class="section" id="system-tables">
+<h2>System Tables<a class="headerlink" href="#system-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Information about the database are also stored in
+database tables that can be queried like any other</p></li>
+<li><p>Examples:</p>
+<ul>
+<li><p>pg_constraint: all constraints on tables</p></li>
+<li><p>pg_user: all users that their access rights (can they
+create databases? are they superusers?)</p></li>
+<li><p>pg_views: the name of the views, owner and tex</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="case-statements-in-select">
+<h2>Case Statements in SELECT<a class="headerlink" href="#case-statements-in-select" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Not being able to write some simple if statement in SQL can be
+annoying. Well, you can actually.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+  <span class="n">a</span><span class="p">,</span>
+  <span class="n">CASE</span> <span class="n">WHEN</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span> <span class="n">THEN</span> <span class="s1">&#39;one&#39;</span>
+       <span class="n">WHEN</span> <span class="n">a</span><span class="o">=</span><span class="mi">2</span> <span class="n">THEN</span> <span class="s1">&#39;two&#39;</span>
+       <span class="n">ELSE</span> <span class="s1">&#39;other&#39;</span>
+  <span class="n">END</span>
+<span class="n">FROM</span> <span class="n">test</span><span class="p">;</span>
+
+ <span class="n">a</span> <span class="o">|</span> <span class="n">case</span>
+ <span class="o">---+-------</span>
+ <span class="mi">1</span> <span class="o">|</span> <span class="n">one</span>
+ <span class="mi">2</span> <span class="o">|</span> <span class="n">two</span>
+ <span class="mi">3</span> <span class="o">|</span> <span class="n">other</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="group-by-extended">
+<h2>Group by extended<a class="headerlink" href="#group-by-extended" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Group by multiple groups</p>
+<p>See <code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">database</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">used</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">events</span> <span class="p">(</span>
+    <span class="n">name</span>     <span class="n">varchar</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">day</span>    <span class="n">varchar</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">time</span>   <span class="n">varchar</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+   <span class="p">,</span> <span class="n">price</span>  <span class="n">INT</span>
+<span class="p">)</span> <span class="p">;</span>
+
+<span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">events</span><span class="p">;</span>
+<span class="n">name</span>   <span class="o">|</span> <span class="n">day</span> <span class="o">|</span> <span class="n">time</span>  <span class="o">|</span> <span class="n">price</span>
+<span class="o">----------+-----+-------+-------</span>
+<span class="n">sitting</span>  <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span> <span class="o">|</span>     <span class="mi">5</span>
+<span class="n">reading</span>  <span class="o">|</span> <span class="n">W</span>   <span class="o">|</span> <span class="mi">2</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>    <span class="mi">10</span>
+<span class="n">sleeping</span> <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">2</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>    <span class="mi">12</span>
+<span class="n">hopping</span>  <span class="o">|</span> <span class="n">W</span>   <span class="o">|</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span> <span class="o">|</span>     <span class="mi">8</span>
+<span class="n">jumping</span>  <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">4</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>    <span class="mi">22</span>
+
+
+<span class="n">SELECT</span>
+   <span class="n">day</span>
+   <span class="p">,</span> <span class="n">time</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+   <span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>
+<span class="n">FROM</span>
+   <span class="n">events</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">GROUPING</span> <span class="n">SETS</span> <span class="p">((</span><span class="n">day</span><span class="p">),(</span><span class="n">time</span><span class="p">),());</span>
+
+<span class="n">day</span> <span class="o">|</span> <span class="n">time</span>  <span class="o">|</span> <span class="n">count</span> <span class="o">|</span> <span class="nb">sum</span>
+<span class="o">-----+-------+-------+-----</span>
+<span class="n">M</span>   <span class="o">|</span>       <span class="o">|</span>     <span class="mi">3</span> <span class="o">|</span>  <span class="mi">39</span>      <span class="o">--</span><span class="n">grouped</span> <span class="n">by</span> <span class="n">day</span>
+<span class="n">W</span>   <span class="o">|</span>       <span class="o">|</span>     <span class="mi">2</span> <span class="o">|</span>  <span class="mi">18</span>      <span class="o">--</span><span class="n">grouped</span> <span class="n">by</span> <span class="n">day</span>
+    <span class="o">|</span>       <span class="o">|</span>     <span class="mi">5</span> <span class="o">|</span>  <span class="mi">57</span>      <span class="o">--</span><span class="n">grouped</span> <span class="n">by</span> <span class="n">everything</span>
+    <span class="o">|</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span> <span class="o">|</span>     <span class="mi">2</span> <span class="o">|</span>  <span class="mi">13</span>      <span class="o">--</span><span class="n">grouped</span> <span class="n">by</span> <span class="n">time</span>
+    <span class="o">|</span> <span class="mi">2</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>     <span class="mi">2</span> <span class="o">|</span>  <span class="mi">22</span>      <span class="o">--</span><span class="n">grouped</span> <span class="n">by</span> <span class="n">time</span>
+    <span class="o">|</span> <span class="mi">4</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>     <span class="mi">1</span> <span class="o">|</span>  <span class="mi">22</span>      <span class="o">--</span><span class="n">grouped</span> <span class="n">by</span> <span class="n">time</span>
+</pre></div>
+</div>
+</li>
+<li><p>Rollup does grouping in a hierarchical way, removing one attribute
+at a time</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ROLLUP</span> <span class="p">(</span><span class="n">day</span><span class="p">,</span><span class="n">time</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will first group by (day,time), then by (day) alone, then by
+everything.</p>
+</li>
+<li><p>Cube will do group by every combination:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUBE</span> <span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will group by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">day</span><span class="p">,</span><span class="n">time</span><span class="p">)</span>
+<span class="p">(</span><span class="n">day</span><span class="p">)</span>
+<span class="p">(</span><span class="n">time</span><span class="p">)</span>
+<span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="window-functions">
+<h2>Window Functions<a class="headerlink" href="#window-functions" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Window functions compute aggregates without a group by
+for a window of values.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">name</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="n">OVER</span> <span class="p">(</span><span class="n">partition</span> <span class="n">by</span> <span class="n">day</span><span class="p">)</span>
+<span class="n">FROM</span>   <span class="n">events</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">day</span><span class="p">;</span>
+
+
+<span class="n">name</span>   <span class="o">|</span> <span class="n">day</span> <span class="o">|</span> <span class="n">time</span>  <span class="o">|</span> <span class="nb">sum</span>
+<span class="o">----------+-----+-------+-----</span>
+<span class="n">sitting</span>  <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span> <span class="o">|</span>  <span class="mi">39</span>
+<span class="n">sleeping</span> <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">2</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>  <span class="mi">39</span>
+<span class="n">jumping</span>  <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">4</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>  <span class="mi">39</span>
+<span class="n">reading</span>  <span class="o">|</span> <span class="n">W</span>   <span class="o">|</span> <span class="mi">2</span><span class="p">:</span><span class="mi">00</span>  <span class="o">|</span>  <span class="mi">18</span>
+<span class="n">hopping</span>  <span class="o">|</span> <span class="n">W</span>   <span class="o">|</span> <span class="mi">12</span><span class="p">:</span><span class="mi">00</span> <span class="o">|</span>  <span class="mi">18</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="group-by-with-filter">
+<h2>Group by with Filter<a class="headerlink" href="#group-by-with-filter" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Filter allows you to apply an aggregate to a subset of tuples in
+that group.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">day</span>
+       <span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">as</span> <span class="n">total</span>
+       <span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="nb">filter</span> <span class="p">(</span><span class="n">where</span> <span class="n">price</span><span class="o">&gt;</span><span class="mi">10</span><span class="p">)</span> <span class="k">as</span> <span class="n">totalfiltered</span>
+<span class="n">FROM</span> <span class="n">events</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">day</span><span class="p">;</span>
+
+<span class="n">day</span> <span class="o">|</span> <span class="n">total</span> <span class="o">|</span> <span class="n">totalfiltered</span>
+<span class="o">-----+-------+---------------</span>
+ <span class="n">W</span>   <span class="o">|</span>    <span class="mi">18</span> <span class="o">|</span>
+ <span class="n">M</span>   <span class="o">|</span>    <span class="mi">39</span> <span class="o">|</span>            <span class="mi">34</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="recursive-queries">
+<h2>Recursive Queries<a class="headerlink" href="#recursive-queries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Recursive queries use the basis query to build on itself:</p>
+<p>See <code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">database</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">used</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">parents</span> <span class="p">;</span>
+
+ <span class="n">parent</span>  <span class="o">|</span>  <span class="n">child</span>
+ <span class="o">---------+---------</span>
+ <span class="n">Dakota</span>  <span class="o">|</span> <span class="n">Madison</span>
+ <span class="n">Madison</span> <span class="o">|</span> <span class="n">Ava</span>
+ <span class="n">Madison</span> <span class="o">|</span> <span class="n">Sophia</span>
+ <span class="n">Sophia</span>  <span class="o">|</span> <span class="n">Noah</span>
+ <span class="n">Noah</span>    <span class="o">|</span> <span class="n">Emma</span>
+</pre></div>
+</div>
+</li>
+<li><p>Find all ancestral relations of degree 2 or higher:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WITH</span> <span class="n">RECURSIVE</span> <span class="n">ancestors</span><span class="p">(</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">degree</span><span class="p">)</span> <span class="n">AS</span> <span class="p">(</span>
+      <span class="n">SELECT</span> <span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="mi">1</span> <span class="n">FROM</span> <span class="n">parents</span>
+    <span class="n">UNION</span> <span class="n">ALL</span>
+      <span class="n">SELECT</span> <span class="n">a</span><span class="o">.</span><span class="n">ancestor</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">degree</span><span class="o">+</span><span class="mi">1</span>
+      <span class="n">FROM</span> <span class="n">ancestors</span> <span class="n">a</span><span class="p">,</span> <span class="n">parents</span> <span class="n">p</span>
+      <span class="n">WHERE</span> <span class="n">a</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">parent</span>
+<span class="p">)</span>
+<span class="n">SELECT</span> <span class="n">ancestor</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">degree</span> <span class="n">FROM</span> <span class="n">ancestors</span> <span class="n">WHERE</span> <span class="n">degree</span><span class="o">&gt;=</span> <span class="mi">2</span><span class="p">;</span>
+
+<span class="n">ancestor</span> <span class="o">|</span> <span class="n">child</span>  <span class="o">|</span> <span class="n">degree</span>
+<span class="o">----------+--------+--------</span>
+<span class="n">Dakota</span>   <span class="o">|</span> <span class="n">Sophia</span> <span class="o">|</span>      <span class="mi">2</span>
+<span class="n">Dakota</span>   <span class="o">|</span> <span class="n">Ava</span>    <span class="o">|</span>      <span class="mi">2</span>
+<span class="n">Madison</span>  <span class="o">|</span> <span class="n">Noah</span>   <span class="o">|</span>      <span class="mi">2</span>
+<span class="n">Sophia</span>   <span class="o">|</span> <span class="n">Emma</span>   <span class="o">|</span>      <span class="mi">2</span>
+<span class="n">Dakota</span>   <span class="o">|</span> <span class="n">Noah</span>   <span class="o">|</span>      <span class="mi">3</span>
+<span class="n">Madison</span>  <span class="o">|</span> <span class="n">Emma</span>   <span class="o">|</span>      <span class="mi">3</span>
+<span class="n">Dakota</span>   <span class="o">|</span> <span class="n">Emma</span>   <span class="o">|</span>      <span class="mi">4</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sql_objectrelational.html" class="btn btn-neutral float-right" title="SQL - Object-Relational Extensions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="or_frameworks.html" class="btn btn-neutral float-left" title="SQL - Object-Relational Frameworks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+SELECT 'Homework 5 Sample Answers' || E'\n' ||
+       'Generated on: ' || to_char(now(), 'MM-DD HH:MM PM') ||  E'\n' ||
+       'Always check for the latest version before testing against.';
+
+
+
+-- Query 1: For each sport name, return the number of times it appeared
+-- in winter olympics and the number of times it appeared in the summer
+-- olympics (i.e. number of different olympic games). Order by sport
+-- name. Hint: This is a great outer join query, though other solutions
+-- are possible too.
+
+select 'Query 1';
+
+select
+     s.name
+     , count(distinct m.oid) as num_winter_games
+     , count(distinct m2.oid) as num_summer_games
+from
+     sports s join events e on s.id = e.sid
+     left join winter_medals m on m.eid = e.id
+     left join summer_medals m2 on m2.eid = e.id
+group by
+     s.name
+order by
+     s.name asc;
+     
+
+-- Query 2: Find average number of medals for each country in Winter
+-- Olympic games over all the games they participated in (i.e. total
+-- number of medals for that country in each games averaged over all the
+-- games, exclude the medals for 2018). Return country code and the
+-- average medals in descending order of medals.
+
+select 'Query 2';
+
+select
+    f.country
+    , cast(avg(f.num_medals) as numeric(4,2)) as avg_medals
+from (
+    select
+        m.oid
+        , a.country
+        , count(*) as num_medals
+    from
+        winter_medals m
+        , athletes a
+    where
+        m.aid = a.id
+    group by
+        m.oid
+        , a.country) as f
+group by
+    f.country
+order by
+    avg_medals desc;
+
+
+-- Query 3: Return the first year an athlete from Japan (JPN)  won a
+-- medal in Individual (event name) Men's (etype) Figure skating (sport
+-- discipline).
+
+select 'Query 3';
+
+select
+    a.name
+    , a.country
+    , o.year
+    , o.city
+from
+    winter_medals m
+    , athletes a
+    , events e
+    , sports s
+    , olympics o
+where
+    m.aid = a.id
+    and m.oid = o.id
+    and m.eid = e.id
+    and e.sid = s.id
+    and m.medal = 'Gold'
+    and a.country = 'JPN'
+    and e.etype = 'm'
+    and e.name = 'Individual'
+    and s.discipline = 'Figure skating'
+order by o.year
+limit 1 ;
+
+
+
+-- Query 4: For all winter olympics, find the athletes, the events and
+-- the Olympic games in which the athlete shared a gold in that event
+-- with another athlete from a different country. Return id, name,
+-- country of the athlete, name of the event and its sport discipline,
+-- city and year of the games, order by event name, olympic year, city,
+-- athlete country and name.
+
+select 'Query 4';
+
+select
+    a.id
+    , a.name
+    , a.country
+    , o.city
+    , o.year
+    , e.name
+    , s.discipline
+from
+    (select
+        m.oid
+	, e.id
+    from
+        winter_medals m
+        , athletes a
+        , events e
+    where
+        m.aid = a.id
+        and m.eid = e.id
+        and m.medal = 'Gold'
+    group by
+        m.oid
+        , e.id
+    having
+        count(distinct a.country)>1) as f
+    , winter_medals m
+    , athletes a
+    , olympics o
+    , events e
+    , sports s
+where
+    m.oid = o.id
+    and m.aid = a.id
+    and m.eid = e.id
+    and e.sid = s.id
+    and m.medal = 'Gold'
+    and m.oid = f.oid
+    and e.id = f.id
+order by
+    e.name asc
+    , o.year asc
+    , o.city asc 
+    , a.country asc
+    , a.name ; 
+
+
+-- Query 5: We are counting medals incorrectly, because team and pair
+-- events count as 1 gold only. A table listing the event categories for
+-- 2018 events is given in table \verb+winter_eventcategories+. In this
+-- case, if etype is \verb+single+, then we count individuals, otherwise
+-- we should count individual events.
+
+-- Return a correct medal count for 2018 olympics for each
+-- country. Return country name and total number of medals, ordered by
+-- medals first and then by country.
+
+-- (Note there is an error in our data for Germany, but the correct
+-- query should produce results that match our results)
+
+select 'Query 5';
+
+select
+    a.country
+    , count(we.eid) +
+      (select count(distinct (cast(m2.eid as varchar)||m2.medal))
+       from winter_medals m2, winter_eventcategories we2, athletes a2
+       where m2.oid = m.oid and m2.eid=we2.eid and we2.etype <> 'single'
+            and m2.aid = a2.id and a2.country = a.country)
+       as medal_count
+from
+    winter_medals m
+    join athletes a on m.aid=a.id 
+    join olympics o on m.oid=o.id and o.year=2018
+    left join winter_eventcategories we
+          on we.eid=m.eid and we.etype='single'
+group by
+    m.oid
+    , a.country
+order by
+    medal_count desc
+    , a.country asc;
+
+
+-- Query 6: For each country, return the number athletes who won a gold
+-- medal in 2018 Olympics and never before (use the quick and dirty way
+-- of counting medals here, just counting the number of tuples from
+-- winter_medals including the team and pair events). Order by the count
+-- and country. Hint: This is a great query to practice \verb+NOT
+-- EXISTS+.
+
+select 'Query 6';
+
+select 
+    a.country
+    , count(*) as num_firsttimers
+from
+    winter_medals m
+    , olympics o
+    , athletes a
+where
+    m.oid = o.id
+    and o.year = 2018
+    and m.aid = a.id
+    and m.medal = 'Gold'
+    and not exists
+         (select
+	      1
+	  from
+	      winter_medals m2
+	  where
+	      m2.aid = a.id
+	      and m2.medal = 'Gold'
+              and m2.oid <> m.oid)
+group by
+    a.country
+order by
+    num_firsttimers desc
+    , a.country asc;
+
+
+
+-- Query 7: Find countries that won a medal in every Winter olympic game since
+-- 1900 (including 1900). Order by country.
+
+select 'Query 7';
+
+select
+   a.country
+from
+   olympics o
+   , winter_medals m
+   , athletes a
+where
+    m.oid = o.id
+    and m.aid = a.id
+    and o.year >= 1900
+group by
+    a.country
+having     
+    count(distinct o.id) =
+         (  select
+	      count(distinct o2.id)
+            from
+	      olympics o2
+	    where
+	       o2.year >= 1900
+	       and o2.otype = 'winter' )
+order by
+     a.country ;
+
+
+select
+   a.country
+from
+   olympics o
+   , summer_medals m
+   , athletes a
+where
+    m.oid = o.id
+    and m.aid = a.id
+    and o.year >= 1900
+group by
+    a.country
+having     
+    count(distinct o.id) =
+         (  select
+	      count(distinct o2.id)
+            from
+	      olympics o2
+	    where
+	       o2.year >= 1900
+	       and o2.otype = 'summer' )
+order by
+     a.country ;
+
+
+-- Query 8: For all winter sports, return the name of sport and the year
+-- when USA won a Gold medal in that sport for the first time. Order by
+-- sport name. Note that due to the way this database is constructed, the
+-- sport with the same name may actually appear more than once with
+-- different ID. So, when finding the same sport, use the sport name.
+
+select 'Query 8';
+
+SELECT DISTINCT
+    s.name
+    , o.year
+    , o.city
+from
+    sports s
+    , events e
+    , winter_medals m
+    , athletes a
+    , olympics o
+where
+    s.id = e.sid
+    and e.id = m.eid
+    and m.oid = o.id
+    and a.id = m.aid
+    and a.country = 'USA'
+    and m.medal = 'Gold'
+    and not exists (
+         select
+  	     1
+	 from
+	     winter_medals m2
+	     , athletes a2
+	     , events e2
+	     , sports s2
+	     , olympics o2
+	 where
+             m2.eid = e2.id
+	     and m2.oid = o2.id
+	     and o2.year < o.year
+	     and e2.sid = s2.id
+	     and s2.name = s.name
+	     and m2.aid = a2.id
+	     and a2.country = 'USA'
+	     and m2.medal = 'Gold')
+order by
+    s.name; 
+	     
+

@@ -1,0 +1,1140 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Part 1: Basics &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>SQL - Part 1: Basics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2019/course_notes/sql_basics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-part-1-basics">
+<h1>SQL - Part 1: Basics<a class="headerlink" href="#sql-part-1-basics" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p>In this lecture, we will learn how to write queries in SQL.</p></li>
+<li><p>Examples database to be used in this lecture is given in SQL here:</p>
+<p>See <code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">database</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">used</span></code>.</p>
+</li>
+<li><p>First a few early remarks about SQL.</p></li>
+</ul>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>SQL is an industry standard language for relational databases.</p></li>
+<li><p>Almost all database management systems implement SQL the same, except:</p>
+<ul>
+<li><p>Core of the SQL standard is the same across all databases</p></li>
+<li><p>Advanced features may vary from database to database</p></li>
+<li><p>It is highly advisable to write queries that are portable from
+system to system: no bells or whistles unless it really gets you
+some strong performance gains.</p></li>
+</ul>
+</li>
+<li><p>We will try to distinguish between core and special features as
+much as possible.</p></li>
+</ul>
+</div>
+<div class="section" id="sql-as-a-database-language">
+<h2>SQL as a database language<a class="headerlink" href="#sql-as-a-database-language" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>SQL is a full language that has many components:</p>
+<ul>
+<li><p>Query language:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">...</span> <span class="n">FROM</span> <span class="o">...</span> <span class="n">WHERE</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>allows you to write queries to find what is stored in databases.</p>
+</li>
+<li><p>DML: data manipulation language</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span>
+<span class="n">UPDATE</span>
+<span class="n">DELETE</span>
+</pre></div>
+</div>
+<p>allows you to change the contents of the existing tables</p>
+</li>
+<li><p>DDL: data definition language</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">DATABASE</span>
+<span class="n">CREATE</span> <span class="n">TABLE</span>
+<span class="n">ALTER</span> <span class="n">TABLE</span>
+<span class="n">DROP</span> <span class="n">TABLE</span>
+</pre></div>
+</div>
+<p>allows you to define database objects: schema, tables, indices, etc.</p>
+</li>
+</ul>
+</li>
+<li><p>There are many other components to SQL, we will learn each in time.</p>
+<p>First, query languages.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="general-comments">
+<h2>General Comments<a class="headerlink" href="#general-comments" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A logical/declarative query language</p></li>
+<li><p>Express what you want, not how to get it</p></li>
+<li><p>Each SQL expression can be translated to multiple equivalent
+relational algebra expressions</p></li>
+<li><p>SQL is tuple based, each statement refers to individual tuples in relations</p></li>
+<li><p>SQL has bag semantics</p></li>
+<li><p>Recall RDMS implementations of relations as tables do not require
+tables to always have a key, hence allowing the possibility of
+duplicate tuples</p>
+<p>Same is true for SQL, an SQL expression may return duplicate tuples,
+unless they are removed explicitly.</p>
+</li>
+<li><p>SQL is case insensitive (though strings are case sensitive of
+course)</p></li>
+<li><p>Syntax:</p>
+<ul class="simple">
+<li><p>All statements must end with a semi-colon!</p></li>
+<li><p>Strings are single quoted.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="control-flow">
+<h2>Control Flow<a class="headerlink" href="#control-flow" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>It is best to imagine the control flow of SQL as</p>
+<ol class="arabic simple">
+<li><p>From: read relations involved in the from</p></li>
+<li><p>Where:  check for each tuple if it passes the where clause</p></li>
+<li><p>Select: for tuples that pass the where clause, construct the
+output by the projection attributes in select</p></li>
+</ol>
+</li>
+<li><p>This will become very important for understanding which
+statements are valid.</p></li>
+</ul>
+</div>
+<div class="section" id="main-syntax-bag-semantics-and-duplicate-removal">
+<h2>Main Syntax: Bag Semantics and Duplicate Removal<a class="headerlink" href="#main-syntax-bag-semantics-and-duplicate-removal" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">course_id</span>
+<span class="n">FROM</span>
+   <span class="n">classes</span>
+<span class="n">WHERE</span>
+   <span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Spring&#39;</span>
+   <span class="ow">and</span> <span class="n">year</span> <span class="o">=</span> <span class="mi">2016</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>This is equivalent to a bag relational algebra query as follows:</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{course\_id}\, (\sigma_{\mbox{semester='Spring' and year=2016}}\, classes)\]</div>
+</li>
+<li><p>Note that this query can return duplicates because there can be multiple
+sections for a class in a semester.</p>
+<ul class="simple">
+<li><p>SQL programmers need to be aware of the schema to know whether
+results can have duplicates or not.</p></li>
+</ul>
+</li>
+<li><p>If duplicates are not needed in results, then they can be explicitly
+removed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">DISTINCT</span>
+   <span class="n">course_id</span>
+<span class="n">FROM</span>
+   <span class="n">classes</span>
+<span class="n">WHERE</span>
+   <span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Spring&#39;</span>
+   <span class="ow">and</span> <span class="n">year</span> <span class="o">=</span> <span class="mi">2016</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="sql-select-statement">
+<h2>SQL - SELECT statement<a class="headerlink" href="#sql-select-statement" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>It is a bit confusing at first, but remember: SELECT part of SQL is
+actually projection in relational algebra.</p>
+<ul class="simple">
+<li><p>SELECT is constructing a single output tuple for each tuple that
+passes the conditions in the WHERE clause</p></li>
+</ul>
+</li>
+<li><p>SELECT is extended projection:</p>
+<ul>
+<li><p>You can rename attributes returned</p></li>
+<li><p>You can use expressions over the attributes</p></li>
+<li><p>You can return constants</p></li>
+<li><dl>
+<dt>Optionally, you can remove duplicates using distinct (only one</dt><dd><p>DISTINCT clause in a single query)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">left</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">strpos</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">firstname</span>
+    <span class="p">,</span> <span class="n">UPPER</span><span class="p">(</span><span class="n">substring</span><span class="p">(</span><span class="n">name</span> <span class="kn">from</span> <span class="nn">strpos</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="k">as</span> <span class="n">lastname</span>
+    <span class="p">,</span> <span class="n">email</span>
+    <span class="p">,</span> <span class="s1">&#39;student&#39;</span> <span class="k">as</span> <span class="n">position</span>
+    <span class="p">,</span> <span class="n">email</span><span class="o">||</span> <span class="s1">&#39; room: &#39;</span> <span class="o">||</span> <span class="n">address</span> <span class="k">as</span> <span class="n">contact</span>
+<span class="n">FROM</span>
+   <span class="n">students</span> <span class="p">;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>position is a new column with a fixed value, constant ‘student’</p></li>
+<li><p>firstname is a substring of a column</p></li>
+<li><p>constant is a concatenation of two strings</p></li>
+<li><p>functions can be combined in complex expressions</p></li>
+</ul>
+</li>
+<li><p>Given SQL is a programming language, there are many utility
+functions that help simplify your type. You can find them here:</p>
+<p><a class="reference external" href="http://www.postgresql.org/docs/9.3/interactive/functions.html">http://www.postgresql.org/docs/9.3/interactive/functions.html</a></p>
+</li>
+<li><p>Functions used in the SELECT statement operate on single values,
+not a set/bag of values:  A+B, not sum(A).</p></li>
+<li><p>AS for renaming attributes is not needed in some databases, but
+it is good to have to be compliant for standards.</p></li>
+</ul>
+</div>
+<div class="section" id="sql-where-statement">
+<h2>SQL - WHERE statement<a class="headerlink" href="#sql-where-statement" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>WHERE statement is equivalent to the selection in relational algebra.</p></li>
+<li><p>It contains a Boolean expression over individual tuples</p></li>
+<li><p>For each tuple produced by the FROM statement, we check whether
+the WHERE statement is true.</p>
+<p>If it is true, then we produce a tuple that will be passed to the
+SELECT statement.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="o">*</span>     <span class="o">--</span><span class="n">produce</span> <span class="nb">all</span> <span class="n">attributes</span>
+<span class="n">FROM</span>
+   <span class="n">meeting_times</span>
+<span class="n">WHERE</span>
+   <span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Spring&#39;</span>
+   <span class="ow">and</span> <span class="p">(</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2014</span> <span class="ow">or</span> <span class="n">meetingtime</span> <span class="o">&gt;</span> <span class="n">time</span> <span class="s1">&#39;12:00:00&#39;</span><span class="p">)</span>
+   <span class="ow">and</span> <span class="n">days</span> <span class="n">LIKE</span> <span class="s1">&#39;%R%&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="section" id="regular-expressions-using-like">
+<h3>Regular Expressions using LIKE<a class="headerlink" href="#regular-expressions-using-like" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>You can compare a string using regular expressions, but you
+must use the keyword LIKE</p>
+<ul class="simple">
+<li><p><cite>%</cite> stands for 0 or more characters</p></li>
+<li><p><cite>_</cite> stands for exactly 1 character</p></li>
+</ul>
+</li>
+<li><p>What is the difference in output?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">days</span> <span class="n">LIKE</span> <span class="s1">&#39;%R%&#39;</span>
+<span class="n">days</span> <span class="n">LIKE</span> <span class="s1">&#39;_R&#39;</span>
+<span class="n">days</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
+<span class="n">days</span> <span class="o">=</span> <span class="s1">&#39;%R%&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can tell SQL not to treat a character as part of the regular
+expression by escaping it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">val</span> <span class="n">like</span> <span class="s1">&#39;%bc&#39;</span>
+</pre></div>
+</div>
+<p>will match <cite>‘abc’</cite> and <cite>‘a%bc’</cite></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">val</span> <span class="n">like</span> <span class="s1">&#39;%\%bc&#39;</span>
+</pre></div>
+</div>
+<p>will only match <cite>‘a%bc’</cite></p>
+</li>
+<li><p>You can change the escape character with the keyword <cite>ESCAPE</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">like</span> <span class="s1">&#39;</span><span class="si">%x</span><span class="s1">%bc&#39;</span> <span class="n">ESCAPE</span> <span class="s1">&#39;x&#39;</span>
+</pre></div>
+</div>
+<p>This will also only match <cite>‘a%bc’</cite>.</p>
+</li>
+<li><p>Postgresql supports SIMILAR TO as well using more complex
+and SQL standard regular expressions, though it considers these
+regular expressions potential security hazards.</p></li>
+</ul>
+</div>
+<div class="section" id="special-characters-in-strings">
+<h3>Special characters in strings<a class="headerlink" href="#special-characters-in-strings" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Strings are delimited by single quote</p>
+<ul>
+<li><p>Escape single quote by repeating it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="s1">&#39;professor&#39;&#39;s cat&#39;</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>Any special character needs to be escaped. The general escape
+character is <a href="#id1"><span class="problematic" id="id2">`</span></a>`.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">name</span> <span class="o">||</span> <span class="n">E</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">||</span> <span class="n">email</span> <span class="kn">from</span> <span class="nn">students</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>Returns values that has a newline in them.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="null-values">
+<h3>NULL values<a class="headerlink" href="#null-values" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>WHERE statement implements Boolean logic. However, sometimes
+attributes may have <cite>null</cite> values. How should they be interpreted?</p></li>
+<li><p>NULL is a special value in SQL.</p>
+<ul class="simple">
+<li><p>NULL is not the same as empty string. Any data type can have NULL
+value.</p></li>
+</ul>
+</li>
+<li><p>NULL values are used to represent different things:</p>
+<ul>
+<li><p>A value for the attribute does not exist (yet):</p>
+<p>The grade for a course in progress does not exist.</p>
+</li>
+<li><p>The value exists but it is not known.</p>
+<p>We may know that a person has a phone, but we do not know the phone number.</p>
+</li>
+<li><p>It is not known whether a value exists or not.</p>
+<p>A faculty may or may not have an office yet.</p>
+</li>
+</ul>
+</li>
+<li><p>Note that storing empty string for a value is asserting that its value
+is nothing, which is different than saying it has no value! Do not
+confuse the two.</p></li>
+</ul>
+</div>
+<div class="section" id="boolean-statements-with-null-values">
+<h3>Boolean Statements with NULL values<a class="headerlink" href="#boolean-statements-with-null-values" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Given the special meaning of NULL, any comparison involving a
+NULL value returns UNKNOWN:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NULL</span> <span class="o">=</span> <span class="mi">5</span>   <span class="n">evaluates</span> <span class="n">to</span> <span class="n">UKNOWN</span>
+<span class="n">NULL</span> <span class="o">&gt;</span> <span class="mi">5</span>   <span class="n">evaluates</span> <span class="n">to</span> <span class="n">UKNOWN</span>
+<span class="n">NULL</span> <span class="n">LIKE</span> <span class="s1">&#39;%&#39;</span> <span class="n">evaluates</span> <span class="n">to</span> <span class="n">UKNOWN</span>
+</pre></div>
+</div>
+<p>in this last case, any string would satisfy this condition. But, still
+when the value is NULL, we will return UNKNOWN.</p>
+</li>
+<li><p>WHERE statement will only return tuples that evaluate to True. Any
+tuples with UNKNOWN values are eliminated.</p></li>
+<li><p>Boolean conditions with UNKNOWN statements need to be evaluated first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NULL</span> <span class="o">=</span> <span class="mi">5</span> <span class="n">OR</span>   <span class="mi">4</span><span class="o">&gt;</span><span class="mi">5</span>    <span class="n">EVALUATES</span> <span class="n">TO</span> <span class="n">UNKNOWN</span>
+<span class="n">NULL</span> <span class="o">=</span> <span class="mi">5</span> <span class="n">AND</span>  <span class="mi">4</span><span class="o">&gt;</span><span class="mi">5</span>    <span class="n">EVALUATES</span> <span class="n">TO</span> <span class="n">FALSE</span>
+</pre></div>
+</div>
+</li>
+<li><p>Boolean logic with UNKNOWN VALUES:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 17%" />
+<col style="width: 24%" />
+<col style="width: 24%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C1</p></th>
+<th class="head"><p>C2</p></th>
+<th class="head"><p>C1 OR C2</p></th>
+<th class="head"><p>C1 AND C2</p></th>
+<th class="head"><p>NOT C2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TRUE</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>TRUE</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>UNKNOWN</p></td>
+</tr>
+<tr class="row-odd"><td><p>FALSE</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>FALSE</p></td>
+<td><p>UNKNOWN</p></td>
+</tr>
+<tr class="row-even"><td><p>UNKNOWN</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>UNKNOWN</p></td>
+<td><p>UNKNOWN</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="comparing-null-values">
+<h3>Comparing NULL values<a class="headerlink" href="#comparing-null-values" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>To check a value is NULL or not, no selection criteria will work.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">create</span> <span class="n">table</span> <span class="n">abc</span> <span class="p">(</span><span class="n">val</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span> <span class="p">;</span>
+<span class="n">insert</span> <span class="n">into</span> <span class="n">abc</span> <span class="n">values</span><span class="p">(</span><span class="s1">&#39;cat&#39;</span><span class="p">);</span>
+<span class="n">insert</span> <span class="n">into</span> <span class="n">abc</span> <span class="n">values</span><span class="p">(</span><span class="s1">&#39;dog&#39;</span><span class="p">);</span>
+<span class="n">insert</span> <span class="n">into</span> <span class="n">abc</span> <span class="n">values</span><span class="p">(</span><span class="n">null</span><span class="p">);</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">abc</span> <span class="p">;</span>  <span class="o">--</span> <span class="n">returns</span> <span class="mi">3</span> <span class="n">tuples</span>
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">abc</span> <span class="n">where</span> <span class="n">val</span> <span class="n">like</span> <span class="s1">&#39;%&#39;</span><span class="p">;</span> <span class="o">--</span> <span class="n">returns</span> <span class="mi">2</span> <span class="n">tuples</span>
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">abc</span> <span class="n">where</span> <span class="n">length</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span> <span class="o">--</span> <span class="n">returns</span> <span class="mi">2</span> <span class="n">tuples</span>
+</pre></div>
+</div>
+</li>
+<li><p>You need to explicitly search for NULL using the keyword <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NULL</span></code>
+or <code class="docutils literal notranslate"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">NULL</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">abc</span> <span class="n">where</span> <span class="n">val</span> <span class="ow">is</span> <span class="n">NULL</span> <span class="p">;</span> <span class="o">--</span> <span class="n">returns</span> <span class="mi">1</span> <span class="nb">tuple</span>
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">abc</span> <span class="n">where</span> <span class="n">val</span> <span class="ow">is</span> <span class="n">NULL</span> <span class="ow">or</span> <span class="n">val</span> <span class="n">like</span> <span class="s1">&#39;%&#39;</span><span class="p">;</span> <span class="o">--</span> <span class="n">returns</span> <span class="nb">all</span> <span class="n">tuples</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="complex-expressions">
+<h3>Complex expressions<a class="headerlink" href="#complex-expressions" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>SQL has many functions for different data types. Any expression
+involving these functions are allowed.</p></li>
+<li><p>Some example functions:</p>
+<ul>
+<li><p>String operations: <code class="docutils literal notranslate"><span class="pre">||,</span> <span class="pre">upper,</span> <span class="pre">lower,</span> <span class="pre">position,</span> <span class="pre">substring,</span> <span class="pre">trim</span></code></p></li>
+<li><p>Numerical operations: <code class="docutils literal notranslate"><span class="pre">+,-,*,/,%,^,!</span></code></p></li>
+<li><p>Mathematical operations: <code class="docutils literal notranslate"><span class="pre">abs,</span> <span class="pre">ceil,</span> <span class="pre">floor,</span> <span class="pre">log,</span> <span class="pre">mod,</span> <span class="pre">round,</span> <span class="pre">sqrt</span></code></p></li>
+<li><p>Utilities: <code class="docutils literal notranslate"><span class="pre">random,</span> <span class="pre">now</span></code></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="date-based-data-types">
+<h3>Date based data types<a class="headerlink" href="#date-based-data-types" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Data types:</p>
+<ul class="simple">
+<li><p>Date (year, month, day)</p></li>
+<li><p>Time of day</p></li>
+<li><p>Timestamp (date and time combined)</p></li>
+<li><p>Interval (a time duration)</p></li>
+</ul>
+</li>
+<li><p>Full support for complex operations on date/time data types</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">date</span> <span class="s1">&#39;2016-01-28&#39;</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">=</span> <span class="n">date</span> <span class="s1">&#39;2016-01-30&#39;</span>   <span class="o">--</span><span class="n">default</span> <span class="n">assumption</span> <span class="n">of</span> <span class="n">day</span>
+<span class="n">date</span> <span class="s1">&#39;2016-01-28&#39;</span> <span class="o">+</span> <span class="n">interval</span> <span class="s1">&#39;2 day&#39;</span> <span class="o">=</span> <span class="n">timestap</span> <span class="s1">&#39;2016-01-30 00:00:00&#39;</span>
+<span class="n">date</span> <span class="s1">&#39;2016-01-28&#39;</span> <span class="o">+</span> <span class="n">interval</span> <span class="s1">&#39;3 hours&#39;</span> <span class="o">=</span> <span class="n">timestamp</span> <span class="s1">&#39;2016-01-28 03:00:00&#39;</span>
+<span class="n">timestamp</span> <span class="s1">&#39;2016-01-28 03:00:00&#39;</span> <span class="o">+</span> <span class="n">interval</span> <span class="s1">&#39;10 hours&#39;</span> <span class="o">=</span> <span class="n">timestamp</span> <span class="s1">&#39;2016-01-28 13:00:00&#39;</span>
+<span class="n">time</span> <span class="s1">&#39;12:00:00&#39;</span> <span class="o">+</span> <span class="n">interval</span> <span class="s1">&#39;8 hours&#39;</span> <span class="o">=</span> <span class="n">time</span> <span class="s1">&#39;20:00:00&#39;</span>
+<span class="n">date</span> <span class="s1">&#39;2016-05-19&#39;</span> <span class="o">-</span> <span class="n">date</span> <span class="s1">&#39;2016-01-28&#39;</span> <span class="o">=</span> <span class="mi">112</span>   <span class="o">--</span> <span class="n">integer</span> <span class="n">number</span> <span class="n">of</span> <span class="n">days</span>
+</pre></div>
+</div>
+</li>
+<li><p>Postgresql functions allow complex operations over date/time. Be
+careful, these functions apply to specific data types only but not
+necessarily do implicit type conversion:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extract</span><span class="p">(</span><span class="n">field</span> <span class="kn">from</span> <span class="nn">timestamp</span><span class="p">)</span>  <span class="o">--</span><span class="n">day</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span>
+                               <span class="o">--</span><span class="n">minute</span><span class="p">,</span> <span class="n">seconds</span><span class="p">,</span> <span class="n">dow</span>
+
+<span class="n">select</span> <span class="n">extract</span><span class="p">(</span><span class="n">year</span> <span class="kn">from</span> <span class="nn">now</span><span class="p">());</span>
+
+<span class="n">date_part</span>
+<span class="o">-----------</span>
+<span class="mi">2016</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Convert between data types:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">to_char</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+<span class="n">to_date</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+<span class="n">to_date</span><span class="p">(</span><span class="s1">&#39;02 29 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;MM DD YYYY&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can also check whether two time intervals overlap with each other:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="p">(</span><span class="n">date</span> <span class="s1">&#39;2016-03-01&#39;</span><span class="p">,</span> <span class="n">date</span> <span class="s1">&#39;2016-03-31&#39;</span><span class="p">)</span> <span class="n">overlaps</span>
+       <span class="p">(</span><span class="n">date</span> <span class="s1">&#39;2016-02-25&#39;</span><span class="p">,</span> <span class="n">date</span> <span class="s1">&#39;2016-03-04&#39;</span><span class="p">);</span>
+
+<span class="kc">True</span>
+
+<span class="n">select</span> <span class="p">(</span><span class="n">date</span> <span class="s1">&#39;2016-03-01&#39;</span><span class="p">,</span> <span class="n">date</span> <span class="s1">&#39;2016-03-31&#39;</span><span class="p">)</span> <span class="n">overlaps</span>
+<span class="p">(</span><span class="n">date</span> <span class="s1">&#39;2016-02-25&#39;</span><span class="p">,</span> <span class="n">date</span> <span class="s1">&#39;2016-02-29&#39;</span><span class="p">);</span>
+
+<span class="kc">False</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example: Find requirements that have been enforced for at least
+1 year:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">requires</span> <span class="n">where</span> <span class="n">cast</span><span class="p">(</span><span class="n">now</span><span class="p">()</span> <span class="k">as</span> <span class="n">date</span><span class="p">)</span> <span class="o">-</span> <span class="n">enforcedsince</span> <span class="o">&gt;</span> <span class="mi">365</span><span class="p">;</span>
+
+<span class="n">course_id</span> <span class="o">|</span> <span class="n">prereq_id</span> <span class="o">|</span> <span class="n">isenforced</span> <span class="o">|</span> <span class="n">enforcedsince</span>
+<span class="o">-----------+-----------+------------+---------------</span>
+         <span class="mi">5</span> <span class="o">|</span>         <span class="mi">1</span> <span class="o">|</span> <span class="n">t</span>          <span class="o">|</span> <span class="mi">2011</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="from-clause">
+<h2>FROM Clause<a class="headerlink" href="#from-clause" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>So far we have seen a single table in the FROM clause. What happens
+with multiple tables?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">classes</span><span class="p">,</span> <span class="n">courses</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>This is actually a Cartesian product of two tables. To make this
+a join, we must include a join condition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="o">*</span>
+<span class="n">FROM</span>
+   <span class="n">classes</span> <span class="n">c</span>
+   <span class="p">,</span> <span class="n">courses</span> <span class="n">co</span>
+<span class="n">WHERE</span>
+   <span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">co</span><span class="o">.</span><span class="n">id</span>
+</pre></div>
+</div>
+</li>
+<li><p>The variables <cite>c</cite> and <cite>co</cite> are aliases for the table names, especially
+needed if the two tables have attributes with the same name.</p></li>
+<li><p>In short, a query of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">attributes</span> <span class="n">FROM</span> <span class="n">R1</span><span class="p">,</span><span class="n">R2</span><span class="p">,</span><span class="o">..</span><span class="p">,</span> <span class="n">Rn</span> <span class="n">WHERE</span> <span class="n">Conditions</span>
+</pre></div>
+</div>
+<p>is equivalent to the relational algebra operation:</p>
+<div class="math notranslate nohighlight">
+\[\Pi_{attributes}\, (\sigma_{Conditions}\, (R1\times R2 \times \ldots \times Rn))\]</div>
+</li>
+<li><p>Get used to reading the above query as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">For</span> <span class="n">each</span> <span class="nb">tuple</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Cartesian</span> <span class="n">product</span> <span class="n">R1xR2x</span><span class="o">...</span><span class="n">xRn</span>
+   <span class="n">If</span> <span class="n">it</span> <span class="n">satisfies</span> <span class="n">the</span> <span class="n">conditions</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">WHERE</span> <span class="n">clause</span>
+      <span class="n">Construct</span> <span class="n">a</span> <span class="nb">tuple</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">output</span> <span class="k">for</span> <span class="n">attributes</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">SELECT</span> <span class="n">clause</span>
+</pre></div>
+</div>
+</li>
+<li><p>WHERE statement contains both join conditions and selection conditions</p></li>
+</ul>
+</div>
+<div class="section" id="example-queries">
+<h2>Example Queries<a class="headerlink" href="#example-queries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Return the name of faculty who taught courses both in ‘Fall’ and ‘Spring’
+of 2015.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">DISTINCT</span> <span class="o">--</span><span class="n">multiple</span> <span class="n">such</span> <span class="n">courses</span> <span class="n">may</span> <span class="n">exist</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+    <span class="n">classes</span> <span class="n">c1</span>
+    <span class="p">,</span> <span class="n">classes</span> <span class="n">c2</span>
+    <span class="p">,</span> <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+   <span class="n">c1</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Fall&#39;</span>
+   <span class="ow">and</span> <span class="n">c1</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2015</span>
+   <span class="ow">and</span> <span class="n">c2</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Spring&#39;</span>
+   <span class="ow">and</span> <span class="n">c2</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2015</span>
+   <span class="ow">and</span> <span class="n">c1</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">c2</span><span class="o">.</span><span class="n">instructor_id</span>
+   <span class="ow">and</span> <span class="n">c1</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">;</span>   <span class="o">--</span> <span class="n">join</span> <span class="n">condition</span>
+</pre></div>
+</div>
+</li>
+<li><p>Return id and name of all students taking a course with Professor
+Fogg in Spring 2016.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">DISTINCT</span>  <span class="o">--</span><span class="n">student</span> <span class="n">may</span> <span class="n">be</span> <span class="n">taking</span> <span class="n">multiple</span> <span class="n">classes</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">classes</span> <span class="n">c</span>
+   <span class="p">,</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+   <span class="p">,</span> <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+   <span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">section</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span>  <span class="o">--</span> <span class="n">up</span> <span class="n">to</span> <span class="n">here</span> <span class="n">are</span> <span class="nb">all</span> <span class="n">join</span> <span class="n">conditions</span>
+   <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="n">like</span> <span class="s1">&#39;</span><span class="si">%F</span><span class="s1">ogg&#39;</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Spring&#39;</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">2016</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Return the name of the prerequisites of the course named ‘Alternate
+Dimensions’.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">pc</span><span class="o">.</span><span class="n">crsname</span>
+<span class="n">FROM</span>
+   <span class="n">courses</span> <span class="n">c</span>
+   <span class="p">,</span> <span class="n">requires</span> <span class="n">r</span>
+   <span class="p">,</span> <span class="n">courses</span> <span class="n">pc</span>
+<span class="n">WHERE</span>
+   <span class="n">c</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">course_id</span>
+   <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">prereq_id</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">id</span>  <span class="o">--</span> <span class="n">join</span> <span class="n">conditions</span> <span class="n">up</span> <span class="n">to</span> <span class="n">here</span>
+   <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">crsname</span> <span class="o">=</span> <span class="s1">&#39;Alternate Dimensions&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="set-and-bag-operations">
+<h2>Set and Bag Operations<a class="headerlink" href="#set-and-bag-operations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>SQL allows for SET and BAG operations:</p>
+<ul class="simple">
+<li><p>SET operations: UNION, INTERSECT, EXCEPT</p></li>
+<li><p>BAG operations: UNION ALL, INTERSECT ALL, EXCEPT ALL</p></li>
+</ul>
+</li>
+<li><p>The operations are over results of SQL queries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">SELECT</span> <span class="o">...</span> <span class="n">FROM</span> <span class="o">...</span> <span class="n">WHERE</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">UNION</span>
+<span class="p">(</span><span class="n">SELECT</span> <span class="o">...</span> <span class="n">FROM</span> <span class="o">...</span> <span class="n">WHERE</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Same as in relational algebra, the queries should be union compatible:</p>
+<ul class="simple">
+<li><p>Same attributes and same names (though most databases will allow
+same number of attributes with different names as long as the domain
+of attributes at each location match)</p></li>
+</ul>
+</li>
+<li><p>Suppose we have:</p>
+<p>Table a1 with id values:  1,2,2,2,3,3
+Table a2 with id values:  2,3,3</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a1</span> <span class="n">union</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a2</span> <span class="p">;</span>
+
+<span class="n">returns</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span> <span class="o">--</span> <span class="nb">set</span> <span class="n">operation</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a1</span> <span class="n">intersect</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a2</span> <span class="p">;</span>
+
+<span class="n">returns</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a1</span> <span class="k">except</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a2</span> <span class="p">;</span>
+
+<span class="n">returns</span> <span class="mi">1</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a1</span> <span class="n">union</span> <span class="nb">all</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a2</span> <span class="p">;</span>
+
+<span class="n">returns</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span>  <span class="o">-</span><span class="n">bag</span> <span class="n">union</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a1</span> <span class="n">intersect</span> <span class="nb">all</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a2</span> <span class="p">;</span>
+
+<span class="n">returns</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span>  <span class="o">-</span><span class="n">bag</span> <span class="n">intersection</span>
+
+<span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a1</span> <span class="k">except</span> <span class="nb">all</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">a2</span> <span class="p">;</span>
+
+<span class="n">returns</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span>  <span class="o">-</span><span class="n">bag</span> <span class="n">difference</span>
+</pre></div>
+</div>
+</li>
+<li><dl>
+<dt>Example: Find students who have passed ‘Advanced Spellcasting’, but</dt><dd><p>not ‘Spellcasting’. Return their name.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+    <span class="n">courses</span> <span class="n">c</span>
+    <span class="p">,</span> <span class="n">transcript</span> <span class="n">t</span>
+    <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+<span class="n">WHERE</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">crsname</span> <span class="o">=</span> <span class="s1">&#39;Advanced Spellcasting&#39;</span>
+    <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span>
+    <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+    <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">null</span>
+    <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="o">&lt;&gt;</span> <span class="s1">&#39;I&#39;</span>
+<span class="n">EXCEPT</span>
+<span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+    <span class="n">courses</span> <span class="n">c</span>
+    <span class="p">,</span> <span class="n">transcript</span> <span class="n">t</span>
+    <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+<span class="n">WHERE</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">crsname</span> <span class="o">=</span> <span class="s1">&#39;Spellcasting&#39;</span>
+    <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span>
+    <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+    <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">null</span>
+    <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="o">&lt;&gt;</span> <span class="s1">&#39;I&#39;</span> <span class="p">;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>Find faculty who never taught courses, and return their ID.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="nb">id</span> <span class="n">FROM</span> <span class="n">faculty</span>
+<span class="n">EXCEPT</span>
+<span class="n">SELECT</span> <span class="n">instructor_id</span> <span class="k">as</span> <span class="nb">id</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>This works without renaming of the attributes, but what if you wanted
+to retun the name of the faculty:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span> <span class="n">FROM</span> <span class="n">faculty</span>
+<span class="n">EXCEPT</span>
+<span class="n">SELECT</span> <span class="n">instructor_id</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>This does not work, we get the error:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ERROR</span><span class="p">:</span>  <span class="n">each</span> <span class="n">EXCEPT</span> <span class="n">query</span> <span class="n">must</span> <span class="n">have</span> <span class="n">the</span> <span class="n">same</span> <span class="n">number</span> <span class="n">of</span> <span class="n">columns</span>
+<span class="n">LINE</span> <span class="mi">3</span><span class="p">:</span>      <span class="n">SELECT</span> <span class="n">instructor_id</span> <span class="k">as</span> <span class="nb">id</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>We must have the same columns for a set/bag operation. Here is
+how we write it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span> <span class="n">FROM</span> <span class="n">faculty</span>
+<span class="n">EXCEPT</span>
+<span class="n">SELECT</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="n">c</span><span class="p">,</span> <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Find all departments with no faculty in them or offers no
+majors. Return their name.</p>
+<ul class="simple">
+<li><p>Construct slowly, write the following in SQL:</p>
+<ul>
+<li><p>R1: all departments</p></li>
+<li><p>R2: departments with faculty</p></li>
+<li><p>R3: departments that offer a major</p></li>
+</ul>
+</li>
+<li><p>Now we can compute (R1 EXCEPT R2) UNION (R1 EXCEPT R3)</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="aggregates">
+<h2>AGGREGATES<a class="headerlink" href="#aggregates" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Similar to the aggregates in bag relational algebra, you
+can find the aggregate for a specific column or combination
+of columns.</p></li>
+<li><p>Commonly used aggregates are: <code class="docutils literal notranslate"><span class="pre">min</span></code>, <code class="docutils literal notranslate"><span class="pre">max</span></code>, <code class="docutils literal notranslate"><span class="pre">avg</span></code>, <code class="docutils literal notranslate"><span class="pre">sum</span></code>,
+<code class="docutils literal notranslate"><span class="pre">count</span></code>, <code class="docutils literal notranslate"><span class="pre">stddev</span></code>.</p></li>
+<li><p>An aggregate returns a single tuple (unless accompanied by other
+clauses like GROUP BY or FILTER).</p>
+<p>Find total number of courses and total number of credits passed
+by ‘Eliot Waugh’.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num_courses</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">grade</span><span class="p">)</span> <span class="k">as</span> <span class="n">num_passed</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="n">DISTINCT</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span><span class="p">)</span> <span class="k">as</span> <span class="n">num_types_of_grade</span>
+   <span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">credits</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_credits</span>
+<span class="n">FROM</span>
+    <span class="n">transcript</span> <span class="n">t</span>
+    <span class="p">,</span> <span class="n">courses</span> <span class="n">c</span>
+    <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+<span class="n">WHERE</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">id</span>
+    <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+    <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Eliot Waugh&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">count(*)</span></code> counts the total number of tuples.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">count(attribute)</span></code> counts the total number of values for a given
+attribute, disregarding the NULL values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">count(DISTINCT</span> <span class="pre">attribute)</span></code> counts the total number of distinct
+values for a given attribute, disregarding the NULL values.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="group-by">
+<h2>GROUP BY<a class="headerlink" href="#group-by" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Instead of computing the aggregates for the whole query, it is
+possible to compute it for a group.</p>
+<ul class="simple">
+<li><p>Group by multiple attributes by finding tuples that have the same
+values for the grouping attributes</p></li>
+<li><p>For each group, produce a single tuple containing grouping
+attributes and any agregates over the group.</p></li>
+<li><p>To return an attribute from a relation, you must include it in
+the grouping attributes.</p></li>
+</ul>
+</li>
+<li><p>Example: Find the total number of credits passed for each student.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+  <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+  <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num_courses</span>
+  <span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">credits</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_credits</span>
+<span class="n">FROM</span>
+   <span class="n">transcript</span> <span class="n">t</span>
+   <span class="p">,</span> <span class="n">courses</span> <span class="n">c</span>
+   <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+<span class="n">WHERE</span>
+   <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">id</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">null</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="o">!=</span> <span class="s1">&#39;I&#39;</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note: we group by name to be able to return it, even though it is
+unique due to the primary key. If your DBMS checks for
+constraints at compile time, you do not have to include name.
+Safest thing is to include all relevant attributes.</p></li>
+</ul>
+</div>
+<div class="section" id="group-by-having">
+<h2>GROUP BY - HAVING<a class="headerlink" href="#group-by-having" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Group by statement can be followed by an optional HAVING clause.</p></li>
+<li><p>You can write conditions to eliminate gruops in the HAVING clause.</p></li>
+<li><p>What makes sense in the HAVING clause?</p>
+<p>Aggregates over the groups.</p>
+<p>All other conditions should be put in the WHERE clause to reduce
+the size of the relation to be grouped.</p>
+</li>
+<li><p>Find all instructors have taught more than two courses. Return
+their id and name.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">faculty</span> <span class="n">f</span>
+   <span class="p">,</span> <span class="n">classes</span> <span class="n">c</span>
+<span class="n">WHERE</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">HAVING</span>
+   <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="order-by">
+<h2>ORDER BY<a class="headerlink" href="#order-by" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>You can order the tuples returned by the query with respect
+to one or more attributes.</p></li>
+<li><p>Return the students, order with respect to year (descending) and
+name (ascending).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="o">*</span>
+<span class="n">FROM</span>
+    <span class="n">students</span>
+<span class="n">ORDER</span> <span class="n">BY</span>
+    <span class="n">year</span> <span class="n">desc</span>
+    <span class="p">,</span> <span class="n">name</span> <span class="n">asc</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="limit">
+<h2>LIMIT<a class="headerlink" href="#limit" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>You can limit the number of tuples returned, by the LIMIT
+statement, the last possible statement to add.</p></li>
+<li><p>LIMIT makes the most sense when combined with an order by.</p></li>
+<li><p>Find the top 3 classes in the university in terms of the
+number of students in them. Return their name.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">crsname</span>
+    <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numstudents</span>
+<span class="n">FROM</span>
+    <span class="n">transcript</span> <span class="n">t</span>
+    <span class="p">,</span> <span class="n">courses</span> <span class="n">c</span>
+<span class="n">WHERE</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">id</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">crsname</span>
+<span class="n">ORDER</span> <span class="n">BY</span>
+    <span class="n">numstudents</span> <span class="n">DESC</span>
+<span class="n">LIMIT</span> <span class="mi">3</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="full-sql-syntax">
+<h2>FULL SQL SYNTAX<a class="headerlink" href="#full-sql-syntax" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Now that we have seen the full SQL syntax, let’s revisit how
+a complex statement such as the following is executed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">A1</span> <span class="n">AS</span> <span class="n">X</span> <span class="n">FROM</span> <span class="n">B1</span> <span class="n">WHERE</span> <span class="n">C1</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">D1</span> <span class="n">HAVING</span> <span class="n">E1</span>
+<span class="n">UNION</span>
+<span class="n">SELECT</span> <span class="n">A2</span> <span class="n">AS</span> <span class="n">X</span> <span class="n">FROM</span> <span class="n">B2</span> <span class="n">WHERE</span> <span class="n">C2</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">D2</span> <span class="n">HAVING</span> <span class="n">E2</span>
+<span class="n">UNION</span>
+<span class="n">SELECT</span> <span class="n">A3</span> <span class="n">AS</span> <span class="n">X</span> <span class="n">FROM</span> <span class="n">B3</span> <span class="n">WHERE</span> <span class="n">C3</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">D3</span> <span class="n">HAVING</span> <span class="n">E3</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">X</span>
+<span class="n">LIMIT</span> <span class="mi">10</span><span class="p">;</span>
+
+<span class="mf">1.</span> <span class="n">FROM</span> <span class="n">B1</span> <span class="n">WHERE</span> <span class="n">C1</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">D1</span> <span class="n">HAVING</span> <span class="n">E1</span> <span class="o">=&gt;</span> <span class="n">construct</span> <span class="n">A1</span>
+<span class="mf">2.</span> <span class="n">FROM</span> <span class="n">B2</span> <span class="n">WHERE</span> <span class="n">C2</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">D2</span> <span class="n">HAVING</span> <span class="n">E2</span> <span class="o">=&gt;</span> <span class="n">construct</span> <span class="n">A2</span>
+<span class="mf">3.</span> <span class="n">FROM</span> <span class="n">B3</span> <span class="n">WHERE</span> <span class="n">C3</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">D3</span> <span class="n">HAVING</span> <span class="n">E3</span> <span class="o">=&gt;</span> <span class="n">construct</span> <span class="n">A3</span>
+<span class="mf">4.</span> <span class="n">TAKE</span> <span class="n">UNION</span><span class="o">/</span><span class="n">APPLY</span> <span class="n">SET</span> <span class="n">OPERATIONS</span>
+   <span class="p">(</span><span class="n">use</span> <span class="n">parantheses</span> <span class="k">as</span> <span class="n">needed</span> <span class="k">for</span> <span class="n">appropriate</span> <span class="n">ordering</span><span class="p">)</span>
+<span class="mf">5.</span> <span class="n">ORDER</span> <span class="n">BY</span> <span class="p">(</span><span class="n">a</span> <span class="n">single</span> <span class="n">order</span> <span class="n">per</span> <span class="n">query</span><span class="p">)</span>
+<span class="mf">6.</span> <span class="n">LIMIT</span> <span class="p">(</span><span class="n">a</span> <span class="n">single</span> <span class="n">LIMIT</span> <span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The ordering is important. In the above query for top 3
+students, we can order by a column named <code class="docutils literal notranslate"><span class="pre">numstudents</span></code>
+because ORDER BY comes after SELECT. However, we CANNOT
+refer to this attribute anywhere before ORDER BY (such as
+in HAVING).</p></li>
+</ul>
+</div>
+<div class="section" id="common-errors-when-writing-sql-queries">
+<h2>Common Errors When Writing SQL Queries<a class="headerlink" href="#common-errors-when-writing-sql-queries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Do not forget join conditions. Even if a foreign key
+constraint exists, you must explicitly write the join condition.</p></li>
+<li><p>Remember the ordering of execution. The following query is
+is not correct, why?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">student_id</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numc</span> <span class="n">FROM</span> <span class="n">transcript</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">student_id</span> <span class="n">HAVING</span> <span class="n">numc</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="n">ERROR</span><span class="p">:</span>  <span class="n">column</span> <span class="s2">&quot;numc&quot;</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">exist</span>
+<span class="n">LINE</span> <span class="mi">2</span><span class="p">:</span>      <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">student_id</span> <span class="n">HAVING</span> <span class="n">numc</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Remember that aggregates only make sense after a group by
+statement. So, only in HAVING and SELECT.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">student_id</span> <span class="n">FROM</span> <span class="n">transcript</span> <span class="n">WHERE</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">student_id</span> <span class="p">;</span>
+
+<span class="n">ERROR</span><span class="p">:</span>  <span class="n">aggregate</span> <span class="n">functions</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">allowed</span> <span class="ow">in</span> <span class="n">WHERE</span>
+<span class="n">LINE</span> <span class="mi">1</span><span class="p">:</span> <span class="n">SELECT</span> <span class="n">student_id</span> <span class="n">FROM</span> <span class="n">transcript</span> <span class="n">WHERE</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span>
+</pre></div>
+</div>
+</li>
+<li><p>You cannot return an attribute that is not part of group by.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">semester</span> <span class="n">FROM</span> <span class="n">transcript</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">student_id</span><span class="p">;</span>
+
+<span class="n">ERROR</span><span class="p">:</span>  <span class="n">column</span> <span class="s2">&quot;transcript.semester&quot;</span> <span class="n">must</span> <span class="n">appear</span> <span class="ow">in</span> <span class="n">the</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">clause</span> <span class="ow">or</span> <span class="n">be</span> <span class="n">used</span> <span class="ow">in</span> <span class="n">an</span> <span class="n">aggregate</span> <span class="n">function</span>
+<span class="n">LINE</span> <span class="mi">1</span><span class="p">:</span> <span class="n">SELECT</span> <span class="n">semester</span> <span class="n">FROM</span> <span class="n">transcript</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">student_id</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Also think for a second to see that this query makes no sense.</p>
+</li>
+<li><p>You can do a selection or return an attribute that is part
+of group by, but be careful:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">semester</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">transcript</span>
+<span class="n">GROUP</span> <span class="n">BY</span> <span class="n">semester</span> <span class="n">HAVING</span> <span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Fall&#39;</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>This would not work is semester was not part of the grouping
+attributes.</p>
+<p>While not technically wrong, this is an inefficient query.
+If you are going to do a selection on semester, you should
+do it in the WHERE clause. You will reduce the size of the query
+that needs to be processed with the remaining statements.</p>
+<p>Here is the better version of the same query:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">semester</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">transcript</span>
+<span class="n">WHERE</span> <span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Fall&#39;</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">semester</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

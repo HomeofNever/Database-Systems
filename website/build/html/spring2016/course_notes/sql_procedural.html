@@ -1,0 +1,1178 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Procedural Programming &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>SQL - Procedural Programming</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/spring2016/course_notes/sql_procedural.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-procedural-programming">
+<h1>SQL - Procedural Programming<a class="headerlink" href="#sql-procedural-programming" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Queries and expressions in SQL are ideal for large set-at-a-time
+operations:</p>
+<ul>
+<li><p>Operations that need to search the whole relation to answer a
+complex combination of tuples.</p></li>
+<li><p>Using SQL allows database to use the query optimizer to find the
+best query execution plan for the query.</p></li>
+</ul>
+</li>
+<li><p>However, SQL is not efficient for some programming tasks:</p>
+<ul>
+<li><p>Sequence of code: A block of queries that must be executed in an order</p></li>
+<li><p>Conditionals: if/then/else statements (some simple ones can be
+handled, but cannot be combined with sequence of code</p></li>
+<li><p>Loops</p></li>
+<li><p>Store values in and use values from program variables</p></li>
+<li><p>Error handling</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="example-program">
+<h2>Example Program<a class="headerlink" href="#example-program" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>We will see an example program that is hard to write using an SQL
+query, but trivial with a procedural language.</p></li>
+<li><p>Find the top 3 most frequent y for each x in table R(x,y,z).</p>
+<ul>
+<li><p>Not very easy!</p></li>
+<li><p>However, suppose we have a query:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">num</span> <span class="n">FROM</span> <span class="n">R</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Now, we can write a simple program to compute this as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Algorithm</span> <span class="n">Top</span> <span class="mi">3</span> <span class="n">y</span> <span class="k">for</span> <span class="n">each</span> <span class="n">x</span><span class="p">:</span>
+   <span class="n">Run</span> <span class="n">query</span><span class="p">:</span>
+        <span class="n">SELECT</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">num</span>
+        <span class="n">FROM</span> <span class="n">R</span>
+        <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+        <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">num</span><span class="p">;</span>
+   <span class="n">In</span> <span class="n">a</span> <span class="n">loop</span> <span class="n">read</span> <span class="n">each</span> <span class="nb">tuple</span> <span class="n">such</span> <span class="n">that</span><span class="p">:</span>
+       <span class="k">if</span> <span class="n">a</span> <span class="n">new</span> <span class="n">x</span> <span class="ow">is</span> <span class="n">found</span><span class="p">:</span>
+           <span class="n">read</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">three</span> <span class="n">y</span> <span class="n">values</span>
+           <span class="p">(</span><span class="n">error</span> <span class="n">handling</span> <span class="k">if</span> <span class="n">less</span> <span class="n">than</span> <span class="n">three</span> <span class="n">y</span> <span class="n">values</span> <span class="n">are</span> <span class="n">found</span><span class="p">)</span>
+           <span class="n">skip</span> <span class="n">remaining</span> <span class="n">x</span> <span class="n">values</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="procedural-sql">
+<h2>Procedural SQL<a class="headerlink" href="#procedural-sql" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>To enable the use of SQL for costly queries, while making it
+possible to write code/procedures on top of it, databases support a
+number of options.</p></li>
+<li><p>The options belong in two main options:</p>
+<ul>
+<li><p>Server side</p></li>
+<li><p>Client side</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="server-side">
+<h3>Server side<a class="headerlink" href="#server-side" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Languages make it possible to define procedures, functions and
+triggers</p></li>
+<li><p>These programs are compiled and stored within the database server</p></li>
+<li><p>They can also be called by queries</p></li>
+</ul>
+</div>
+<div class="section" id="client-side">
+<h3>Client side<a class="headerlink" href="#client-side" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Languages allow programs to integrate querying of the database with
+a procedural language</p></li>
+<li><p>Coding in a host language with db hooks (C, C++, Java, Python, etc.)
+using the data structures of these languages</p></li>
+<li><p>Coding in frameworks with their own data models (Java, Python, etc)
+with similar db hooks as in above.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="programming-with-sql">
+<h2>Programming with SQL<a class="headerlink" href="#programming-with-sql" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>All programming paradigms support:</p>
+<ul>
+<li><p>Methods to execute queries and update statements</p>
+<p>Executing any SQL statement and catching the outcome</p>
+</li>
+<li><p>Interpret errors returned if any</p></li>
+<li><p>Input values from variables into queries, output query results
+into variables</p></li>
+<li><p>Loop over query results (for queries returning multiple tuples)</p></li>
+<li><p>Raise exceptions (which results in rollback of transactions)</p></li>
+<li><p>Store and reuse queries in the shape of cursors</p></li>
+<li><p>Starting and committing transactions</p></li>
+</ul>
+</li>
+<li><p>Client side programs also support:</p>
+<ul class="simple">
+<li><p>Opening/closing connections, allocating/releasing database
+resources for queries</p></li>
+</ul>
+</li>
+<li><p>The actual syntax of the methods for doing this vary, but the
+principle is the same.</p></li>
+</ul>
+<div class="section" id="server-side-language-examples">
+<h3>Server side language examples<a class="headerlink" href="#server-side-language-examples" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Generally database specific</p></li>
+<li><p>Postgresql:</p>
+<ul>
+<li><p>pl/pgsql: generic procedural language for postgresql</p></li>
+<li><p>pl/pyhton: procedural language that is an extension of python
+(also see pl/tcl, pl/perl)</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="client-side-language-examples">
+<h3>Client side language examples<a class="headerlink" href="#client-side-language-examples" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Database specific extensions of host languages, for example</p>
+<ul class="simple">
+<li><p>libpq: C library for postgresql, uses library calls for specific
+to postgresql</p></li>
+<li><p>OCCI: Oracle library for C</p></li>
+</ul>
+<p>Write code in C with hooks to the database in the form of
+functions and libraries, and compile using C compiler</p>
+<ul class="simple">
+<li><p>ECPG: embedded programming in SQL, based on the embedded
+programming standard with a postgresql specific pre-compiler, an
+the standard C compiler</p></li>
+</ul>
+</li>
+<li><p>Standard libraries for connecting to the database</p>
+<ul>
+<li><p>JDBC is a Java standard library, all databases implement the same
+functions (some non-standard data types will be different)</p>
+<p>To compile code with JDBC functions, the specific adapter
+(library) for a database must be used.</p>
+</li>
+<li><p>No specific standard for libraries based on C, but ODBC is a
+non-language specific standard, .NET tries to achieve the same</p></li>
+<li><p>Python DB-API is a database independent framework for Python</p>
+<p>Similar to Java, a module for each database management system is
+needed. The postgresql module is called psycopg2.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="frameworks">
+<h2>Frameworks<a class="headerlink" href="#frameworks" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Frameworks are based on specific design principles for developing
+database backed applications</p></li>
+<li><p>Examples:</p>
+<ul>
+<li><p>Object-relational-mapping used by Rails, Hibernate, Django,
+WebObjects, .NET (different frameworks have different models)</p></li>
+<li><p>Note that the frameworks can be built on top of other languages
+(such as Java + JDBC)</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="pl-pgsql">
+<h2>pl/pgsql<a class="headerlink" href="#pl-pgsql" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Note that languages may be different, but the way that communicate
+with SQL is very similar.</p></li>
+<li><p>We will go into detail of one language and then show similar
+concepts in other paradigms.</p>
+<p>See full documentation here:</p>
+<p><a class="reference external" href="http://www.postgresql.org/docs/9.5/interactive/plpgsql.html">http://www.postgresql.org/docs/9.5/interactive/plpgsql.html</a></p>
+</li>
+<li><p>pl/pgsql supports the same data types as the database</p></li>
+<li><p>Programs and functions can be compiled and used directly at the db
+server</p></li>
+<li><p>Main pl/pgsql block has the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="o">&lt;&lt;</span><span class="n">label</span><span class="o">&gt;&gt;</span> <span class="p">]</span>
+<span class="p">[</span><span class="n">DECLARE</span>
+<span class="n">variable</span> <span class="n">declarations</span> <span class="p">]</span>
+<span class="n">BEGIN</span>
+<span class="n">statement</span>
+<span class="n">END</span> <span class="p">[</span> <span class="n">label</span> <span class="p">]</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Variable types:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">integer</span>
+<span class="n">numeric</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">varchar</span>
+<span class="n">tablename</span><span class="o">%</span><span class="n">ROWTYPE</span>
+<span class="n">tablename</span><span class="o">.</span><span class="n">columname</span><span class="o">%</span><span class="n">TYPE</span>
+<span class="n">RECORD</span>
+</pre></div>
+</div>
+<p>ROWTYPE and RECORD have subfields, i.e. x.name.</p>
+</li>
+</ul>
+<div class="section" id="programming-constructs">
+<h3>Programming constructs<a class="headerlink" href="#programming-constructs" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Conditionals:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">IF</span> <span class="o">...</span> <span class="n">THEN</span> <span class="o">...</span> <span class="n">ELSIF</span> <span class="o">...</span> <span class="n">THEN</span> <span class="o">...</span> <span class="n">ELSE</span> <span class="o">...</span> <span class="n">END</span> <span class="n">IF</span>
+<span class="n">Loops</span><span class="p">:</span>
+<span class="p">[</span> <span class="o">&lt;&lt;</span><span class="n">label</span><span class="o">&gt;&gt;</span> <span class="p">]</span>
+<span class="n">LOOP</span>
+<span class="n">statements</span>
+<span class="n">END</span> <span class="n">LOOP</span> <span class="p">[</span> <span class="n">label</span> <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p>Returning a value:</p>
+<ul class="simple">
+<li><p>pl/pgsql does not allow you to modify input variables</p></li>
+<li><p>RETURN will return a value</p></li>
+<li><p>You can also return a table of rows:</p>
+<ul>
+<li><p>Return each tuple with RETURN NEXT and finish with RETURN</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>CREATE FUNCTION sales_tax(subtotal real, state varchar) RETURNS real AS $$
+DECLARE
+   adjusted_subtotal real ;
+BEGIN
+   IF state = &#39;NY&#39; THEN
+       adjusted_subtotal = subtotal * 0.08 ;
+   ELSIF state = &#39;AL&#39; THEN
+       adjusted_subtotal = subtotal ;
+   ELSE
+       adjusted_subtotal = subtotal * 0.06;
+   END IF ;
+   RETURN adjusted_subtotal ;
+END ;
+$$ LANGUAGE plpgsql ;
+</pre></div>
+</div>
+</li>
+<li><p>Now, test it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">select</span> <span class="n">sales_tax</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;NY&#39;</span><span class="p">)</span> <span class="p">;</span>
+
+<span class="n">sales_tax</span>
+<span class="o">-----------</span>
+<span class="mi">8</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note: The whole body of the function is entered within the two $$ signs.</p></li>
+</ul>
+</div>
+<div class="section" id="handling-sql">
+<h3>Handling SQL:<a class="headerlink" href="#handling-sql" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>We will consider three types of SQL expressions:</p>
+<ol class="arabic simple">
+<li><p>Statements that return no output but a status (successful or not,
+and what was wrong)</p></li>
+<li><p>Statements that return a single tuple</p></li>
+<li><p>Statements that return multiple tuples</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>CREATE FUNCTION sales_tax(subtotal real) RETURNS boolean AS $$
+DECLARE
+   adjusted_subtotal real ;
+BEGIN
+   adjusted_subtotal = subtotal * 0.06;
+   BEGIN
+       INSERT INTO temp VALUES (adjusted_subtotal) ;
+       RETURN true ;
+   EXCEPTION WHEN unique_violation THEN
+       RETURN false ;
+   END ;
+END ;
+$$ LANGUAGE plpgsql ;
+</pre></div>
+</div>
+</li>
+<li><p>Now, when you run this function, a row is inserted into table temp.</p></li>
+</ul>
+</div>
+<div class="section" id="executing-queries">
+<h3>Executing queries<a class="headerlink" href="#executing-queries" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>When the query returns a single row, then we can read it directly
+into a variable.</p></li>
+<li><p>Note that when using variables as input/output, pl/pgsql does not
+need any special delimiters (be careful naming the variables so as
+not to clash with column names)</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">SELECT</span> <span class="o">*</span> <span class="n">INTO</span> <span class="n">myrec</span> <span class="n">FROM</span> <span class="n">emp</span> <span class="n">WHERE</span> <span class="n">empname</span> <span class="o">=</span> <span class="n">myname</span><span class="p">;</span>
+  <span class="n">IF</span> <span class="n">NOT</span> <span class="n">FOUND</span> <span class="n">THEN</span>
+  <span class="n">RAISE</span> <span class="n">EXCEPTION</span> <span class="s1">&#39;employee % not found&#39;</span><span class="p">,</span> <span class="n">myname</span><span class="p">;</span>
+  <span class="n">END</span> <span class="n">IF</span><span class="p">;</span>
+
+<span class="o">-</span> <span class="nb">input</span><span class="p">:</span> <span class="n">myname</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="n">myrec</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>Executing queries<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>When the query returns multiple rows, then a loop is needed to go
+through them one by one.</p>
+<ul class="simple">
+<li><p>A query returns a stream of tuples, which needs to be processed.</p></li>
+<li><p>Equally important is closing the stream associated with a query
+if required by the programming language.</p></li>
+</ul>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="o">&lt;&lt;</span><span class="n">label</span><span class="o">&gt;&gt;</span> <span class="p">]</span>
+<span class="n">FOR</span> <span class="n">target</span> <span class="n">IN</span> <span class="n">query</span> <span class="n">LOOP</span>
+<span class="n">statements</span>
+<span class="n">END</span> <span class="n">LOOP</span> <span class="p">[</span> <span class="n">label</span> <span class="p">];</span>
+
+<span class="n">DECLARE</span>
+<span class="n">myRow</span>  <span class="n">RECORD</span> <span class="p">;</span>
+<span class="n">lastX</span>      <span class="n">INT</span> <span class="p">;</span>
+<span class="n">yCnt</span>       <span class="n">INT</span> <span class="p">;</span>
+<span class="n">BEGIN</span>
+   <span class="n">lastX</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span>
+   <span class="n">yCnt</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span>
+   <span class="n">FOR</span> <span class="n">myRow</span> <span class="n">IN</span>
+          <span class="n">SELECT</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">num</span>
+          <span class="n">FROM</span> <span class="n">temp</span> <span class="n">GROUP</span> <span class="n">BY</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="n">ORDER</span> <span class="n">BY</span> <span class="n">x</span><span class="p">,</span> <span class="n">num</span> <span class="n">ASC</span> <span class="n">LOOP</span>
+      <span class="n">yCnt</span> <span class="o">=</span> <span class="n">yCnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+      <span class="n">IF</span> <span class="n">yCnt</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="n">AND</span> <span class="n">lastX</span> <span class="o">=</span> <span class="n">myRow</span><span class="o">.</span><span class="n">x</span> <span class="n">THEN</span>
+          <span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">temp2</span> <span class="n">VALUES</span><span class="p">(</span><span class="n">myRow</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">myRow</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">myRow</span><span class="o">.</span><span class="n">num</span><span class="p">)</span> <span class="p">;</span>
+      <span class="n">ELSIF</span> <span class="n">lastX</span> <span class="o">&lt;&gt;</span> <span class="n">myRow</span><span class="o">.</span><span class="n">x</span> <span class="n">THEN</span>
+          <span class="n">lastX</span> <span class="o">=</span> <span class="n">myRow</span><span class="o">.</span><span class="n">x</span> <span class="p">;</span>
+          <span class="n">yCnt</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">;</span>
+          <span class="n">INSERT</span> <span class="n">INTO</span> <span class="n">temp2</span> <span class="n">VALUES</span><span class="p">(</span><span class="n">myRow</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">myRow</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">myRow</span><span class="o">.</span><span class="n">num</span><span class="p">)</span> <span class="p">;</span>
+      <span class="n">END</span> <span class="n">IF</span> <span class="p">;</span>
+   <span class="n">END</span> <span class="n">LOOP</span> <span class="p">;</span>
+<span class="n">RETURN</span> <span class="mi">1</span> <span class="p">;</span>
+<span class="n">END</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note that procedure proc2() computes and inserts the top 3 y values
+(by count) for each x.  Call it as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">proc2</span><span class="p">()</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="cursors">
+<h3>Cursors<a class="headerlink" href="#cursors" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>A cursor is a query with a handle. Cursors may have input.</p></li>
+<li><p>Cursors may be defined once, and used many times to read tuples.</p>
+<p>A query in a cursor is optimized once, reducing the cost of
+optimizing the query many times.</p>
+</li>
+<li><p>Functions may return reference to a cursor, allowing a program to
+read tuples that are returned.</p></li>
+<li><p>Cursors provide a more efficient implementation of queries returning
+many tuples.</p></li>
+<li><p>First, declare cursors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DECLARE</span> <span class="n">curs2</span> <span class="n">CURSOR</span> <span class="n">FOR</span> <span class="n">SELECT</span> <span class="o">*</span> <span class="n">FROM</span> <span class="n">tenk1</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Then, execute the associated query by opening them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OPEN</span> <span class="n">curs2</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Then, retrieve tuples in the result using fetch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FETCH</span> <span class="n">curs2</span> <span class="n">INTO</span> <span class="n">foo</span><span class="p">,</span> <span class="n">bar</span><span class="p">,</span> <span class="n">baz</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>or</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FOR</span> <span class="n">recordvar</span> <span class="n">IN</span> <span class="n">curs2</span> <span class="n">LOOP</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul>
+<li><p>When finished, close the cursor to release allocated memory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOSE</span> <span class="n">curs2</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Cursors can also be used for update/delete if it is pointing to a
+specific tuple (similar to the notion of an updatable view).
+- Update/delete the tuple the cursor is pointing to.</p></li>
+</ul>
+</div>
+<div class="section" id="exceptions">
+<h3>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>When an SQL statement is executed, if it is not successful, it raises an error. This error can be caught in the usual try/catch format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BEGIN</span>
+<span class="n">statement</span>
+<span class="n">EXCEPTION</span> <span class="n">WHEN</span> <span class="n">condition</span> <span class="n">THEN</span>
+  <span class="n">statement</span>
+<span class="n">END</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>The exception conditions define integrity violations, statement
+errors, connection errors, etc.</p></li>
+<li><p>The pl/pgsql statements can also raise exceptions to be caught by
+the calling statement:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RAISE</span> <span class="n">NOTICE</span>  <span class="s1">&#39;&#39;</span>
+<span class="n">RAISE</span> <span class="n">EXCEPTION</span> <span class="s1">&#39;&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Also uncaught exceptions within the function will be raised when the
+function fails.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="other-languages-and-formalisms-for-procedural-programming">
+<h2>Other languages and formalisms for procedural programming<a class="headerlink" href="#other-languages-and-formalisms-for-procedural-programming" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given our introduction to programming with pl/pgsql, we will now
+cover some alternate languages to program in databases.</p></li>
+<li><p>Each will have constructs similar to pl/pgsql, some will be generic
+and some will be database specific. I invite you to compare them to
+each other and notice similarities.</p></li>
+</ul>
+</div>
+<div class="section" id="client-side-programming">
+<h2>Client-side programming<a class="headerlink" href="#client-side-programming" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Client-side programming languages have additional constructs to
+connect to a database, keep a pool of open connections and close
+connections.</p></li>
+</ul>
+<div class="section" id="running-and-debugging">
+<h3>Running and Debugging<a class="headerlink" href="#running-and-debugging" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Depending on how tight the integration with the database, error
+checking becomes an issue.</p></li>
+<li><p>Two sources of syntax errors:</p>
+<ul>
+<li><p>Host language syntax errors</p></li>
+<li><p>SQL syntax errors: note that often these are not checked until you
+send the query to the server. So, it is difficult to debug.</p></li>
+</ul>
+</li>
+<li><p>Some client-side programming paradigms are a hybrid of host language
+and additional constructs.</p>
+<ul>
+<li><p>Example: Embedded SQL is an SQL standard for writing programs in a
+host language.</p></li>
+<li><p>There is a precompilation phase for only the SQL code and
+variables with better error checking.</p></li>
+<li><p>SQL calls are changed to calls in the host language after
+precompilation.</p></li>
+<li><p>Though writing programs in this paradigm can be a bit awkward and
+it is a less popular platform as a result.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="performance">
+<h3>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>One must be especially careful about sending large data sets over
+the network when writing client code.</p></li>
+<li><p>When writing client-side code, you must balance the work that must
+be done in the server side and client side.</p>
+<ul>
+<li><p>Very complex queries slow down performance.</p></li>
+<li><p>Very simple queries lead to very large data sets being sent over
+the network.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="call-level-interfaces-for-client-side-programming">
+<h2>Call level interfaces for client-side programming<a class="headerlink" href="#call-level-interfaces-for-client-side-programming" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Supplies the constructs for opening connections, running queries,
+looping over them etc.</p></li>
+<li><p>SQL is completely handled with special function calls in the host
+language</p></li>
+<li><p>JDBC is an industry standard for Java, supported by all databases
+using drivers.</p></li>
+<li><p>Other database specific examples: OCCI for C in Oracle, Libpq for C
+in Postgresql</p></li>
+</ul>
+</div>
+<div class="section" id="occi-example">
+<h2>OCCI Example<a class="headerlink" href="#occi-example" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>OCCI is a C-library specific to Oracle, but it is designed to
+very closely resemble JDBC for Java which is a standard.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;occi.h&gt;</span>
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">oracle</span><span class="p">::</span><span class="n">occi</span><span class="p">;</span>
+
+<span class="n">Environment</span><span class="o">*</span> <span class="n">const</span> <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">::</span><span class="n">createEnvironment</span><span class="p">(</span><span class="n">Environment</span><span class="p">::</span><span class="n">DEFAULT</span><span class="p">);</span>
+
+<span class="n">Connection</span><span class="o">*</span> <span class="n">const</span> <span class="n">con</span> <span class="o">=</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">createConnection</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="k">pass</span><span class="p">,</span> <span class="n">osid</span><span class="p">);</span>
+
+<span class="n">Statement</span><span class="o">*</span> <span class="n">const</span> <span class="n">s</span> <span class="o">=</span>
+       <span class="n">con</span><span class="o">-&gt;</span><span class="n">createStatement</span><span class="p">(</span><span class="s2">&quot;SELECT a.stageName&quot;</span>
+                            <span class="s2">&quot; FROM movies.actors a&quot;</span>
+                            <span class="s2">&quot; WHERE a.stagename like &#39;A%&#39;&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="section" id="initialization">
+<h3>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Each OCCI program must initialize an environment at the start of a
+program.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">Environment</span><span class="o">*</span> <span class="n">Environment</span><span class="p">::</span><span class="n">createEnvironment</span> <span class="p">(</span><span class="n">Environment</span><span class="p">::</span><span class="n">DEFAULT</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The Environment object contains the memory allocator and
+thread-library configuration for OCI.</p></li>
+<li><p>You should explicitly terminate an environment at the end of a
+program to release all memory.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Environment</span><span class="p">::</span><span class="n">terminateEnvironment</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="connection">
+<h3>Connection<a class="headerlink" href="#connection" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>After initialization, you must open a connection to the specific database instance you are going to query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Connection</span><span class="o">*</span> <span class="n">Environment</span><span class="p">::</span><span class="n">createConnection</span> <span class="p">(</span><span class="n">string</span> <span class="n">username</span><span class="p">,</span> <span class="n">string</span> <span class="n">password</span><span class="p">,</span> <span class="n">string</span> <span class="n">sid</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>It will authenticate the given user and password for the given instance id.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Connection</span><span class="o">*</span> <span class="n">con</span> <span class="o">=</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">createConnection</span><span class="p">(</span><span class="s2">&quot;scott&quot;</span><span class="p">,</span>  <span class="s2">&quot;tiger&quot;</span><span class="p">,</span> <span class="s2">&quot;ora9i&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>A single connection can be used to query the same database multiple
+times in parallel or sequentially.</p></li>
+<li><p>You should terminate your connection at the end of your program to
+release all memory at the client and the database server.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">env</span><span class="o">-&gt;</span><span class="n">terminateConnection</span><span class="p">(</span><span class="n">con</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="querying">
+<h3>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Once you have established a connection to the database, you are
+ready to execute queries and updates.</p></li>
+<li><p>To execute a query, you will need to:</p>
+<ul>
+<li><p>Create an SQL statement and load it into a <code class="docutils literal notranslate"><span class="pre">statement</span></code> type object.</p></li>
+<li><p>Execute your query which will return one or more tuples.</p></li>
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">resultset</span></code> object that will allow you to iterate through
+the tuples returned by the query.</p></li>
+<li><p>Close your resultset object so that the database and your program
+releases the necessary memory.</p></li>
+<li><p>Close your statement if you will no longer use it. Note that you
+can use a single statement object repeatedly with different SQL
+queries.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="statements">
+<h3>Statements<a class="headerlink" href="#statements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Create a statement for a specific connection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Statement* sel_all_stmt
+con-&gt;createStatement(&quot;SELECT attr1 FROM my_table&quot;);
+
+..statements to execute this query here…
+</pre></div>
+</div>
+</li>
+<li><p>Change the query for this statement if necessary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sel_all_stmt</span><span class="o">-&gt;</span><span class="n">setSQL</span><span class="p">(</span><span class="s2">&quot;SELECT attr2, attr3 FROM new_table&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>When finished, release the statement object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">con</span><span class="o">-&gt;</span><span class="n">terminateStatement</span><span class="p">(</span><span class="n">sel_all_stmt</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="parametrized-statements">
+<h3>Parametrized Statements<a class="headerlink" href="#parametrized-statements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Very often statements are executed multiple times with different
+values.</p></li>
+<li><p>For example, suppose a query that finds the name of a specific
+employee may be executed multiple times for different employees.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Statement</span><span class="o">*</span> <span class="n">sel_name</span> <span class="n">con</span><span class="o">-&gt;</span><span class="n">createStatement</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM employee WHERE id = :1&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>This means this query will need to be supplied by one value before it is executed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sel_name</span><span class="o">-&gt;</span><span class="n">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">112223333</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>The type used in the “set” method should set the type of the value
+being supplied.</p></li>
+<li><p>This type of a query is UNPREPARED if the required value is not
+supplied by the program.</p></li>
+<li><p>A prepared statement is optimized once and the query plan is used
+multiple times for each execution of the query saving execution
+time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Statement* sel_name con-&gt;createStatement(&quot;SELECT name FROM employee WHERE id = :1 AND Office = :2&quot;);
+sel_name-&gt;setInt(1, 112223333);
+sel_name-&gt;setString(2, “AE125”);
+</pre></div>
+</div>
+</li>
+<li><p>Or</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Statement</span><span class="o">*</span> <span class="n">sel_name</span> <span class="n">con</span><span class="o">-&gt;</span><span class="n">createStatement</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM employee WHERE id = :1 AND Office = :2&quot;</span><span class="p">);</span>
+<span class="n">sel_name</span><span class="o">-&gt;</span><span class="n">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ssnVar</span><span class="p">);</span>
+<span class="n">sel_name</span><span class="o">-&gt;</span><span class="n">setString</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">officeVar</span><span class="p">);</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Where ssnVar and officeVar are program variables of types integer
+and string respectively containing the necessary values.</p></li>
+</ul>
+</div>
+<div class="section" id="update-statements">
+<h3>Update statements<a class="headerlink" href="#update-statements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>All statements that change the database are executed using
+executeUpdate method.</p></li>
+<li><p>Examples are insert, update, delete, create …, drop … statements</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>stmt-&gt;executeUpdate(“CREATE TABLE basket_tab (fruit VARCHAR2(30), quantity NUMBER)”);
+
+statement* s1 =
+con-&gt;createStatement(&quot;INSERT INTO my_table (a, b) VALUES (1, &#39;A&#39;)&quot;);
+s1-&gt;executeUpdate();
+</pre></div>
+</div>
+</li>
+<li><p>Update statements return the total number of tuples effected which
+can be returned by getUpdateCount() method.</p></li>
+</ul>
+</div>
+<div class="section" id="select-statements">
+<h3>Select statements<a class="headerlink" href="#select-statements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>A SELECT query returns one or more tuples by the execution of the
+executeQuery method.</p></li>
+<li><p>To process these tuples, you need a result set object which
+processes tuples in a similar way to a file.</p></li>
+<li><p>You need to open, iterate through and close a result set to access the tuples.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">statement</span><span class="o">*</span> <span class="n">s1</span> <span class="o">=</span>
+<span class="n">con</span><span class="o">-&gt;</span><span class="n">createStatement</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM emp WHERE id &lt; 1000&quot;</span><span class="p">);</span>
+<span class="n">ResultSet</span> <span class="n">r</span> <span class="o">=</span> <span class="n">s1</span><span class="o">-&gt;</span><span class="n">executeQuery</span><span class="p">();</span>
+</pre></div>
+</div>
+</li>
+<li><p>Query is executed, the tuples are returned to the program and the
+result set is initialized to the before the first item in the
+results.</p></li>
+<li><p>To find the first item, you need to execute “next” operation.</p></li>
+<li><p>next returns false if the last tuple is already been read.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">statement</span><span class="o">*</span> <span class="n">s1</span> <span class="o">=</span> <span class="n">con</span><span class="o">-&gt;</span><span class="n">createStatement</span><span class="p">(</span>
+         <span class="s2">&quot;SELECT id, name FROM emp WHERE id &lt; 1000&quot;</span><span class="p">);</span>
+<span class="n">ResultSet</span> <span class="n">r</span> <span class="o">=</span> <span class="n">s1</span><span class="o">-&gt;</span><span class="n">executeQuery</span><span class="p">();</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">r</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">varId</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">getInt</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">varName</span> <span class="o">=</span> <span class="n">r</span><span class="o">-&gt;</span><span class="n">getString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span>
+<span class="p">}</span>
+<span class="n">s</span><span class="o">-&gt;</span><span class="n">closeResultSet</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>To read the columns of the current tuple pointed to by the result
+set, get methods are used.</p></li>
+<li><p>The type of these methods much match the type of the column returned
+by the program.
+- getXXX(i)  means attribute i of the query should have type XXX.</p></li>
+</ul>
+</div>
+<div class="section" id="errors-and-status">
+<h3>Errors and Status<a class="headerlink" href="#errors-and-status" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>An SQLException is raised for many things that may go wrong for your program:
+- Connection cannot be established
+- The query cannot be executed, etc.</p></li>
+<li><p>The exceptions can be caught and checked in the program.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">{</span>
+   <span class="o">...</span> <span class="n">operations</span> <span class="n">which</span> <span class="n">throw</span> <span class="n">SQLException</span> <span class="o">...</span>
+<span class="p">}</span>
+<span class="n">catch</span> <span class="p">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="p">){</span>
+   <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="o">.</span><span class="n">what</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Other useful methods: <code class="docutils literal notranslate"><span class="pre">e.getMessage()</span></code>, <code class="docutils literal notranslate"><span class="pre">e.getErrorCode()</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Errors and Status<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>As statements are created dynamically and executed in the program,
+it may be necessary to check their status while the program is
+running.</p></li>
+<li><p>This is accomplished with the status methods for each class.</p></li>
+<li><p>Examples:</p>
+<ul>
+<li><p>Check whether the statement is <code class="docutils literal notranslate"><span class="pre">UNPREPARED,</span> <span class="pre">PREPARED,</span>
+<span class="pre">RESULT_SET_AVAILABLE,</span> <span class="pre">or</span> <span class="pre">UPDATE_COUNT_AVAILABLE</span></code>.</p></li>
+<li><p>Check whether the result set is <code class="docutils literal notranslate"><span class="pre">END_OF_FETCH</span> <span class="pre">=</span> <span class="pre">0</span></code>,
+<code class="docutils literal notranslate"><span class="pre">DATA_AVAILABLE</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Other methods exist to check for other status related
+information. For example, check whether the result set is empty
+(<code class="docutils literal notranslate"><span class="pre">r-&gt;isNull</span></code>).</p></li>
+</ul>
+</div>
+<div class="section" id="dynamic-conditions">
+<h3>Dynamic Conditions<a class="headerlink" href="#dynamic-conditions" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Suppose tableName is a program variable set to a specific constant by the user.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sqlString = &quot;SELECT * FROM &quot; &lt;&lt; tableName ;
+statement* s1 = con-&gt;createStatement(sqlString);
+ResultSet r = s1-&gt;executeQuery();
+while (r-&gt;next()) {
+           // what attributes are in this result set?
+}
+s-&gt;closeResultSet(r);
+</pre></div>
+</div>
+</li>
+<li><p>The function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vector</span><span class="o">&lt;</span><span class="n">MetaData</span><span class="o">&gt;</span> <span class="n">getColumnListMetaData</span><span class="p">()</span> <span class="n">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>that returns number, types and properties of aResultSet’s columns.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="transactions">
+<h3>Transactions<a class="headerlink" href="#transactions" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>A transaction starts with the first executeQuery, executeUpdate
+statement and ends until the first commit, abort and rollback
+statement executed for the given connection.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">con</span><span class="o">-&gt;</span><span class="n">commit</span><span class="p">();</span>
+<span class="n">con</span><span class="o">-&gt;</span><span class="n">rollback</span><span class="p">();</span>
+</pre></div>
+</div>
+</li>
+<li><p>After a rollback/commit, the next query/update will start a new transaction.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="jdbc">
+<h2>JDBC<a class="headerlink" href="#jdbc" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>OCCI is an Oracle specific language for enabling communications
+between a C++ program and a database.</p></li>
+<li><p>JDBC is a standard for any database product and a Java program for
+the same purpose.</p></li>
+<li><p>JDBC and OCCI are very similar to each other and have almost
+identical set of classes and methods. In fact, OCCI is based on
+JDBC.</p></li>
+<li><p>To accomplish the communication between a Java program and a
+database, a set of libraries called a “driver” is needed.</p></li>
+<li><p>JDBC drivers are specific to the database server.</p></li>
+<li><p>Example program:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.sql.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">oracle.sql.</span><span class="o">*</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">oracle.jdbc.driver.</span><span class="o">*</span><span class="p">;</span>
+<span class="k">class</span> <span class="nc">Employee</span>
+<span class="p">{</span>
+<span class="n">public</span> <span class="n">static</span> <span class="n">void</span> <span class="n">main</span> <span class="p">(</span><span class="n">String</span> <span class="n">args</span> <span class="p">[])</span> <span class="n">throws</span> <span class="n">SQLException</span>
+<span class="p">{</span><span class="o">//</span><span class="n">Set</span> <span class="n">your</span> <span class="n">user</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">password</span>
+<span class="n">String</span> <span class="n">userName</span> <span class="o">=</span> <span class="s2">&quot;dummy&quot;</span> <span class="p">;</span>
+<span class="n">String</span> <span class="n">passWord</span> <span class="o">=</span> <span class="s2">&quot;dummy&quot;</span> <span class="p">;</span>
+
+<span class="o">//</span> <span class="n">Load</span> <span class="n">the</span> <span class="n">Oracle</span> <span class="n">JDBC</span> <span class="n">driver</span>
+<span class="n">DriverManager</span><span class="o">.</span><span class="n">registerDriver</span><span class="p">(</span><span class="n">new</span> <span class="n">oracle</span><span class="o">.</span><span class="n">jdbc</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">OracleDriver</span><span class="p">());</span>
+
+   <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="n">DriverManager</span><span class="o">.</span><span class="n">getConnection</span><span class="p">(</span><span class="s2">&quot;jdbc:oracle:thin:@acadoracle.server.rpi.edu:1521:ora9&quot;</span><span class="p">,</span><span class="n">userName</span><span class="p">,</span><span class="n">passWord</span><span class="p">);</span>
+<span class="o">//</span> <span class="n">Create</span> <span class="n">a</span> <span class="n">statement</span> <span class="n">which</span> <span class="n">will</span> <span class="k">return</span> <span class="n">a</span> <span class="n">cursor</span> <span class="n">that</span>
+<span class="o">//</span> <span class="n">will</span> <span class="n">allow</span> <span class="n">you</span> <span class="n">to</span> <span class="n">scroll</span> <span class="n">the</span> <span class="n">result</span> <span class="nb">set</span> <span class="n">using</span> <span class="n">both</span>
+<span class="o">//</span> <span class="s2">&quot;next&quot;</span> <span class="ow">and</span> <span class="s2">&quot;previous&quot;</span> <span class="n">methods</span>
+
+<span class="k">try</span> <span class="p">{</span>
+      <span class="n">Statement</span> <span class="n">stmt</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">createStatement</span>
+           <span class="p">(</span><span class="n">ResultSet</span><span class="o">.</span><span class="n">TYPE_SCROLL_INSENSITIVE</span><span class="p">,</span> <span class="n">ResultSet</span><span class="o">.</span><span class="n">CONCUR_READ_ONLY</span><span class="p">);</span>
+
+      <span class="n">ResultSet</span> <span class="n">rset</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="n">executeQuery</span><span class="p">(</span><span class="s2">&quot;SELECT name, oid FROM items &quot;</span><span class="p">);</span>
+
+      <span class="o">//</span> <span class="n">Iterate</span> <span class="n">through</span> <span class="n">the</span> <span class="n">result</span> <span class="ow">and</span> <span class="nb">print</span> <span class="n">the</span> <span class="n">item</span> <span class="n">names</span>
+      <span class="k">while</span> <span class="p">(</span><span class="n">rset</span><span class="o">.</span><span class="n">next</span> <span class="p">())</span> <span class="p">{</span>
+          <span class="o">//</span><span class="n">Get</span> <span class="n">item</span> <span class="n">name</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">first</span> <span class="n">column</span>
+          <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span> <span class="p">(</span><span class="n">rset</span><span class="o">.</span><span class="n">getString</span> <span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+
+          <span class="n">PreparedStatement</span> <span class="n">pstmt</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">prepareStatement</span> <span class="p">(</span><span class="s2">&quot;SELECT name FROM owners WHERE oid = ?&quot;</span><span class="p">)</span> <span class="p">;</span>
+
+          <span class="o">//</span><span class="n">Feed</span> <span class="n">the</span> <span class="n">owner</span> <span class="nb">id</span> <span class="n">retrieved</span> <span class="kn">from</span> <span class="nn">rset</span> <span class="n">into</span> <span class="n">pstmt</span>
+          <span class="n">pstmt</span><span class="o">.</span><span class="n">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rset</span><span class="o">.</span><span class="n">getInt</span> <span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+          <span class="n">ResultSet</span> <span class="n">dset</span> <span class="o">=</span> <span class="n">pstmt</span><span class="o">.</span><span class="n">executeQuery</span><span class="p">()</span> <span class="p">;</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">dset</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+              <span class="n">System</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">println</span><span class="p">(</span><span class="n">dset</span><span class="o">.</span><span class="n">getString</span> <span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+      <span class="p">}</span> <span class="p">}</span>
+ <span class="p">}</span>
+ <span class="n">catch</span> <span class="p">(</span><span class="n">SQLException</span><span class="p">)</span> <span class="p">{</span> <span class="n">error</span><span class="o">-</span><span class="n">handling</span><span class="o">-</span><span class="n">code</span> <span class="p">}</span> <span class="p">}</span>  <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="python-db-api">
+<h2>Python DB-API<a class="headerlink" href="#python-db-api" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>DB-API is a generic db interface for python (like JDBC).</p></li>
+<li><p>psycopg2 is a python adapter that implements DB-API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg2</span> <span class="k">as</span> <span class="nn">dbapi2</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">dbapi2</span><span class="o">.</span><span class="n">connect</span> <span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span> <span class="p">(</span><span class="s2">&quot;INSERT INTO versions VALUES (&#39;2007-10-18&#39;, &#39;2.4.4&#39;, &#39;stable&#39;)&quot;</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">commit</span> <span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">psycopg2</span> <span class="k">as</span> <span class="nn">dbapi2</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">dbapi2</span><span class="o">.</span><span class="n">connect</span> <span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span> <span class="p">(</span><span class="s2">&quot;SELECT * FROM versions&quot;</span><span class="p">);</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s2">&quot;Row&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;value = &quot;</span><span class="p">,</span> <span class="n">row</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span> <span class="p">(</span><span class="s2">&quot;&quot;&quot;UPDATE versions SET status=&#39;stable&#39; where version=&#39;2.6.0&#39; &quot;&quot;&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span> <span class="p">(</span><span class="s2">&quot;&quot;&quot;UPDATE versions SET status=&#39;old&#39; where version=&#39;2.4.4&#39; &quot;&quot;&quot;</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="libpq-postgresql-c-language-interface">
+<h2>libpq: Postgresql C-language interface<a class="headerlink" href="#libpq-postgresql-c-language-interface" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The C-language interface for Postgresql uses a number of
+function calls to commmunicate with the database.</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
+<span class="c1">#include &lt;stdlib.h&gt;</span>
+<span class="c1">#include &quot;libpq-fe.h”</span>
+<span class="n">static</span> <span class="n">void</span>
+<span class="n">exit_nicely</span><span class="p">(</span><span class="n">PGconn</span> <span class="o">*</span><span class="n">conn</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">PQfinish</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nb">int</span>
+<span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">const</span> <span class="n">char</span> <span class="o">*</span><span class="n">conninfo</span><span class="p">;</span>
+    <span class="n">PGconn</span>     <span class="o">*</span><span class="n">conn</span><span class="p">;</span>  <span class="n">PGresult</span>   <span class="o">*</span><span class="n">res</span><span class="p">;</span>
+    <span class="nb">int</span>         <span class="n">nFields</span><span class="p">;</span>
+    <span class="nb">int</span>         <span class="n">i</span><span class="p">,</span>  <span class="n">j</span><span class="p">;</span>
+
+    <span class="n">conninfo</span> <span class="o">=</span> <span class="s2">&quot;port=5432 dbname=&#39;sibel&#39; host=&#39;localhost&#39; user=&#39;sibel&#39; &quot;</span><span class="p">;</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">PQconnectdb</span><span class="p">(</span><span class="n">conninfo</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PQstatus</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CONNECTION_OK</span><span class="p">)</span>    <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s2">&quot;Connection to database failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">PQerrorMessage</span><span class="p">(</span><span class="n">conn</span><span class="p">));</span>
+        <span class="n">exit_nicely</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="o">/*</span> <span class="n">Start</span> <span class="n">a</span> <span class="n">transaction</span> <span class="n">block</span> <span class="o">*/</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">PQexec</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;BEGIN&quot;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">PQresultStatus</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="n">PGRES_COMMAND_OK</span><span class="p">)</span>
+    <span class="p">{</span>
+         <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s2">&quot;BEGIN command failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">PQerrorMessage</span><span class="p">(</span><span class="n">conn</span><span class="p">));</span>
+         <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+         <span class="n">exit_nicely</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">/*</span> <span class="n">Should</span> <span class="n">PQclear</span> <span class="n">PGresult</span> <span class="n">whenever</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="n">needed</span> <span class="n">to</span> <span class="n">avoid</span>\
+    <span class="n">memory</span> <span class="n">leaks</span> <span class="o">*/</span>
+    <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">PQexec</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;DECLARE myportal CURSOR FOR select * from pg_database&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PQresultStatus</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="n">PGRES_COMMAND_OK</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s2">&quot;DECLARE CURSOR failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">PQerrorMessage</span><span class="p">(</span><span class="n">conn</span><span class="p">));</span>
+        <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+        <span class="n">exit_nicely</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">PQexec</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;FETCH ALL in myportal&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">PQresultStatus</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="n">PGRES_TUPLES_OK</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s2">&quot;FETCH ALL failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">PQerrorMessage</span><span class="p">(</span><span class="n">conn</span><span class="p">));</span>
+        <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+        <span class="n">exit_nicely</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">/*</span> <span class="n">first</span><span class="p">,</span> <span class="nb">print</span> <span class="n">out</span> <span class="n">the</span> <span class="n">attribute</span> <span class="n">names</span> <span class="o">*/</span>
+    <span class="n">nFields</span> <span class="o">=</span> <span class="n">PQnfields</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nFields</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%-15s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">PQfname</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">);</span>
+    <span class="o">/*</span> <span class="nb">next</span><span class="p">,</span> <span class="nb">print</span> <span class="n">out</span> <span class="n">the</span> <span class="n">rows</span> <span class="o">*/</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">PQntuples</span><span class="p">(</span><span class="n">res</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">nFields</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%-15s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">PQgetvalue</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">));</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+
+    <span class="o">/*</span> <span class="n">close</span> <span class="n">the</span> <span class="n">portal</span> <span class="o">...</span> <span class="n">we</span> <span class="n">don</span><span class="s1">&#39;t bother to check for errors ... */</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">PQexec</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;CLOSE myportal&quot;</span><span class="p">);</span>
+    <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+
+    <span class="o">/*</span> <span class="n">end</span> <span class="n">the</span> <span class="n">transaction</span> <span class="o">*/</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">PQexec</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;END&quot;</span><span class="p">);</span>
+    <span class="n">PQclear</span><span class="p">(</span><span class="n">res</span><span class="p">);</span>
+
+    <span class="o">/*</span> <span class="n">close</span> <span class="n">the</span> <span class="n">connection</span> <span class="n">to</span> <span class="n">the</span> <span class="n">database</span> <span class="ow">and</span> <span class="n">cleanup</span> <span class="o">*/</span>
+    <span class="n">PQfinish</span><span class="p">(</span><span class="n">conn</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

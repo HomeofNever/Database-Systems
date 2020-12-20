@@ -1,0 +1,1131 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Transaction Management - Durability &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Transaction Management - Durability</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2019/course_notes/transactions_durability.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="transaction-management-durability">
+<h1>Transaction Management - Durability<a class="headerlink" href="#transaction-management-durability" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Data for databases are stored on disk</p></li>
+<li><p>Data is brought to memory to be modified</p></li>
+<li><p>Until the changes made are written to disk, they are not permanent:</p>
+<ul>
+<li><p>A power loss will loose any data changed in memory but not yet
+written to disk</p></li>
+</ul>
+</li>
+<li><p>Due to atomicity, if a transaction aborts we must UNDO all changes
+by that transaction</p>
+<ul>
+<li><p>A second problem is that if a transaction changed data and this
+change is written to disk, we must be able to find out what it did
+and change it back</p></li>
+</ul>
+</li>
+<li><p>Algorithms for ensuring durability deal with these two problems:</p>
+<ul>
+<li><p>How not to loose data changed by committed transactions</p></li>
+<li><p>How not to loose information about changes written to disk by
+uncommitted transactions</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Logs deal with keeping track of changes made by transactions.</p></li>
+<li><p>A log is a system table continuously updated as transactions execute
+(new tuples/records are appended)</p></li>
+<li><p>Each log entry has a sequential number, <strong>LSN</strong>: log sequence number</p></li>
+<li><p>Log is created in memory but periodically written to disk
+completely, i.e. flushed to disk</p></li>
+<li><p>Log entries are created for:</p>
+<ul>
+<li><p>Changes to transactions</p></li>
+<li><p>Transaction states: commit, abort</p></li>
+<li><p>Recovery steps from a crash: undo of log entries</p></li>
+<li><p>Checkpoints: a snapshot of the active transactions</p></li>
+</ul>
+</li>
+<li><p>Each entry has an LSN, continuously increasing number</p></li>
+</ul>
+</div>
+<div class="section" id="what-happens-in-a-crash-when-log-is-used-incorrectly">
+<h2>What happens in a crash when log is used incorrectly?<a class="headerlink" href="#what-happens-in-a-crash-when-log-is-used-incorrectly" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Let’s see a scenario:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Suppose</span> <span class="n">T1</span> <span class="n">modified</span> <span class="n">data</span> <span class="n">pages</span> <span class="n">P1</span> <span class="ow">and</span> <span class="n">P2</span> <span class="ow">in</span> <span class="n">memory</span>
+
+<span class="n">We</span> <span class="n">want</span> <span class="n">to</span> <span class="n">write</span> <span class="n">both</span> <span class="n">P1</span> <span class="ow">and</span> <span class="n">P2</span> <span class="n">to</span> <span class="n">disk</span><span class="p">,</span> <span class="n">then</span> <span class="n">we</span> <span class="n">will</span> <span class="n">allow</span>
+<span class="n">T1</span> <span class="n">to</span> <span class="n">commit</span><span class="o">.</span>
+
+<span class="n">However</span> <span class="n">after</span> <span class="n">writing</span> <span class="n">P1</span> <span class="n">to</span> <span class="n">disk</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crash</span><span class="o">.</span> <span class="n">We</span> <span class="n">loose</span>
+<span class="nb">all</span> <span class="n">state</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">memory</span> <span class="n">including</span> <span class="n">the</span> <span class="n">portion</span> <span class="n">of</span> <span class="n">the</span> <span class="n">log</span>
+<span class="ow">in</span> <span class="n">memory</span><span class="o">.</span>
+
+<span class="n">T1</span> <span class="n">did</span> <span class="ow">not</span> <span class="n">finish</span><span class="p">,</span> <span class="n">so</span> <span class="n">we</span> <span class="n">must</span> <span class="n">undo</span> <span class="n">its</span> <span class="n">changes</span> <span class="n">by</span> <span class="n">reading</span>
+<span class="n">T1</span> <span class="n">back</span> <span class="kn">from</span> <span class="nn">disk.</span>
+
+<span class="n">If</span> <span class="n">the</span> <span class="n">log</span> <span class="n">containing</span> <span class="n">the</span> <span class="n">changes</span> <span class="n">to</span> <span class="n">page</span> <span class="n">P1</span> <span class="n">by</span> <span class="n">T1</span> <span class="ow">is</span> <span class="ow">not</span>
+<span class="n">on</span> <span class="n">disk</span><span class="p">,</span> <span class="n">we</span> <span class="n">are</span> <span class="ow">in</span> <span class="n">trouble</span><span class="o">.</span> <span class="n">We</span> <span class="n">cannot</span> <span class="n">UNDO</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>To make sure that such a situation does not cause a problem, we will
+employ a method called WRITE AHEAD LOGGING (WAL).</p></li>
+</ul>
+</div>
+<div class="section" id="write-ahead-logging-wal">
+<h2>Write Ahead Logging (WAL)<a class="headerlink" href="#write-ahead-logging-wal" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Write ahead logging (WAL) is a method to ensure that if a data page
+is modified on disk, we have a log record for it on disk.</p></li>
+<li><p>To accomplish this, the log is always written to disk ahead of the
+data.</p></li>
+<li><p>Write ahead logging:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Before</span> <span class="n">writing</span> <span class="nb">any</span> <span class="n">data</span> <span class="n">page</span> <span class="n">modified</span> <span class="kn">from</span> <span class="nn">memory</span> <span class="n">to</span> <span class="n">disk</span><span class="p">:</span>
+
+    <span class="n">First</span><span class="p">,</span> <span class="n">flush</span> <span class="nb">all</span> <span class="n">the</span> <span class="n">log</span> <span class="n">records</span> <span class="n">currently</span> <span class="ow">in</span> <span class="n">memory</span>
+    <span class="n">including</span> <span class="n">the</span> <span class="n">information</span> <span class="n">about</span> <span class="n">what</span> <span class="n">was</span> <span class="n">changed</span> <span class="ow">in</span> <span class="n">this</span>
+    <span class="n">data</span> <span class="n">page</span><span class="o">.</span>
+
+    <span class="n">After</span> <span class="n">log</span> <span class="ow">is</span> <span class="n">written</span><span class="p">,</span> <span class="n">the</span> <span class="n">data</span> <span class="n">pages</span> <span class="n">can</span> <span class="n">be</span> <span class="n">written</span>
+    <span class="n">to</span> <span class="n">disk</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example log entry:</p>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">Log entries (on disk)</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 50%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>LSN</p></th>
+<th class="head"><p>Log Entry</p></th>
+<th class="head"><p>PrevLSN</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>1234</p></th>
+<td><p>Update: T2 PageY  21 25</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1235</p></th>
+<td><p>Update: T1 PageX  12 15</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1236</p></th>
+<td><p>Commit: T2</p></td>
+<td><p>1234</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1237</p></th>
+<td><p>Update: T1 PageY   25  31</p></td>
+<td><p>1235</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1238</p></th>
+<td><p>Commit: T1</p></td>
+<td><p>1237</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>PrevLSN is the LSN number of the last change by the same transaction
+before the current one (used to trace back a transaction steps).</p></li>
+<li><p>Each update has the previous and next value for the data page:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">T2</span> <span class="n">PageY</span>  <span class="mi">21</span> <span class="mi">25</span>
+
+<span class="n">Page</span> <span class="n">Y</span><span class="p">:</span> <span class="n">old</span> <span class="n">value</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span> <span class="n">new</span> <span class="n">value</span><span class="p">:</span> <span class="mi">25</span>
+</pre></div>
+</div>
+<p>This is a simplification of the actual log entry.</p>
+<p>In reality, we only write the part of the data paged changed.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">T2</span> <span class="n">PageY</span> <span class="n">startoffset</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">page</span>  <span class="n">oldvalue</span> <span class="n">newvalue</span>
+</pre></div>
+</div>
+</li>
+<li><p>Data pages contain the LSN of the last change to that page in their
+header.</p>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Data pages (on disk)</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 20%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>Page number</p></th>
+<th class="head"><p>LSN</p></th>
+<th class="head"><p>Page Contents</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>PageX</p></th>
+<td><p>1235</p></td>
+<td><p>15</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>PageY</p></th>
+<td><p>1237</p></td>
+<td><p>31</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>This allows us to see whether a change recorded in log is already
+written to disk or not.</p></li>
+<li><p>All transaction management systems must use WAL to make sure that a
+change to a data page written to disk can be traced and undone is
+possible.</p></li>
+<li><p>We will assume WAL is always used in all the discussion below.</p></li>
+</ul>
+</div>
+<div class="section" id="force-and-steal">
+<h2>Force and Steal<a class="headerlink" href="#force-and-steal" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Whenever a transaction aborts, we must UNDO all the changes it has
+already made, by reversing the updates.</p></li>
+<li><p>Whenever there is a crash:</p>
+<ul>
+<li><p>First, we must UNDO all the changes by all transactions that have
+not completed.</p></li>
+<li><p>Second, we must REDO the changes made by committed transactions to
+make sure that they are not lost.</p></li>
+<li><p>These actions are called recovery.</p></li>
+</ul>
+</li>
+<li><p>In both cases, what must be done for REDO and UNDO will ultimately
+depend on the rules we employ in executing transactions, namely
+force and steal.</p>
+<ul>
+<li><p>Force has to do with whether we force data pages to disk when a
+transaction commits.</p></li>
+<li><p>Steal has to do with whether memory pages are dedicated to a
+single transaction or can be shared (or stolen) by others.</p></li>
+<li><p>We will see how to do both properly and their impact on recovery.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="force">
+<h2>Force<a class="headerlink" href="#force" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Transaction management systems may employ force:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">force</span> <span class="n">means</span> <span class="n">that</span> <span class="n">whenever</span> <span class="n">a</span> <span class="n">transaction</span>
+<span class="n">wants</span> <span class="n">to</span> <span class="n">commit</span><span class="p">:</span>
+
+   <span class="mf">1.</span> <span class="n">flush</span> <span class="n">the</span> <span class="n">log</span> <span class="n">to</span> <span class="n">disk</span>
+
+   <span class="mf">2.</span> <span class="nb">all</span> <span class="n">the</span> <span class="n">pages</span> <span class="n">modified</span> <span class="n">by</span> <span class="n">that</span> <span class="n">transaction</span>
+      <span class="n">are</span> <span class="n">written</span> <span class="n">to</span> <span class="n">disk</span>
+
+   <span class="mf">3.</span> <span class="n">write</span> <span class="n">commit</span> <span class="n">record</span> <span class="n">to</span> <span class="n">log</span><span class="p">,</span> <span class="n">flush</span> <span class="n">the</span> <span class="n">log</span> <span class="n">to</span> <span class="n">disk</span>
+
+   <span class="mf">4.</span> <span class="n">allow</span> <span class="n">transaction</span> <span class="n">to</span> <span class="n">commit</span>
+</pre></div>
+</div>
+</li>
+<li><p>Advantage of force is that if a transaction is committed, then we
+know all the pages by the transaction are written to disk.</p>
+<p>No data by a committed transaction is lost.</p>
+</li>
+<li><p>Disadvantage of force is that writing pages may require many seeks.
+Other transactions may also use the pages once they are in memory
+improving performance if force was not employed.</p></li>
+<li><p>In case of crash:</p>
+<ul class="simple">
+<li><p>If we see a commit record, we know that all changes by the
+transaction are written to disk already. No need to REDO.</p></li>
+<li><p>If we do not see a commit record, some data pages may actually be
+written to disk while we were trying to commit. So, we need to
+UNDO those changes.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="no-force">
+<h2>No force<a class="headerlink" href="#no-force" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>For comparison, let’s see how NO FORCE will work.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">force</span> <span class="n">means</span> <span class="n">that</span> <span class="n">whenever</span> <span class="n">a</span> <span class="n">transaction</span>
+<span class="n">wants</span> <span class="n">to</span> <span class="n">commit</span><span class="p">:</span>
+
+   <span class="mf">1.</span> <span class="n">write</span> <span class="n">the</span> <span class="n">commit</span> <span class="n">record</span> <span class="ow">and</span> <span class="n">flush</span> <span class="n">the</span> <span class="n">log</span> <span class="n">to</span> <span class="n">disk</span>
+
+   <span class="mf">2.</span> <span class="n">allow</span> <span class="n">the</span> <span class="n">transaction</span> <span class="n">to</span> <span class="n">commit</span>
+
+      <span class="n">pages</span> <span class="n">modified</span> <span class="n">by</span> <span class="n">the</span> <span class="n">transaction</span> <span class="n">will</span> <span class="n">be</span>
+      <span class="n">written</span> <span class="n">to</span> <span class="n">disk</span> <span class="n">by</span> <span class="n">the</span> <span class="n">operating</span> <span class="n">system</span>
+      <span class="k">as</span> <span class="n">needed</span> <span class="n">by</span> <span class="n">other</span> <span class="n">transactions</span>
+</pre></div>
+</div>
+</li>
+<li><p>The advantage is that we can improve performance by allowing commits
+without forcing lots of disk accesses.</p></li>
+<li><p>Log contains all actions by a committed transaction, so we can make
+sure no data is lost even in case of crash.</p>
+<p>However, recovery may not involve both an UNDO and a REDO. We will
+see such a recovery algorithm below.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="no-steal">
+<h2>No steal<a class="headerlink" href="#no-steal" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>If a system does not use steal, then specific memory pages allocated
+to a transaction remain allocated to the same transaction until
+it commits:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">no</span> <span class="n">steal</span> <span class="n">means</span> <span class="n">that</span> <span class="k">if</span> <span class="n">a</span> <span class="n">transaction</span> <span class="n">has</span> <span class="n">modified</span>
+<span class="n">a</span> <span class="n">page</span><span class="p">,</span> <span class="n">it</span> <span class="n">must</span> <span class="n">be</span> <span class="n">kept</span> <span class="ow">in</span> <span class="n">memory</span> <span class="p">(</span><span class="ow">not</span> <span class="n">written</span> <span class="n">to</span> <span class="n">disk</span><span class="p">)</span>
+<span class="n">until</span> <span class="n">the</span> <span class="n">transaction</span> <span class="n">decided</span> <span class="n">to</span> <span class="n">commit</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Disadvantage of no steal is that memory use is not optimal.</p></li>
+<li><p>Advantage of no steal is the simplicity of recovery. In case of a
+crash, any transaction that is not yet committed according to the
+log has not written any data to disk.</p>
+<p>No need to UNDO.</p>
+<p>There may be a need to REDO.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="steal">
+<h2>Steal<a class="headerlink" href="#steal" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Using steal means the reverse:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Using</span> <span class="n">steal</span> <span class="n">means</span> <span class="n">that</span> <span class="n">a</span> <span class="n">transaction</span> <span class="n">can</span> <span class="n">steal</span> <span class="n">the</span> <span class="n">memory</span>
+<span class="n">block</span> <span class="n">allocated</span> <span class="n">to</span> <span class="n">a</span> <span class="n">transaction</span> <span class="n">by</span>
+
+    <span class="n">First</span> <span class="n">writing</span> <span class="n">the</span> <span class="n">log</span> <span class="n">due</span> <span class="n">to</span> <span class="n">Write</span> <span class="n">Ahead</span> <span class="n">Logging</span>
+
+    <span class="n">Then</span><span class="p">,</span> <span class="n">writing</span> <span class="n">the</span> <span class="n">modified</span> <span class="n">page</span> <span class="n">to</span> <span class="n">disk</span> <span class="n">to</span> <span class="n">free</span>
+    <span class="n">up</span> <span class="n">memory</span> <span class="k">for</span> <span class="n">this</span> <span class="n">transaction</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Advantage of steal is that memory is used more efficiently, allowing
+transactions to use more or less memory depending on need of
+different operations.</p></li>
+<li><p>Disadvantage of steal is that if there is a crash, we need to UNDO
+any pages modified by uncommitted transactions (i.e. dirty pages)
+that were written to disk due to steal. Hence both UNDO and REDO are
+needed.</p></li>
+</ul>
+</div>
+<div class="section" id="recovery-from-a-crash">
+<h2>Recovery from a crash<a class="headerlink" href="#recovery-from-a-crash" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>ARIES series of algorithms provide safe recovery from a crash.</p></li>
+<li><p>Often recovery occurs after a catastrophic event that causes loss of
+all state information.</p></li>
+<li><p>To recover, we must find out the state of the database just before
+crash based on the portion of the log on disk. The first step of
+recovery is the “analysis step”.</p></li>
+<li><p>The analysis step will read log from the beginning all the way to
+its end to find all transactions that have ended and all
+transactions that were still in progress.</p>
+<ul class="simple">
+<li><p>To simplify analysis, we can take period snapshots of the database
+state called checkpoints.</p></li>
+<li><p>The analysis starts from the latest checkpoint.</p></li>
+</ul>
+</li>
+<li><p>Based on the analysis, we find two things:</p>
+<ul>
+<li><p>All pages modified by committed transactions that may not have
+been written to disk. All these changes must be redone.</p>
+<p>If force is used, there is no need to REDO.</p>
+</li>
+<li><p>All transactions that were still executing at the time of
+crash. The changes by these transactions must be undone.</p>
+<p>If steal is not used, there is no need UNDO.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="checkpointing">
+<h2>Checkpointing<a class="headerlink" href="#checkpointing" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A checkpoint is a snapshot of the database state written to the log.</p></li>
+<li><p>Checkpoints store two main types of information:</p>
+<ul>
+<li><p>Transaction table: all transactions that are still executing at
+the time of checkpoint.</p>
+<p>For each transaction, we store its id and the LSN of the last
+action by the transaction.</p>
+</li>
+<li><p>Dirty page table: list of all pages modified in memory and were
+not written back to disk at the time of checkpoint.</p>
+<p>For each dirty page, we store the page id and the LSN of the
+earliest change that was not written to disk.</p>
+</li>
+</ul>
+</li>
+<li><p>When log is flushed to disk, checkpoints are also written to disk.</p></li>
+<li><p>During recovery, we will start from the last checkpoint for
+analysis.</p></li>
+<li><p>Example:</p>
+<table class="colwidths-given docutils align-default" id="id3">
+<caption><span class="caption-text">Log checkpoint example</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>LSN</p></th>
+<th class="head"><p>Log Entry</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>1001</p></th>
+<td><p>begin checkpoint</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1002</p></th>
+<td><p>Transaction table</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1003</p></th>
+<td><p>T1 991, T2 995</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1004</p></th>
+<td><p>Dirty page table</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1005</p></th>
+<td><p>P1 981, P4 987</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1006</p></th>
+<td><p>end checkpoint</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Note in reality, checkpoints can span many log entries.</p>
+<p>It may take time to write a checkpoint, so it is possible to use a
+fuzzy checkpoint that will allow transactions to continue while
+checkpoint is being written.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="data-used-during-recovery">
+<h2>Data Used During Recovery<a class="headerlink" href="#data-used-during-recovery" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Let’s recap what data is available during recovery</p></li>
+<li><p>Log records contain data about:</p>
+<ul>
+<li><p>Transaction actions:</p>
+<p>update of pages</p>
+<p>commit of transactions</p>
+<p>abort of transactions</p>
+<p>end of transactions</p>
+</li>
+</ul>
+</li>
+<li><p>We keep track of when a committed or aborted transaction is
+completely finished with an END record.</p>
+<ul class="simple">
+<li><p>for abort, all changes are undone (in memory)</p></li>
+<li><p>for commit, log has been flushed.</p></li>
+</ul>
+<p>Only at this point, the transaction is notified that it has ended.</p>
+<ul>
+<li><p>Recovery actions: log records for these are called Compensation
+Log Record (CLR)</p>
+<p>undo of updates</p>
+</li>
+<li><p>Checkpoints:</p>
+<p>transaction table</p>
+<p>dirty page table</p>
+</li>
+</ul>
+</li>
+<li><p>Data pages contain information about</p>
+<ul class="simple">
+<li><p>LSN of the last update that changed that page</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="aries-recovery-algorithm">
+<h2>ARIES Recovery Algorithm<a class="headerlink" href="#aries-recovery-algorithm" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The algorithm consists of three phases:</p>
+<ul>
+<li><p>Analysis phase</p></li>
+<li><p>REDO phase</p></li>
+<li><p>UNDO phase</p></li>
+</ul>
+</li>
+<li><p>Remember that DPT (dirty page table) stores pairs of the form
+(PX, LX) where PX is a page number and LX is the LSN number of the
+log entry for the first update to PX that has not been written to
+disk yet.</p></li>
+<li><p>TT (transaction table) stores pairs of the form (TX,LX) where TX is
+a transaction that is still active, and LX is the LSN number of the
+log entry for the last operation performed by LX.</p></li>
+<li><p>I summarize the operations performed at each step below.</p></li>
+</ul>
+</div>
+<div class="section" id="analysis-phase">
+<h2>Analysis Phase<a class="headerlink" href="#analysis-phase" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The main point of analysis is to find at the time of crash which
+pages may be dirty and which transactions may still be executing.</p></li>
+<li><p>We simply trace the log starting with the checkpoint:</p>
+<ul class="simple">
+<li><p>Find the last LSN for all transactions we find</p></li>
+<li><p>Remove committed transactions</p></li>
+<li><p>Record all new potentially dirty pages (and earliest potentially
+unrecorded change for each page)</p></li>
+</ul>
+</li>
+<li><p>Any transaction that is not committed at the end of analysis is
+assumed to be incomplete and must be aborted. However, UNDO step
+comes first, then we will first REDO.</p></li>
+<li><p>Analysis algorithm:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Read</span> <span class="n">last</span> <span class="n">checkpoint</span> <span class="n">entry</span>
+
+<span class="n">Initialize</span> <span class="n">the</span> <span class="n">DPT</span> <span class="p">(</span><span class="n">dirty</span> <span class="n">page</span> <span class="n">table</span><span class="p">)</span> <span class="ow">and</span> <span class="n">TT</span> <span class="p">(</span><span class="n">transaction</span> <span class="n">table</span><span class="p">)</span> <span class="n">to</span>
+<span class="n">the</span> <span class="n">recorded</span> <span class="n">checkpoint</span> <span class="n">entries</span>
+
+<span class="nb">set</span> <span class="n">NEXT_LSN</span> <span class="n">to</span> <span class="n">the</span> <span class="n">last</span> <span class="n">LSN</span> <span class="k">for</span> <span class="n">checkpoint</span>
+
+<span class="k">while</span> <span class="n">the</span> <span class="n">end</span> <span class="n">of</span> <span class="n">log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">reached</span>
+    <span class="n">read</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">log</span> <span class="n">record</span> <span class="n">pointed</span> <span class="n">by</span> <span class="n">NEXT_LSN</span> <span class="n">into</span> <span class="n">LOG_RECORD</span>
+    <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">update</span><span class="p">:</span> <span class="p">(</span><span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">)</span>
+       <span class="n">put</span> <span class="p">(</span><span class="n">TX</span><span class="p">,</span> <span class="n">NEXT_LSN</span><span class="p">)</span> <span class="n">into</span> <span class="n">TT</span>
+       <span class="c1">## or modify the LSN for TX if it is already in TT</span>
+       <span class="k">if</span> <span class="n">PG</span>  <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DPT</span> <span class="n">then</span>
+           <span class="n">add</span> <span class="p">(</span><span class="n">PG</span><span class="p">,</span> <span class="n">NEXT_LSN</span><span class="p">)</span> <span class="n">to</span> <span class="n">DPT</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">CLR</span><span class="p">:</span> <span class="p">(</span><span class="n">CLR</span><span class="p">:</span> <span class="n">undo</span> <span class="p">[</span><span class="n">TX</span> <span class="n">update</span> <span class="n">PG</span><span class="p">])</span>
+        <span class="n">put</span> <span class="p">(</span><span class="n">TX</span><span class="p">,</span> <span class="n">NEXT_LSN</span><span class="p">)</span> <span class="n">into</span> <span class="n">TT</span>
+        <span class="c1">## or modify the LSN for TX if it is already in TT</span>
+        <span class="k">if</span> <span class="n">PG</span>  <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DPT</span> <span class="n">then</span>
+            <span class="n">add</span> <span class="p">(</span><span class="n">PG</span><span class="p">,</span> <span class="n">NEXT_LSN</span><span class="p">)</span>  <span class="n">to</span> <span class="n">DPT</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span><span class="p">:</span> <span class="n">abort</span> <span class="n">TX</span>
+        <span class="n">mark</span> <span class="n">TX</span>  <span class="ow">in</span> <span class="n">TT</span>  <span class="k">as</span> <span class="n">aborted</span>
+        <span class="n">change</span> <span class="n">the</span> <span class="n">LSN</span> <span class="n">to</span> <span class="n">NEXT_LSN</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span><span class="p">:</span> <span class="n">commit</span> <span class="n">TX</span>
+        <span class="n">mark</span> <span class="n">TX</span>  <span class="ow">in</span> <span class="n">TT</span>  <span class="k">as</span> <span class="n">committed</span>
+        <span class="n">change</span> <span class="n">the</span> <span class="n">LSN</span> <span class="n">to</span> <span class="n">NEXT_LSN</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span><span class="p">:</span> <span class="n">end</span> <span class="n">TX</span>
+        <span class="n">remove</span> <span class="n">TX</span>  <span class="kn">from</span> <span class="nn">TT</span>
+    <span class="k">else</span>
+        <span class="n">ignore</span> <span class="n">the</span> <span class="n">log</span> <span class="n">record</span>
+    <span class="n">advance</span> <span class="n">to</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">log</span> <span class="n">record</span>  <span class="c1">##set NEXT_LSN to NEXT_LSN+1</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="redo-phase">
+<h2>REDO Phase<a class="headerlink" href="#redo-phase" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The point of REDO is to bring the database to the same state at the
+time of crash. What we really care is making sure the changes by
+committed transactions are recorded.</p>
+<ul class="simple">
+<li><p>Depending on the underlying concurrency scheme, we can REDO only
+the changes by committed transactions.</p></li>
+</ul>
+</li>
+<li><p>Redo step will read each data page that is potentially dirty and if
+its pageLSN is smaller than the LSN of the log record, that means
+this change is not yet recorded to disk and we must REDO.</p></li>
+<li><p>Redo will simply make the NEW value of the change the current value.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Update</span> <span class="n">TX</span> <span class="n">PY</span> <span class="mi">10</span> <span class="mi">12</span>
+</pre></div>
+</div>
+<p>means that TX changes page PY from 10 to 12, so we must REDO to change
+the page to 12 if this change is not yet recorded.</p>
+</li>
+<li><p>As in the transaction management system, UNDO/REDO changes are kept
+in memory or forced to disk at commit depending on whether
+force/steal are used.</p>
+<p>The algorithm works even in the case of repeated crashes as long as
+write ahead logging is used.</p>
+</li>
+<li><p>REDO proceeds in forward log order, from earlier records to later
+records.</p></li>
+<li><p>Redo algorithm</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">assume</span> <span class="n">DPT</span> <span class="ow">and</span> <span class="n">TT</span> <span class="n">are</span> <span class="n">computed</span> <span class="n">by</span> <span class="n">the</span> <span class="n">above</span> <span class="n">Analysis</span> <span class="n">Phase</span>
+<span class="nb">set</span> <span class="n">NEXT_LSN</span>  <span class="n">to</span> <span class="n">the</span> <span class="n">lowest</span> <span class="n">LSN</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">DPT</span>
+<span class="c1">## earliest change to a dirty page that may not have been recorded</span>
+
+<span class="k">while</span> <span class="n">the</span> <span class="n">end</span> <span class="n">of</span> <span class="n">log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">reached</span>
+    <span class="n">read</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">log</span> <span class="n">record</span> <span class="n">pointed</span> <span class="n">by</span> <span class="n">NEXT_LSN</span> <span class="n">into</span> <span class="n">LOG_RECORD</span>
+    <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">update</span><span class="p">:</span> <span class="p">(</span><span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="n">committed</span> <span class="n">transaction</span>
+        <span class="n">call</span> <span class="n">function</span> <span class="n">REDO_RECORD</span><span class="p">(</span><span class="n">LOG_RECORD</span><span class="p">,</span><span class="n">NEXT_LSN</span><span class="p">)</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">CLR</span><span class="p">:</span> <span class="p">(</span><span class="n">CLR</span><span class="p">:</span> <span class="n">undo</span> <span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="n">committed</span> <span class="n">transaction</span>
+        <span class="n">call</span> <span class="n">function</span>  <span class="n">REDO_RECORD</span><span class="p">(</span><span class="n">LOG_RECORD</span><span class="p">,</span><span class="n">NEXT_LSN</span><span class="p">)</span>
+    <span class="k">else</span>
+        <span class="n">ignore</span> <span class="n">the</span> <span class="n">log</span> <span class="n">record</span>
+    <span class="n">advance</span> <span class="n">to</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">log</span> <span class="n">record</span> <span class="c1">## set NEXT_LSN  to NEXT_LSN+1</span>
+<span class="k">for</span> <span class="nb">all</span> <span class="n">transaction</span> <span class="n">TX</span> <span class="ow">in</span> <span class="n">TT</span> <span class="k">with</span> <span class="n">status</span> <span class="n">committed</span>
+    <span class="n">write</span> <span class="n">an</span> <span class="n">end</span> <span class="n">TX</span> <span class="n">log</span> <span class="n">record</span>
+    <span class="n">remove</span> <span class="n">TX</span> <span class="kn">from</span> <span class="nn">TT</span>
+
+
+<span class="n">Subroutine</span> <span class="n">REDO_RECORD</span><span class="p">(</span><span class="n">LOG_RECORD</span><span class="p">,</span><span class="n">NEXT_LSN</span><span class="p">)</span>
+<span class="c1">## the record LOG_RECORD is to be redone at log number NEXT_LSN</span>
+
+<span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">update</span><span class="p">:</span> <span class="p">(</span><span class="n">TX</span> <span class="n">update</span> <span class="n">PG</span><span class="p">)</span>
+   <span class="k">if</span> <span class="n">PG</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DPT</span> <span class="n">then</span>
+       <span class="n">ignore</span> <span class="c1">##this change has already been recorded</span>
+   <span class="k">else</span>
+       <span class="n">find</span> <span class="n">the</span> <span class="n">record</span> <span class="p">(</span><span class="n">PG</span><span class="p">,</span> <span class="n">DPT_LSN</span><span class="p">)</span> <span class="ow">in</span> <span class="n">DPT</span> <span class="k">for</span> <span class="n">this</span> <span class="n">page</span>
+       <span class="k">if</span>  <span class="n">NEXT_LSN</span> <span class="o">&lt;</span> <span class="n">DPT_LSN</span> <span class="n">then</span>
+          <span class="n">ignore</span> <span class="c1">##this change has already been recorded</span>
+       <span class="k">else</span>
+          <span class="n">read</span> <span class="n">PG</span> <span class="n">into</span> <span class="n">memory</span> <span class="ow">and</span> <span class="n">find</span> <span class="n">its</span> <span class="n">pageLSN</span>
+          <span class="k">if</span>  <span class="n">NEXT_LSN</span> <span class="o">&lt;=</span> <span class="n">PG</span><span class="o">.</span><span class="n">pageLSN</span> <span class="n">then</span>
+              <span class="n">ignore</span> <span class="c1">## this update has already been recorded</span>
+          <span class="k">else</span>
+              <span class="n">REDO</span> <span class="n">the</span> <span class="n">update</span> <span class="p">[</span><span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">]</span>
+
+<span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">CLR</span><span class="p">:</span> <span class="p">(</span><span class="n">CLR</span><span class="p">:</span> <span class="n">undo</span> <span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">)</span>
+    <span class="c1">##do the same as above, except REDO the undo</span>
+    <span class="k">if</span> <span class="n">PG</span> <span class="ow">is</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DPT</span> <span class="n">then</span>
+        <span class="n">ignore</span>  <span class="c1">##this change has already been recorded</span>
+    <span class="k">else</span>
+        <span class="n">find</span> <span class="n">the</span> <span class="n">record</span> <span class="p">(</span><span class="n">PG</span><span class="p">,</span> <span class="n">DPT_LSN</span><span class="p">)</span>  <span class="ow">in</span> <span class="n">DPT</span> <span class="k">for</span> <span class="n">this</span> <span class="n">page</span>
+        <span class="k">if</span>  <span class="n">NEXT_LSN</span> <span class="o">&lt;</span> <span class="n">DPT_LSN</span> <span class="n">then</span>
+            <span class="n">ignore</span>
+        <span class="k">else</span>
+            <span class="n">read</span> <span class="n">PG</span>  <span class="n">into</span> <span class="n">memory</span><span class="p">,</span> <span class="n">find</span> <span class="n">its</span> <span class="n">pageLSN</span>
+            <span class="k">if</span>  <span class="n">NEXT_LSN</span>  <span class="o">&lt;=</span> <span class="n">PG</span><span class="o">.</span><span class="n">pageLSN</span>  <span class="n">then</span>
+                <span class="n">ignore</span>
+            <span class="k">else</span>
+                <span class="n">UNDO</span> <span class="n">the</span> <span class="n">update</span> <span class="p">[</span><span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">])</span>
+                <span class="o">/*</span> <span class="n">hence</span> <span class="n">redo</span> <span class="n">the</span> <span class="n">CLR</span> <span class="o">*/</span>
+
+<span class="n">end</span> <span class="n">of</span> <span class="n">subroutine</span> <span class="n">REDO_RECORD</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="undo-phase">
+<h2>UNDO Phase<a class="headerlink" href="#undo-phase" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The point of undo is to erase changes made by aborted transactions.</p></li>
+<li><p>Undo will read data pages modified by the transaction to check if
+the change by a log entry is recorded on disk.</p></li>
+<li><p>Undo will simply make the OLD value of the change the current value.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Update</span> <span class="n">TX</span> <span class="n">PY</span> <span class="mi">10</span> <span class="mi">12</span>
+</pre></div>
+</div>
+<p>means that TX changes page PY from 10 to 12, so we must UNDO to change
+it back to 10.</p>
+</li>
+<li><p>Similar to redo, the undo is made in memory. Pages changed by an
+UNDO are written back based on the force/steal protocol.</p>
+<p>As long as we follow the write ahead logging, we can recover from
+repeated crashes.</p>
+</li>
+<li><p>Undo proceeds in backward order, each change must be changed in reverse.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Update</span> <span class="n">TX</span> <span class="n">PY</span> <span class="mi">10</span> <span class="mi">12</span>
+<span class="n">Update</span> <span class="n">TX</span> <span class="n">PY</span> <span class="mi">12</span> <span class="mi">15</span>
+</pre></div>
+</div>
+<p>to undo we must first change PY from 15 to 12, then from 12
+to 10. Hence, we will trace the log in reverse order.</p>
+</li>
+<li><p>As we undo multiple transactions, we will find the largest LSN to undo
+for each transaction.</p>
+<ul>
+<li><p>We will pick the largest to undo and then add the next LSN to undo
+to a list.</p></li>
+<li><p>We will continue picking the largest until no operations are left.</p>
+<p>Hence we do not trace a single transaction back, but all
+transactions at the same time.</p>
+</li>
+</ul>
+</li>
+<li><p>Undo algorithm:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Assume</span> <span class="n">the</span> <span class="n">analysis</span> <span class="ow">and</span> <span class="n">redo</span> <span class="n">phases</span> <span class="n">are</span> <span class="n">completed</span> <span class="n">successfully</span>
+<span class="n">Set</span> <span class="n">the</span> <span class="nb">set</span> <span class="n">TO_UNDO</span>  <span class="n">to</span> <span class="n">empty</span>
+<span class="n">For</span> <span class="nb">all</span> <span class="n">active</span> <span class="n">transactions</span> <span class="p">(</span><span class="n">TX</span><span class="p">,</span> <span class="n">LSNX</span><span class="p">)</span> <span class="ow">in</span> <span class="n">TT</span><span class="p">,</span>
+   <span class="n">add</span> <span class="n">LSNX</span>   <span class="n">to</span> <span class="nb">set</span> <span class="n">TO_UNDO</span>
+   <span class="n">write</span> <span class="n">a</span> <span class="n">log</span> <span class="n">record</span> <span class="p">(</span><span class="n">abort</span> <span class="n">TX</span><span class="p">)</span>
+
+<span class="n">While</span> <span class="n">TO_UNDO</span>  <span class="ow">is</span> <span class="ow">not</span> <span class="n">empty</span>
+   <span class="n">remove</span> <span class="n">the</span> <span class="n">largest</span> <span class="n">LSN</span> <span class="n">number</span> <span class="n">UNDO_LSN</span>  <span class="kn">from</span> <span class="nn">TO_UNDO</span>
+   <span class="n">find</span> <span class="n">LOG_RECORD</span> <span class="n">corresponding</span> <span class="n">to</span> <span class="n">UNDO_LSN</span>
+   <span class="k">if</span> <span class="n">LOG_RECORD</span>  <span class="ow">is</span> <span class="n">an</span> <span class="n">update</span> <span class="n">record</span> <span class="n">of</span> <span class="n">the</span> <span class="n">form</span> <span class="p">[</span><span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">]</span>
+      <span class="n">undo</span> <span class="n">the</span> <span class="n">update</span> <span class="n">to</span> <span class="n">PG</span>  <span class="p">(</span><span class="ow">in</span> <span class="n">memory</span><span class="p">)</span>
+      <span class="n">write</span> <span class="n">a</span> <span class="n">CLR</span> <span class="n">record</span><span class="p">:</span> <span class="n">CLR</span><span class="p">:</span> <span class="n">undo</span> <span class="n">of</span> <span class="n">record</span> <span class="p">[</span><span class="n">TX</span> <span class="n">updates</span> <span class="n">PG</span><span class="p">])</span>
+      <span class="n">find</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">operation</span> <span class="k">for</span> <span class="n">TX</span> <span class="p">(</span><span class="n">follow</span> <span class="n">previous</span> <span class="n">lsn</span> <span class="n">pointer</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">prevlsn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">nil</span>
+          <span class="n">add</span> <span class="n">it</span> <span class="n">to</span> <span class="n">TO_UNDO</span>
+      <span class="k">if</span> <span class="n">prevlsn</span> <span class="ow">is</span> <span class="n">nil</span>
+          <span class="n">write</span> <span class="n">an</span> <span class="n">end</span> <span class="n">record</span> <span class="k">for</span> <span class="n">this</span> <span class="n">transaction</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">TX</span><span class="p">)</span>
+   <span class="k">else</span> <span class="k">if</span> <span class="n">LOG_RECORD</span>  <span class="ow">is</span> <span class="n">a</span> <span class="n">CLR</span> <span class="n">record</span>
+       <span class="n">find</span> <span class="n">previous</span> <span class="n">undo</span>
+       <span class="k">if</span> <span class="n">previous</span> <span class="n">undo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">nil</span>
+           <span class="n">add</span> <span class="n">it</span> <span class="n">to</span> <span class="n">TO_UNDO</span>
+       <span class="k">if</span> <span class="n">prevlsn</span> <span class="ow">is</span> <span class="n">nil</span>
+           <span class="n">write</span> <span class="n">an</span> <span class="n">end</span> <span class="n">record</span> <span class="k">for</span> <span class="n">this</span> <span class="n">transaction</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">TX</span><span class="p">)</span>
+   <span class="k">else</span> <span class="n">find</span> <span class="n">the</span> <span class="n">prevlsn</span> <span class="k">for</span> <span class="n">the</span> <span class="n">same</span> <span class="n">transaction</span>
+       <span class="k">if</span> <span class="n">it</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">nil</span>
+            <span class="n">add</span> <span class="n">it</span> <span class="n">to</span> <span class="n">TO_UNDO</span>
+       <span class="k">if</span> <span class="n">prevlsn</span> <span class="ow">is</span> <span class="n">nil</span>
+             <span class="n">write</span> <span class="n">an</span> <span class="n">end</span> <span class="n">record</span> <span class="k">for</span> <span class="n">this</span> <span class="n">transaction</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">TX</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="example-aries-recovery">
+<h2>Example ARIES recovery<a class="headerlink" href="#example-aries-recovery" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Suppose after a crash, we find the following information in the log
+on disk (we only show the relevant part of the log):</p>
+<table class="colwidths-given docutils align-default" id="id4">
+<caption><span class="caption-text">Log entries (on disk)</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 50%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>LSN</p></th>
+<th class="head"><p>Log Entry</p></th>
+<th class="head"><p>PrevLSN</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>994</p></th>
+<td><p>Update: TA P6 10 15</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>995</p></th>
+<td><p>Update: TA P5 ZZ H</p></td>
+<td><p>994</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>996</p></th>
+<td><p>begin checkpoint</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>997</p></th>
+<td><p>TT: TA 995</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>998</p></th>
+<td><p>DPT: P6 994</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>999</p></th>
+<td><p>end checkpoint</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1000</p></th>
+<td><p>Commit: TA</p></td>
+<td><p>996</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1001</p></th>
+<td><p>Update: T1 P1 A B</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1002</p></th>
+<td><p>Update: T1 P2 C D</p></td>
+<td><p>1001</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1003</p></th>
+<td><p>Update: T2 P3 E F</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1004</p></th>
+<td><p>Update: T2 P4 F G</p></td>
+<td><p>1003</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1005</p></th>
+<td><p>Update: T3 P5 H I</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1006</p></th>
+<td><p>Update: T4 P6 15 22</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1007</p></th>
+<td><p>Commit T4</p></td>
+<td><p>1006</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1008</p></th>
+<td><p>Update: T2 P6 K L</p></td>
+<td><p>1003</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>1009</p></th>
+<td><p>Commit T1</p></td>
+<td><p>1002</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>1010</p></th>
+<td><p>Update T3 P2 D E</p></td>
+<td><p>1005</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Assume also the following is the contents of the data pages
+at the time crash.</p>
+<table class="colwidths-given docutils align-default" id="id5">
+<caption><span class="caption-text">Data page contents (on disk)</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>pageid</p></th>
+<th class="head"><p>pageLSN</p></th>
+<th class="head"><p>content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>P1</p></th>
+<td><p>1001</p></td>
+<td><p>B</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>P2</p></th>
+<td><p>1010</p></td>
+<td><p>E</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>P3</p></th>
+<td><p>980</p></td>
+<td><p>E</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>P4</p></th>
+<td><p>1004</p></td>
+<td><p>G</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>P5</p></th>
+<td><p>996</p></td>
+<td><p>H</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>P6</p></th>
+<td><p>994</p></td>
+<td><p>15</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>Based on this log, we can conclude that there is no force
+used in this DBMS system.</p>
+<p>T4 is commited, but change at LSN=1006 to P6 is not written to disk.</p>
+</li>
+<li><p>Based on this log, we can conclude that there is steal used in this
+DBMS system.</p>
+<p>T3 is not yet committed, but its changes at LSN=1010 to P2 are
+written to disk.</p>
+</li>
+<li><p>We can now trace each step of the algorithm based on this information.</p></li>
+<li><p>Analysis:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Start</span> <span class="n">at</span> <span class="n">checkpoint</span> <span class="p">(</span><span class="n">LSN</span><span class="p">:</span> <span class="mi">996</span><span class="p">),</span> <span class="n">initialize</span> <span class="n">TT</span> <span class="ow">and</span> <span class="n">DPT</span>
+
+<span class="n">LSN</span>      <span class="n">State</span> <span class="n">info</span>
+<span class="mi">996</span>      <span class="n">TT</span><span class="p">:</span> <span class="n">TA</span> <span class="mi">995</span>  <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span>
+<span class="mi">1000</span>     <span class="n">TT</span><span class="p">:</span>         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span>
+<span class="mi">1001</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1001</span> <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span>
+<span class="mi">1002</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span> <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span>
+<span class="mi">1003</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">T2</span> <span class="mi">1003</span> <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span>
+<span class="mi">1004</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">T2</span> <span class="mi">1004</span> <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span>
+<span class="mi">1005</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">T2</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">T3</span> <span class="mi">1005</span>
+         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">P5</span> <span class="mi">1005</span>
+<span class="mi">1006</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">T2</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">T3</span> <span class="mi">1005</span><span class="p">,</span> <span class="n">T4</span> <span class="mi">1006</span>
+         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">P5</span> <span class="mi">1005</span>
+<span class="mi">1007</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">T2</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">T3</span> <span class="mi">1005</span>
+         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">P5</span> <span class="mi">1005</span>
+<span class="mi">1008</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T1</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">T2</span> <span class="mi">1008</span><span class="p">,</span> <span class="n">T3</span> <span class="mi">1005</span>
+         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">P5</span> <span class="mi">1005</span>
+<span class="mi">1009</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T2</span> <span class="mi">1008</span><span class="p">,</span> <span class="n">T3</span> <span class="mi">1005</span>
+         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">P5</span> <span class="mi">1005</span>
+<span class="mi">1010</span>     <span class="n">TT</span><span class="p">:</span> <span class="n">T2</span> <span class="mi">1008</span><span class="p">,</span> <span class="n">T3</span> <span class="mi">1010</span>
+         <span class="n">DPT</span><span class="p">:</span> <span class="n">P6</span> <span class="mi">994</span><span class="p">,</span> <span class="n">P1</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">P2</span> <span class="mi">1002</span><span class="p">,</span> <span class="n">P3</span> <span class="mi">1003</span><span class="p">,</span> <span class="n">P4</span> <span class="mi">1004</span><span class="p">,</span> <span class="n">P5</span> <span class="mi">1005</span>
+
+ <span class="n">Abort</span> <span class="n">transactions</span><span class="p">:</span> <span class="n">T2</span> <span class="ow">and</span> <span class="n">T3</span>
+ <span class="n">write</span> <span class="n">abort</span> <span class="n">log</span> <span class="n">records</span>
+
+ <span class="n">LSN</span>    <span class="n">Log</span> <span class="n">Entry</span>
+ <span class="mi">1011</span>   <span class="n">abort</span> <span class="n">T2</span>
+ <span class="mi">1012</span>   <span class="n">abort</span> <span class="n">T3</span>
+</pre></div>
+</div>
+</li>
+<li><p>Now, redo phase, we will go through every single log entry starting
+with the earliest LSN in the recovered DPT, go forward and redo the
+actions of all committed transactions.</p>
+<p>We will need to read each potentially dirty page. We will only REDO
+an entry if it is an update to a page in DPT that was not yet
+written to disk.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Start</span> <span class="n">at</span> <span class="mi">994</span>
+
+<span class="n">Skip</span> <span class="n">the</span> <span class="n">following</span> <span class="n">LSNs</span><span class="p">:</span>
+
+<span class="mi">995</span> <span class="o">--</span> <span class="n">LSN</span> <span class="k">for</span> <span class="n">P5</span> <span class="ow">in</span> <span class="n">DPT</span> <span class="ow">is</span> <span class="n">higher</span> <span class="n">than</span> <span class="mi">995</span>
+<span class="mi">1003</span><span class="p">,</span> <span class="mi">1004</span><span class="p">,</span> <span class="mi">1005</span><span class="p">,</span> <span class="mi">1008</span><span class="p">,</span> <span class="mi">1010</span> <span class="o">--</span> <span class="n">aborting</span> <span class="n">transactions</span>
+
+<span class="n">Test</span> <span class="k">for</span> <span class="n">REDO</span> <span class="n">the</span> <span class="n">following</span> <span class="n">LSNs</span><span class="p">:</span>
+
+<span class="n">test</span> <span class="mi">994</span><span class="p">:</span> <span class="n">Read</span> <span class="n">P6</span><span class="p">,</span> <span class="n">pageLSN</span> <span class="mi">994</span><span class="p">,</span> <span class="n">already</span> <span class="n">written</span><span class="p">,</span> <span class="n">no</span> <span class="n">need</span> <span class="n">to</span> <span class="n">REDO</span>
+<span class="n">test</span> <span class="mi">1001</span><span class="p">:</span> <span class="n">Read</span> <span class="n">P1</span><span class="p">,</span> <span class="n">pageLSN</span> <span class="mi">1001</span><span class="p">,</span> <span class="n">already</span> <span class="n">written</span><span class="p">,</span> <span class="n">no</span> <span class="n">need</span> <span class="n">to</span> <span class="n">REDO</span>
+<span class="n">test</span> <span class="mi">1002</span><span class="p">:</span> <span class="n">Read</span> <span class="n">P2</span><span class="p">,</span> <span class="n">pageLSN</span> <span class="mi">1010</span><span class="p">,</span> <span class="n">already</span> <span class="n">written</span><span class="p">,</span> <span class="n">no</span> <span class="n">need</span> <span class="n">to</span> <span class="n">REDO</span>
+<span class="n">test</span> <span class="mi">1006</span><span class="p">:</span> <span class="n">P6</span> <span class="n">already</span> <span class="ow">in</span> <span class="n">memory</span><span class="p">,</span> <span class="n">but</span> <span class="n">pageLSN</span><span class="o">=</span><span class="mi">994</span><span class="p">,</span> <span class="n">must</span> <span class="n">REDO</span> <span class="n">this</span> <span class="n">update</span>
+
+<span class="n">REDO</span> <span class="mi">1006</span>
+</pre></div>
+</div>
+</li>
+<li><p>Next, we will do UNDO all the actions of aborting transactions T2 and T3
+in backwards order.</p>
+<p>For each action, we will check if the action has been written to
+disk. If so, we will UNDO by changing the disk entry.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Aborting</span> <span class="n">T2</span> <span class="ow">and</span> <span class="n">T3</span><span class="p">,</span> <span class="n">put</span> <span class="n">the</span> <span class="n">last</span> <span class="n">LSN</span> <span class="k">for</span> <span class="n">each</span> <span class="n">into</span>
+<span class="n">the</span> <span class="n">TO_UNDO</span> <span class="nb">set</span><span class="o">.</span>
+
+<span class="n">TO_UNDO</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1010</span><span class="p">,</span> <span class="mi">1008</span><span class="p">}</span>
+
+<span class="n">Write</span><span class="p">:</span> <span class="n">UNDO</span> <span class="mi">1010</span> <span class="n">log</span> <span class="n">record</span>
+
+   <span class="n">P2</span> <span class="ow">is</span> <span class="n">already</span> <span class="ow">in</span> <span class="n">memory</span> <span class="k">with</span> <span class="n">pageLSN</span> <span class="o">=</span> <span class="mf">1010.</span> <span class="n">We</span> <span class="n">must</span>
+   <span class="n">undo</span> <span class="n">P2</span> <span class="n">contents</span> <span class="ow">and</span> <span class="n">change</span> <span class="n">it</span> <span class="n">to</span> <span class="n">D</span><span class="o">.</span>
+
+   <span class="n">PrevLSN</span> <span class="o">=</span> <span class="mi">1005</span> <span class="ow">is</span> <span class="n">added</span> <span class="n">to</span> <span class="n">TO_UNDO</span><span class="o">.</span>
+
+<span class="n">TO_UNDO</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1005</span><span class="p">,</span> <span class="mi">1008</span><span class="p">}</span>
+
+<span class="n">Write</span><span class="p">:</span> <span class="n">UNDO</span> <span class="mi">1008</span> <span class="n">log</span> <span class="n">record</span>
+
+   <span class="n">P6</span> <span class="ow">is</span> <span class="n">already</span> <span class="ow">in</span> <span class="n">memory</span><span class="p">,</span> <span class="n">but</span> <span class="n">pageLSN</span><span class="o">=</span><span class="mf">1006.</span> <span class="n">So</span><span class="p">,</span> <span class="n">no</span> <span class="n">need</span> <span class="n">to</span> <span class="n">change</span>
+   <span class="n">the</span> <span class="n">data</span> <span class="n">page</span> <span class="n">content</span><span class="o">.</span>
+
+   <span class="n">PrevLSN</span> <span class="o">=</span> <span class="mi">1003</span> <span class="ow">is</span> <span class="n">added</span> <span class="n">to</span> <span class="n">TO_UNDO</span><span class="o">.</span>
+
+<span class="n">TO_UNDO</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1005</span><span class="p">,</span> <span class="mi">1003</span><span class="p">}</span>
+
+<span class="n">Write</span><span class="p">:</span> <span class="n">UNDO</span> <span class="mi">1005</span> <span class="n">log</span> <span class="n">record</span>
+
+   <span class="n">Read</span> <span class="n">P5</span> <span class="n">into</span> <span class="n">memory</span><span class="p">,</span> <span class="n">pageLSN</span><span class="o">=</span><span class="mf">996.</span> <span class="n">So</span><span class="p">,</span> <span class="n">no</span> <span class="n">need</span> <span class="n">to</span> <span class="n">change</span>
+   <span class="n">the</span> <span class="n">data</span> <span class="n">page</span> <span class="n">content</span> <span class="k">as</span> <span class="n">this</span> <span class="n">update</span> <span class="n">was</span> <span class="n">never</span> <span class="n">written</span> <span class="n">to</span> <span class="n">disk</span><span class="o">.</span>
+
+   <span class="n">PrevLSN</span> <span class="o">=</span> <span class="n">nil</span><span class="o">.</span>
+
+<span class="n">TO_UNDO</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1003</span><span class="p">}</span>
+
+<span class="n">Write</span><span class="p">:</span> <span class="n">UNDO</span> <span class="mi">1003</span> <span class="n">log</span> <span class="n">record</span>
+
+   <span class="n">Read</span> <span class="n">P3</span> <span class="n">into</span> <span class="n">memory</span><span class="p">,</span> <span class="n">pageLSN</span><span class="o">=</span><span class="mf">980.</span> <span class="n">So</span><span class="p">,</span> <span class="n">no</span> <span class="n">need</span> <span class="n">to</span> <span class="n">change</span>
+   <span class="n">the</span> <span class="n">data</span> <span class="n">page</span> <span class="n">content</span> <span class="k">as</span> <span class="n">this</span> <span class="n">update</span> <span class="n">was</span> <span class="n">never</span> <span class="n">written</span> <span class="n">to</span> <span class="n">disk</span><span class="o">.</span>
+
+   <span class="n">PrevLSN</span> <span class="o">=</span> <span class="n">nil</span><span class="o">.</span>
+
+<span class="n">TO_UNDO</span> <span class="o">=</span> <span class="p">{}</span>
+
+   <span class="n">Recovery</span> <span class="ow">is</span> <span class="n">complete</span><span class="o">.</span>
+
+   <span class="n">Write</span> <span class="n">END</span> <span class="n">log</span> <span class="n">records</span> <span class="k">for</span> <span class="n">aborted</span> <span class="n">transactions</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

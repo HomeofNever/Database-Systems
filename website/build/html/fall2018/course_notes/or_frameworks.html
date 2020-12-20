@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Object-Relational Frameworks &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>SQL - Object-Relational Frameworks</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2018/course_notes/or_frameworks.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-object-relational-frameworks">
+<h1>SQL - Object-Relational Frameworks<a class="headerlink" href="#sql-object-relational-frameworks" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p>Tight integration between application logic and the database</p></li>
+<li><p>Describe the database model as an object-oriented class description</p></li>
+<li><p>Write queries not in SQL but directly in the programming language</p></li>
+<li><p>Create tools that are DB agnostic</p></li>
+<li><p>Main focus:</p>
+<ul>
+<li><p>Most web based db programming requires a number of tasks that are
+highly repetitive and common (and not as glamarous as SQL
+programming).</p>
+<p>Examples: data validation, input sanitization, etc.</p>
+</li>
+<li><p>Frameworks are designed to provide common tools for these tasks so
+that the programs are easy and fast to develop.</p>
+<p>Examples: authentication tools, password/email data types</p>
+</li>
+</ul>
+</li>
+<li><p>Many commonly used examples:</p>
+<ul class="simple">
+<li><p>Django for Python: Disqus, bitbucket, instagram, pinterest</p></li>
+<li><p>Ruby on Rails or Grail for Ruby: airbnb, ask.fm, couchsurfind, github</p></li>
+<li><p>Hibernate for Java</p></li>
+<li><p>DataObjects.Net for .NET</p></li>
+<li><p>SQLAlchemy and Flask for Python</p></li>
+</ul>
+</li>
+<li><p>We will base the examples below on Django.</p></li>
+</ul>
+<div class="section" id="mvc-t-models-views-and-templates-or-controllers">
+<h2>MVC/T: Models, Views and Templates (or Controllers)<a class="headerlink" href="#mvc-t-models-views-and-templates-or-controllers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Build a full-stack application by defining the different components</p>
+<ul>
+<li><p>Models are the data models of the tables that will be stored in
+the database</p></li>
+<li><p>Views are the HTML pages that you will see, loading data from
+models and executing functions for certain actions (like button
+clicks)</p></li>
+<li><p>Controller is the application logic: that tells you what will
+happen when certain actions are executed: run queries, db changes
+and render new HTML pages</p></li>
+</ul>
+</li>
+<li><p>Often views are a mix of HTML/Python and Javascript for active
+elements</p></li>
+</ul>
+</div>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Define your DB tables using an object-relational paradigm</p></li>
+<li><p>Each table is a class, storing objects of this type</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">gpa</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">major</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The table associated will be called <cite>Students</cite> and will have a
+primary key <cite>id</cite> by default (can be overridden).</p></li>
+</ul>
+</div>
+<div class="section" id="views">
+<h2>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Views can query these objects using simple queries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">students</span> <span class="o">=</span> <span class="n">Student</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;students&#39;</span><span class="p">:</span><span class="n">students</span><span class="p">,})</span>
+</pre></div>
+</div>
+</li>
+<li><p>Templates can render these objects using simple loops:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+  <span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">student</span> <span class="ow">in</span> <span class="n">students</span> <span class="o">%</span><span class="p">}</span>
+    <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;&lt;</span><span class="n">b</span><span class="o">&gt;</span><span class="p">{{</span> <span class="n">student</span><span class="o">.</span><span class="n">name</span> <span class="p">}}</span><span class="o">&lt;/</span><span class="n">b</span><span class="o">&gt;</span><span class="p">:</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+       <span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">ID</span><span class="p">:</span> <span class="p">{{</span><span class="n">student</span><span class="o">.</span><span class="n">id</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">Address</span><span class="p">:</span> <span class="p">{{</span><span class="n">student</span><span class="o">.</span><span class="n">address</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">Email</span><span class="p">:</span> <span class="p">{{</span><span class="n">student</span><span class="o">.</span><span class="n">email</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">Year</span><span class="p">:</span> <span class="p">{{</span><span class="n">student</span><span class="o">.</span><span class="n">year</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+       <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;</span><span class="n">GPA</span><span class="p">:</span> <span class="p">{{</span><span class="n">student</span><span class="o">.</span><span class="n">gpa</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+     <span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+  <span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+<span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="complex-models">
+<h2>Complex Models<a class="headerlink" href="#complex-models" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Foreign keys:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Department</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">office</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">phone</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Major</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">department</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Department</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">.</span><span class="n">Models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Allows for the querying and retrieval of models through the foreign
+keys:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">departments</span> <span class="o">=</span> <span class="n">Deparment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="n">majors</span> <span class="o">=</span> <span class="n">Major</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">major</span> <span class="ow">in</span> <span class="n">majors</span><span class="p">:</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">major</span><span class="o">.</span><span class="n">department</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="n">majors</span> <span class="o">=</span> <span class="n">Major</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">department__name</span> <span class="o">=</span> <span class="s1">&#39;Computer Science&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="querying">
+<h2>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Most queries are simple filter statements over single relations or
+relations obtained through foreign keys.</p></li>
+<li><p>Does not require you to know full SQL.</p></li>
+<li><p>Most application function is easily mapped to CRUD operations
+(create, read, update and delete) that are easily supported</p></li>
+<li><p>Be careful if your join is different than what the foreign key
+implies</p></li>
+<li><p>Be careful about how much data is read for each object and when: for
+deep nested structures, does it read the whole hierarchy?</p></li>
+</ul>
+<div class="section" id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>OR frameworks are quite powerful and provide a lot of functionality
+off the shelf</p></li>
+<li><p>DRY principle: do not repeat yourself: write code once and use many
+times</p></li>
+<li><p>For the tools, you pay a price: restrictive models and naming
+conventions</p>
+<p>Example: lack of support for multi-attribute keys</p>
+</li>
+<li><p>You need to be careful if your query is best handled by the tool and
+by custom SQL</p></li>
+<li><p>Same as application logic: is it better to write functions in the
+views or a stored procedure in the back end.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

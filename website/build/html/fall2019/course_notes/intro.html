@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction to Relational Databases &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Introduction to Relational Databases</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2019/course_notes/intro.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction-to-relational-databases">
+<h1>Introduction to Relational Databases<a class="headerlink" href="#introduction-to-relational-databases" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="course-notes">
+<h2>Course Notes<a class="headerlink" href="#course-notes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>These notes are meant as a study guide. They will often be an
+outline of the material discussed in class.</p></li>
+<li><p>The notes are meant to complement the book, not replace.</p></li>
+</ul>
+</div>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p><em>DBMS (Database Management System)</em>
+is a software tool for storing and managing large amounts of data.</p>
+<p>A database server is a specific installation of a DBMS.</p>
+</li>
+<li><p><em>Database</em>
+is a collection of data organized for a specific
+application, often stored in a DBMS.</p></li>
+<li><p><em>Database application</em>
+is a software product that uses DBMSs to
+store one or more databases to accomplish a specific purpose.</p></li>
+</ul>
+</div>
+<div class="section" id="what-makes-something-a-dbms">
+<h2>What makes something a DBMS?<a class="headerlink" href="#what-makes-something-a-dbms" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Can we call any tool for storing data a DBMS?</p>
+<ul>
+<li><p>Is Excel a DBMS?</p></li>
+<li><p>Is your file system a DBMS?</p></li>
+</ul>
+</li>
+<li><p>What are desired properties of a DBMS?</p>
+<ul>
+<li><p>what type of data can be stored (data model)</p></li>
+<li><p>store massive amounts of data</p></li>
+<li><p>allow access (read/write/update) to stored data easily (query language)</p></li>
+<li><p>allow durable data storage, even when there are power failures (durability)</p></li>
+<li><p>allow multiple users to read and write the same data without compromising data integrity (concurrent access)</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="dbms-components">
+<h2>DBMS Components<a class="headerlink" href="#dbms-components" title="Permalink to this headline">¶</a></h2>
+<p>A DBMS is a complex software system with many components:</p>
+<ul class="simple">
+<li><p>Storage manager</p>
+<ul>
+<li><p>Index/file manager</p></li>
+</ul>
+</li>
+<li><p>Database language tools</p>
+<ul>
+<li><p>Data query/manipulation language compiler (DML)</p></li>
+<li><p>Data definition language compiler (DDL)</p></li>
+</ul>
+</li>
+<li><p>Query execution engine</p>
+<ul>
+<li><p>Buffer manager</p></li>
+</ul>
+</li>
+<li><p>Transaction manager</p>
+<ul>
+<li><p>Logging and recovery</p></li>
+<li><p>Concurrency control</p></li>
+</ul>
+</li>
+<li><p><em>A database administrator</em>
+is responsible for designing the
+data model.</p></li>
+<li><p><em>A database programmer</em>
+is responsible for writing application
+software that stores the database.</p></li>
+<li><p><em>A DBMS systems administrator</em>
+is responsible for installation
+and tuning of the DBMS system.</p></li>
+</ul>
+</div>
+<div class="section" id="a-c-i-d">
+<h2>A C I D<a class="headerlink" href="#a-c-i-d" title="Permalink to this headline">¶</a></h2>
+<p>A program that changes data is called a <em>transaction</em>.</p>
+<p>A DBMS is <em>generally</em> expected to support ACID properties for
+transactions that can be implemented on them:</p>
+<ul class="simple">
+<li><p>Atomicity: transactions must either complete fully or leave no
+effect in the database.</p></li>
+<li><p>Consistency: DMBS must not allow the programmers to violate the
+consistency rules for the database schema.</p></li>
+<li><p>Isolation: multiple transactions executing at the same time should
+result in a database state identical to transactions executing one
+at a time.</p></li>
+<li><p>Durability: when a transaction completes, DBMS must guarantee its
+results are recorded and not lost.</p></li>
+</ul>
+<p>There may be different ways to define these properties in a DBMS as we
+will see.</p>
+</div>
+<div class="section" id="databases">
+<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt><em>Database</em></dt><dd><p>is given by rules regarding data (data schema or data model) and
+the data (database instance)</p>
+</dd>
+</dl>
+</li>
+<li><p><em>Database schema (or data model)</em>
+describes what types of data are valid to store</p></li>
+<li><p><em>Database instance</em>
+is the
+actual data that satisfies the rules of the database schema.</p></li>
+<li><p>We often use the term database to refer to the database instance
+assuming the data model is encapsulated within the data</p></li>
+<li><p>Relational data model is the most popular way to describe data
+schema, but many others are possible: RDF, graph data,
+object-oriented, object-relational</p></li>
+</ul>
+</div>
+<div class="section" id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Logical data model</p>
+<ul>
+<li><p>Relations and attributes</p></li>
+<li><p>Constraints: what is valid data and what is not</p></li>
+</ul>
+</li>
+<li><p>Physical data model</p>
+<ul>
+<li><p>Where to store the data: which file systems, distributed, replicated</p></li>
+<li><p>How to store the data: which indices to create</p></li>
+</ul>
+</li>
+<li><p>Application logic</p>
+<ul>
+<li><p>Built on top of database queries: declarative, write once and
+optimize on top of the logical data model</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="relational-data-model">
+<h2>Relational Data Model<a class="headerlink" href="#relational-data-model" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p><em>Relations (or tables)</em>
+store information about the world</p></li>
+<li><p><em>Attribute (or column)</em>
+is a property of a specific object represented by a relation</p></li>
+<li><p><em>Tuple (or row)</em> is a specific object stored in a relation.</p></li>
+<li><p><em>Domain</em>
+is a set of valid values.</p>
+<ul class="simple">
+<li><p>Simple domains are integers, strings.</p></li>
+<li><p>More complex domains can be defined with restrictions over these
+domains: a RIN is an 8 digit integer, starts with 6.</p></li>
+</ul>
+</li>
+<li><p><em>Schema</em>
+for a relation defined the names of the attributes and the
+domain for the attributes.</p></li>
+<li><p>Note: logical vs. physical names are used interchangeably, but
+remember the distinction:</p>
+<ul class="simple">
+<li><p>Logical terms refer to the mathematical definition of the relational
+data model: based on set semantics.</p></li>
+<li><p>Physical terms refer to the storage/implementation of the same
+data model. Sometimes the implementation is not identical to the
+logical model.</p></li>
+</ul>
+<p>For now, we care about the logical model.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h2>Relational Data Model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A database is given by a set of relations.</p></li>
+<li><p>Each relation has a name and stores a set of tuples.</p></li>
+<li><p>Each relation schema consists of a set of attributes, the ordering
+of the attributes is not relevant.</p></li>
+<li><p>Each attribute has a domain, the set of valid values.</p></li>
+</ul>
+</div>
+<div class="section" id="relation-instance">
+<h2>Relation Instance<a class="headerlink" href="#relation-instance" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A relation contains a set of tuples</p></li>
+<li><p>In a valid relation instance each tuple contains values
+for all the attributes in the relation
+schema that are drawn from the domain of that attribute.</p></li>
+<li><p>We can represent a relation in one of many ways:</p>
+<ul class="simple">
+<li><p>A table:</p></li>
+</ul>
+<blockquote>
+<div><p><strong>Hero</strong></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Alias</p></th>
+<th class="head"><p>Name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Flash</p></td>
+<td><p>Barry Allen</p></td>
+</tr>
+<tr class="row-odd"><td><p>Arrow</p></td>
+<td><p>Oliver Queen</p></td>
+</tr>
+<tr class="row-even"><td><p>Jessica Jones</p></td>
+<td><p>Jessica Jones</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul>
+<li><p>A logical representation of tuples using predicates where
+the attributes are arguments of the predicate. Each tuple is a
+fact about the world.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Hero</span><span class="p">(</span><span class="s1">&#39;Flash&#39;</span><span class="p">,</span> <span class="s1">&#39;Barry Allen&#39;</span><span class="p">)</span>
+<span class="n">Hero</span><span class="p">(</span><span class="s1">&#39;Arrow&#39;</span><span class="p">,</span> <span class="s1">&#39;Oliver Queen&#39;</span><span class="p">)</span>
+<span class="n">Hero</span><span class="p">(</span><span class="s1">&#39;Jessica Jones&#39;</span><span class="p">,</span> <span class="s1">&#39;Jessica Jones&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>A set representation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Hero</span> <span class="o">=</span> <span class="p">{</span> <span class="o">&lt;</span><span class="s1">&#39;Flash&#39;</span><span class="p">:</span><span class="n">Alias</span><span class="p">,</span> <span class="s1">&#39;Barry Allen&#39;</span><span class="p">:</span><span class="n">Name</span><span class="o">&gt;</span><span class="p">,</span>
+         <span class="o">&lt;</span><span class="s1">&#39;Arrow&#39;</span><span class="p">:</span><span class="n">Alias</span><span class="p">,</span> <span class="s1">&#39;Oliver Queen&#39;</span><span class="p">:</span><span class="n">Name</span><span class="o">&gt;</span><span class="p">,</span>
+         <span class="o">&lt;</span><span class="s1">&#39;Jessica Jones&#39;</span><span class="p">:</span><span class="n">Alias</span><span class="p">,</span> <span class="s1">&#39;Jessica Jones&#39;</span><span class="p">:</span><span class="n">Name</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>All representations are equivalent after we agree on the convention.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="example-relation-avengers">
+<h2>Example relation: Avengers<a class="headerlink" href="#example-relation-avengers" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 10%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 8%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name/Alias</p></th>
+<th class="head"><p>Appearances</p></th>
+<th class="head"><p>Gender</p></th>
+<th class="head"><p>Year</p></th>
+<th class="head"><p>NumYears</p></th>
+<th class="head"><p>URL</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Peter Benjamin Parker</p></td>
+<td><p>4333</p></td>
+<td><p>MALE</p></td>
+<td><p>1990</p></td>
+<td><p>25</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Peter_Parker_(Earth-616">http://marvel.wikia.com/Peter_Parker_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-odd"><td><p>Steven Rogers</p></td>
+<td><p>3458</p></td>
+<td><p>MALE</p></td>
+<td><p>1964</p></td>
+<td><p>51</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Steven_Rogers_(Earth-616">http://marvel.wikia.com/Steven_Rogers_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>James “Logan” Howlett</p></td>
+<td><p>3130</p></td>
+<td><p>MALE</p></td>
+<td><p>2005</p></td>
+<td><p>10</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/James_Howlett_(Earth-616">http://marvel.wikia.com/James_Howlett_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-odd"><td><p>Anthony “Tony” Stark</p></td>
+<td><p>3068</p></td>
+<td><p>MALE</p></td>
+<td><p>1963</p></td>
+<td><p>52</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Anthony_Stark_(Earth-616">http://marvel.wikia.com/Anthony_Stark_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>Thor Odinson</p></td>
+<td><p>2402</p></td>
+<td><p>MALE</p></td>
+<td><p>1963</p></td>
+<td><p>52</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Thor_Odinson_(Earth-616">http://marvel.wikia.com/Thor_Odinson_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reed Richards</p></td>
+<td><p>2125</p></td>
+<td><p>MALE</p></td>
+<td><p>1989</p></td>
+<td><p>26</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Reed_Richards_(Earth-616">http://marvel.wikia.com/Reed_Richards_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-even"><td><p>Robert Bruce Banner</p></td>
+<td><p>2089</p></td>
+<td><p>MALE</p></td>
+<td><p>1963</p></td>
+<td><p>52</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Robert_Bruce_Banner_(Earth-616">http://marvel.wikia.com/Robert_Bruce_Banner_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Clinton Francis Barton</p></td>
+<td><p>1456</p></td>
+<td><p>MALE</p></td>
+<td><p>1965</p></td>
+<td><p>50</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Clint_Barton_(Earth-616">http://marvel.wikia.com/Clint_Barton_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-even"><td><p>Henry Jonathan “Hank” Pym</p></td>
+<td><p>1269</p></td>
+<td><p>MALE</p></td>
+<td><p>1963</p></td>
+<td><p>52</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Henry_Pym_(Earth-616">http://marvel.wikia.com/Henry_Pym_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Natalia Alianovna Romanova</p></td>
+<td><p>1112</p></td>
+<td><p>FEMALE</p></td>
+<td><p>1973</p></td>
+<td><p>42</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Natalia_Romanova_(Earth-616">http://marvel.wikia.com/Natalia_Romanova_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-even"><td><p>Victor Shade (alias)</p></td>
+<td><p>1036</p></td>
+<td><p>MALE</p></td>
+<td><p>1968</p></td>
+<td><p>47</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Vision_(Earth-616">http://marvel.wikia.com/Vision_(Earth-616</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Carol Susan Jane Danvers</p></td>
+<td><p>935</p></td>
+<td><p>FEMALE</p></td>
+<td><p>1979</p></td>
+<td><p>36</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Carol_Danvers_(Earth-616">http://marvel.wikia.com/Carol_Danvers_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-even"><td><p>Jennifer Walters</p></td>
+<td><p>933</p></td>
+<td><p>FEMALE</p></td>
+<td><p>1982</p></td>
+<td><p>33</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Jennifer_Walters_(Earth-616">http://marvel.wikia.com/Jennifer_Walters_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jessica Miriam Drew</p></td>
+<td><p>525</p></td>
+<td><p>FEMALE</p></td>
+<td><p>2008</p></td>
+<td><p>7</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Jessica_Drew_(Earth-616">http://marvel.wikia.com/Jessica_Drew_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-even"><td><p>Roberto da Costa</p></td>
+<td><p>491</p></td>
+<td><p>MALE</p></td>
+<td><p>2013</p></td>
+<td><p>2</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Roberto_da_Costa_(Earth-616">http://marvel.wikia.com/Roberto_da_Costa_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-odd"><td><p>Maria Hill</p></td>
+<td><p>359</p></td>
+<td><p>FEMALE</p></td>
+<td><p>2010</p></td>
+<td><p>5</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Maria_Hill_(Earth-616">http://marvel.wikia.com/Maria_Hill_(Earth-616</a>)#</p></td>
+</tr>
+<tr class="row-even"><td><p>Jessica Jones</p></td>
+<td><p>205</p></td>
+<td><p>FEMALE</p></td>
+<td><p>2010</p></td>
+<td><p>5</p></td>
+<td><p><a class="reference external" href="http://marvel.wikia.com/Jessica_Jones_(Earth-616">http://marvel.wikia.com/Jessica_Jones_(Earth-616</a>)#</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="rules-of-relational-data-model">
+<h2>Rules of Relational Data Model<a class="headerlink" href="#rules-of-relational-data-model" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The domain of attributes have to be simple: integer, float, decimal,
+string, boolean,
+date, time, timestample or restrictions of these (9 digit integer).</p>
+<ul>
+<li><p>This restriction is called the first normal form (1NF): attributes are
+indivisible pieces of information.!</p></li>
+<li><p>It says that relations are simple flat pieces of information.</p></li>
+</ul>
+</li>
+<li><p>Each relation contains a set of attributes: the ordering of attributes is not important for the meaning of the relation.</p></li>
+<li><p>Each relation instance contains a set of tuples. No two tuples can repeat, because we are making a logical statement:</p>
+<ul>
+<li><p>Jessica Jones is an avenger. This does not change even if we repeat this value multiple times.</p></li>
+</ul>
+</li>
+<li><p>All relations have at least one key.</p></li>
+</ul>
+</div>
+<div class="section" id="key">
+<h2>Key<a class="headerlink" href="#key" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A key is a set of attributes in a relation such that no two different tuples may have the same value
+for the attributes in the key.</p></li>
+<li><p>In different terms: a key is a way to identify a specific tuple.</p></li>
+<li><p>Keys define the meaning of the relation.</p></li>
+<li><p>All relations have a key. Some relations may have multiple keys.</p></li>
+<li><p>We will discuss some basic relations: student, class, section, book</p>
+<p>Student(rin, name, major, year)   Key: rin</p>
+<p>Movies(title, year, studio, boxofficevalue)  Key: title, year</p>
+</li>
+<li><p>We generally underline the key attributes. See below:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}Student(\underline{rin}, name, major, year)\\Movies(\underline{title, year}, studio, boxofficevalue)\end{aligned}\end{align} \]</div>
+</li>
+</ul>
+</div>
+<div class="section" id="defining-relations-in-sql">
+<h2>Defining relations in SQL<a class="headerlink" href="#defining-relations-in-sql" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>To store a relation, we create a Table in a relational database system.</p></li>
+<li><p>Examples of attribute types are following:</p>
+<ul class="simple">
+<li><p>CHAR(n), VARCHAR(n), BIT(n)</p></li>
+<li><p>BOOLEAN</p></li>
+<li><p>INT</p></li>
+<li><p>FLOAT, DOUBLE   ; floating point precision</p></li>
+<li><p>NUMERIC(n,p)      ; fixed point precision</p></li>
+<li><p>DATE</p></li>
+</ul>
+</li>
+<li><p>Create table command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">tablename</span>
+<span class="p">(</span>
+    <span class="n">attribute1</span>  <span class="n">datatype</span>
+    <span class="p">,</span> <span class="n">attribute2</span>  <span class="n">datatype</span>
+
+    <span class="p">,</span> <span class="o">...</span>
+
+    <span class="p">,</span> <span class="n">attributen</span>  <span class="n">datatype</span>
+    <span class="n">constraints</span>
+<span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">TABLE</span> <span class="n">student</span>
+<span class="p">(</span>
+  <span class="nb">id</span> <span class="nb">int</span>
+  <span class="p">,</span> <span class="n">name</span>  <span class="n">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span>
+  <span class="p">,</span> <span class="n">major</span>  <span class="n">char</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+  <span class="p">,</span> <span class="n">enrolledDate</span>   <span class="n">date</span>
+  <span class="p">,</span> <span class="n">constraint</span> <span class="n">student_pk</span> <span class="n">primary</span> <span class="n">key</span> <span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+  <span class="o">--</span>  <span class="n">student_pk</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">name</span> <span class="n">we</span> <span class="n">have</span> <span class="n">given</span> <span class="n">to</span> <span class="n">the</span> <span class="n">primary</span> <span class="n">key</span> <span class="n">constraint</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="sql-for-changing-tables">
+<h2>SQL for changing tables<a class="headerlink" href="#sql-for-changing-tables" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Delete a table (with all the tuples in it):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DROP</span> <span class="n">TABLE</span> <span class="n">tablename</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Add a new attribute to a table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ALTER</span> <span class="n">TABLE</span> <span class="n">tableName</span> <span class="n">add</span> <span class="n">attributeName</span> <span class="n">attributeType</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Remove an attribute from a table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ALTER</span> <span class="n">TABLE</span> <span class="n">tableName</span> <span class="n">drop</span> <span class="n">attributeName</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

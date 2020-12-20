@@ -1,0 +1,185 @@
+
+Q1.
+SELECT
+   DISTINCT
+   b.id
+   , b.title
+FROM
+   people p
+   , bookAuthors ba
+   , books b
+   , bookTopics bt
+   , topic t
+WHERE
+   p.name = 'Barack Obama'
+   and ba.person_id = p.id
+   and ba.book_id = b.id
+   and bt.book_id = b.id
+   and bt.topic_id = t.id
+   and (t.title = 'Politics' or t.title = 'Biography')
+
+Q2. 
+
+SELECT
+   p.id
+   , p.name
+   , count(b.id)
+   , avg(b.price)
+   , sum(b.copiesPublished)
+FROM
+   bookAuthors ba
+   , books b
+   , people p
+WHERE
+   ba.bookId = b.id
+   and p.id = ba.personId
+   and b.versionNo = 1
+GROUP BY
+   p.id
+   , p.name
+
+
+Q3.
+
+SELECT
+    ba.*
+FROM
+    bookAuthors ba
+    , books b
+WHERE
+    ba.bookId = b.id
+    and not exists 
+        (
+         SELECT 
+              1
+         FROM
+             bookAuthors ba2
+             , books b2
+         WHERE
+             ba2.personId = ba.personId
+             and b2.id = ba2.bookId
+             and b2.year > b.year
+        ) 
+
+OR
+
+SELECT
+    ba.*
+FROM
+    bookAuthors ba
+    , books b
+WHERE
+    ba.bookId = b.id
+    b.year =
+        (
+         SELECT 
+             max(b2.year)
+         FROM
+             bookAuthors ba2
+             , books b2
+         WHERE
+             ba2.personId = ba.personId
+             and b2.id = ba2.bookId
+        ) 
+
+
+Q4.
+
+UPDATE 
+   people
+SET 
+   numPublishers = 
+       (
+        SELECT
+           count(DISTINCT b.publisher)
+        FROM
+            books b
+            , bookAuthors ba
+        WHERE
+            b.id = ba.bookId
+            ba.personId = people.id
+        )
+
+Q5.
+
+CREATE ASSERTION
+CHECK NOT EXISTS 
+      ( 
+        SELECT 
+              1 
+        FROM 
+             books 
+        WHERE 
+             versionNo > 1 
+             and previousVersionId IS NULL 
+      ) ;
+
+
+Q6.
+
+SELECT 
+     id, name
+FROM 
+     people
+WHERE 
+    id NOT IN
+    (
+     SELECT 
+          ba.author_id
+     FROM
+          bookTopics bt
+          , bookAuthor ba
+     WHERE
+          b.id = ba.bookId
+          and ba.bookid = bt.bookId
+     GROUP BY
+          ba.authorId, bt.topicId
+     HAVING
+          count(*) >= 2
+    )
+    and id NOT IN
+    (
+     SELECT 
+        bae.bookAuthor
+     FROM
+       (SELECT * FROM bookAuthor) 
+       INTERSECT (SELECT * FROM bookEditor) bae
+    );
+
+
+Q7.
+
+Users(id, name), primary key id
+favbook(userid, bookid, dateAdded), primary key: userid, bookid
+favauthor(userid, personid, dateAdded), primary key: userid, personid
+booklist(id, name, userid), primary key: id
+listitem(listid, seqNo, text, bookid), primary key: listid, seqNo
+
+bookid is f.k. to book(id)
+personid is f.k. to person(id)
+listid is f.k. to booklist(id)
+userid is f.k. to users(id)
+
+Q8.
+
+a. 
+
+r1: a3,b2
+r2: c1,d1; c2,d2; c3,d3
+r3: e2,a3,c1
+r4: h2, e2
+
+The delete from r1 is propagated to r3 and r4 due to the cascade
+
+b. Only r2 is effected as the change is not for a primary key.
+
+r2: c1,d1; c2,d4; c3,d3
+
+c. The result of the update violates the primary key constraint for r1
+and as a result fails. None of the tables are changed.
+
+
+d. r1, r2 is the same. Changes from r3 are propagated to r4 due to cascade.
+
+r3: e1, a1,c1; e2,a3,c1; e3,a1,c3
+r4: h1, e1; h2,e2

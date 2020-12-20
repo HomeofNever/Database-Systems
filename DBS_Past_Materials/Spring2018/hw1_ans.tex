@@ -1,0 +1,240 @@
+\documentclass[11pt]{article}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\thispagestyle{empty}
+\setlength{\parindent}{0cm}
+
+\setlength{\parskip}{0.3cm plus4mm minus3mm}
+
+\oddsidemargin = 0.0in
+\textwidth = 6.5 in
+\textheight = 9 in
+\headsep = 0in
+
+\lhead{Homework \# 1 Answers (Spring 2018)}
+
+\title{Database Systems, CSCI 4380-01 Spring 2018 \\
+Homework \# 1 Answers}
+\date{}
+\begin{document}
+\maketitle
+
+\vspace*{-0.7in}
+
+\noindent{\bf Homework Statement.} This homework is worth 4.5\% of
+your total grade. If you choose to skip it, Midterm \#1 will be worth
+4.5\% more. Remember, practice is extremely important to do well in
+this class. I recommend that not only you solve this homework, but
+also work on homeworks from past semesters. Link to those is provided
+in the Piazza resources page.
+
+This homework aims to teach you how to construct complex queries using
+relational algebra. Please do the parts in sequence. The questions get
+harder and build on your knowledge of relational algebra from previous
+parts. Each question is equal weight.
+
+{\bf Database Description.} Suppose you are given the following
+database that is a slightly simplified version of Reddit data. Users
+create {\tt posts} with given title and text ({\tt ptext}) for a
+specific subreddit ({\tt subname}) and are given scores.
+
+Users post comments. For simplicity, we ignore threads and associate
+comment with a post ({\tt postid}). Each comment and post has an
+associated user ({\tt uname}).
+
+Users can have multiple flairs and trophies. Subreddits may have
+multiple users who are moderators. Users have a reddit birthday ({\tt
+  reddit\_bday}) that is given by a date in the form
+\verb+mon-day-year+. While in reality subreddits don't have a {\tt
+  type}, we are including one here for querying purposes.
+
+\hspace*{0.1in} {\tt 
+posts(\underline{postid}, title, ptext, pdatetime, subname, uname, score)}
+
+\hspace*{0.1in} {\tt comments(\underline{cid}, ctext, postid, uname, cdatetime)}
+
+\hspace*{0.1in} {\tt users(\underline{uname}, email, karma, reddit\_bday, reddit\_gold)}
+
+\hspace*{0.1in} {\tt trophies(\underline{uname, trophyname})}
+
+\hspace*{0.1in} {\tt flairs(\underline{uname, flairname})}
+
+\hspace*{0.1in} {\tt subreddits(\underline{subname}, url, nummembers, created\_date, description, type)}
+
+\hspace*{0.1in} {\tt moderators(\underline{subname, uname})}
+
+
+  Note: All datetime fields are formatted as \verb+mon-day-year-time+,
+  e.g. \verb+01-31-2016-14:00+ and date files are formatted as
+  \verb+mon-day-year+. You can assume that you can check if a datetime
+  or date value {\tt X} comes after another value {\tt Y} by checking
+  whether {\tt X $>$ Y}.
+
+
+  Write the following queries using relational algebra (pay attention
+  to the attributes required in the output!).
+
+{\bf Sample Answer.} (See example Latex code below for formatting
+suggestions. The $\&$ signs allow you to align multiple lines. For
+super long conditions, you can just write them on a separate line for
+better readability. Please consider TAs reading these queries and make
+them easy to digest.)
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{uname} \, (\sigma_{trophyname=PostgreSQLWizard} (Trophies) \bowtie (Moderators)) \\
+  R2 & = & (R1 \bowtie (\sigma_{type = database} (subreddits)) \\
+  R3 & = & \Pi_{url} (R2 \cup (\sigma_{C} subreddits) 
+  \end{eqnarray*}
+  
+where $C: type=postgreSQL \mbox{ and }  (nummembers > 10 \mbox{ or }  type =info)$.
+\newpage 
+{\bf Question 1.} The following queries only need a single SELECT
+($\sigma$), followed by a PROJECT ($\pi$) and RENAMING
+($\rho$) as necessary:
+
+{\bf 1(a).} Return the id and title of all posts with a score above
+{\tt 1,000}, posted to the subreddit named {\tt PerfectTiming} in {\tt
+  2017}.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{postid, title} \, (\sigma_{score \geq 1000 \mbox{ and } subname = PerfectTiming \mbox{ and }
+pdatetime \geq X \mbox { and } pdatetime \leq Y} (Posts) 
+  \end{eqnarray*}
+
+where $X$ = 1-1-17-00:00 and $Y$= 12-31-17-23:59.
+
+{\bf 1(b).} Return the url of all subreddits with at least {\tt
+  100} members and are of type {\tt news}.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{url} \, (\sigma_{nummembers\geq 100 \mbox{ and } type=news} (subreddits) 
+  \end{eqnarray*}
+
+
+\newpage
+
+{\bf Question 2.} The following queries combine SELECT ($\sigma$), SET
+operations ($\cap,\cup,-$), PROJECTION ($\pi$) and RENAMING
+($\rho$) as necessary:
+
+{\bf 2(a).} Find and return the id of all users who either have one or more
+  flairs or they have at least one reddit gold and one or more
+  trophies.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{uname} (Flairs) \cup (\Pi_{uname} (\sigma_{reddit\_gold\geq 1} Users) \cap (\Pi_{uname} Trophies)) 
+\end{eqnarray*}
+
+
+{\bf 2(b).} Return the name of subreddits with at least 200 members created
+  in 2017 with no moderators.
+  
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{subname} (\sigma_{nummembers\geq 200 \mbox{ and } created\_date\geq X \mbox{ and } created\_date\leq Y} Subreddits) - (\Pi_{subname} (Moderators))
+\end{eqnarray*}
+
+where $X$=01-01-2017 and $Y$=12-31-2017.
+
+\newpage 
+
+{\bf Question 3.} The following queries combine SELECT ($\sigma$)
+statements with a JOIN ($\bowtie$) (or CARTESIAN PRODUCT), followed
+by a PROJECT ($\pi$) and RENAMING ($\rho$) as necessary:
+
+{\bf 3(a).} Return the id of all posts posted in 2017 by a user with
+exactly 10 reddit gold on a subreddit of type {\tt news}.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{postid} ( \sigma_{pdatetime \geq X \mbox { and } pdatetime \leq Y} Posts \bowtie (\sigma_{reddit\_gold=10} Users) \bowtie
+  (\sigma_{type=news} Subreddits)
+\end{eqnarray*}
+
+where $X$ = 1-1-17-00:00 and $Y$= 12-31-17-23:59.
+
+
+{\bf 3(b).} Return the id and title of all posts on subreddit named {\tt
+  TIL} with at least one comment posted by the same user who
+  originated the post and has at least one comment by a different
+  user.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{postid} (\sigma_{subname=TIL} Posts) \bowtie Comments \\
+  C2(postid2, uname2)  & = & \Pi_{postid,uname} \\
+  R2 & = & \Pi_{postid,title} (R1 \bowtie_{uname<>uname2 \mbox{ and } postid=postid2} C2)
+\end{eqnarray*}
+
+
+{\bf 3(c).} Return the URL of all subreddits moderated by at least one
+user both with a trophy and at least two flairs.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  F2(U2,f2) & = & Flairs \\
+  R1 & = & \Pi_{uname} (Flairs \bowtie_{uname=u2 and f2<>flairname} F2) \cap \Pi_{uname} (Trophies) \\
+  R2 & = & \Pi_{url} (Subreddits \bowtie Moderators \bowtie R1)
+\end{eqnarray*}
+
+
+\newpage 
+
+{\bf Question 4.} Freeform, you decide which combination is
+needed. Any relational algebra operator is fine. Remember to construct
+these in parts and provide comments on what each part is computing. This will make
+it possible for us to give partial credit.
+
+{\bf 4(a).} Find and return the id and title of all posts posted in a
+  moderated (i.e. has a moderator) subreddit of type {\tt ask} with a
+  comment by a user with a trophy and a flair.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & Posts \bowtie (\sigma_{type=ask} Subreddits) \bowtie \Pi_{subname} (Moderators) \\
+  R2 & = & \Pi_{postid}(Comments \bowtie Trophies \bowtie Flairs) \\
+  R3 & = & \Pi_{postid,title} (R1 \bowtie R2)
+\end{eqnarray*}
+
+
+{\bf 4(b).} Find and return the username and email of all users who are
+moderating a subreddit of type {\tt ask} or have created a post in a
+subreddit of type {\tt ask} in {\tt 2017} with at least {\tt 1,000}
+points.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \sigma_{type=ask} Subreddits \\
+  R2 & = & \Pi_{uname,email}(Users \bowtie R1 \bowtie Moderators)\\
+  R3 & = & \Pi_{uname,email} ((\sigma_{score\geq 1000 \mbox{ and } pdatetime \geq X \mbox { and } pdatetime \leq Y} Posts) \bowtie Users \bowtie R1)\\
+  R4 & = & R2 \cup R3
+\end{eqnarray*}
+
+where $X$ = 1-1-17-00:00 and $Y$= 12-31-17-23:59.
+
+{\bf 4(c).} Find and return the title, post date time of all posts with
+no comments, with a negative post score, posted by a user with a flair
+who is a moderator of the subreddit the post is on.
+
+{\bf Answer.} 
+
+\begin{eqnarray*}
+  R1 & = & \Pi_{postid} ((\sigma_{score<0} Posts)\bowtie Users \bowtie Flairs \bowtie Moderators) \\
+  R2 & = & \Pi_{title, pdatetime} (( R1- (\Pi_{postid} Comments))\bowtie Posts)
+\end{eqnarray*}
+
+\end{document}
+

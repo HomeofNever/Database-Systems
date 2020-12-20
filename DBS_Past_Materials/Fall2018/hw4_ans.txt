@@ -1,0 +1,232 @@
+
+select 'query 1';
+
+select 
+    fullname
+from
+    contestants
+where
+    description like '%5-day%'
+order by
+    fullname
+;
+
+select 'query 2';
+
+select distinct
+    c.fullname
+    , c.shortname
+from
+    contestants c
+    , clues cl
+    , responses r
+where
+    lower(c.shortname) like 'b%'
+    and c.gameid = cl.gameid
+    and cl.isdd = True
+    and cl.cat_type = 'DJ'
+    and r.shortname = c.shortname
+    and r.gameid = c.gameid
+    and r.clueid = cl.clueid
+    and r.iscorrect = True
+order by
+    c.fullname
+;
+
+
+select 'query 3';
+
+select
+    gameid
+    , clue
+    , category
+from
+   final_clues
+except
+select
+    f.gameid
+    , f.clue
+    , f.category
+from
+   final_clues f
+   , final_responses fr
+where
+   f.gameid = fr.gameid
+   and fr.iscorrect = True
+order by
+   gameid, clue, category
+;
+
+
+select 'query 4';
+
+select
+    s1.gameid
+    , s1.shortname as name1
+    , s2.shortname as name2
+from
+    scores s1
+    , scores s2
+where
+    s1.gameid = s2.gameid
+    and s1.shortname < s2.shortname
+    and s1.score = s2.score
+    and s1.round = '3'
+    and s2.round = '3'
+order by
+    gameid, name1, name2
+;
+
+select 'Query 5' ;
+
+select
+    c.gameid
+    , c.cat_type
+from
+   clues c
+except
+select
+    c.gameid
+    , c.cat_type
+from
+    clues c
+where
+    length(c.category) > 11
+order by
+    gameid, cat_type
+;
+
+
+select 'Query 6' ;
+
+select
+   c.fullname
+   , s.score
+   , c.description
+from
+   contestants c
+   , scores s
+where
+   c.description like '%Wisconsin%'
+   and c.gameid = s.gameid
+   and c.shortname = s.shortname
+   and s.round = 'Final Score'
+   and s.score = 
+       (select
+           max(s2.score)
+	from
+	   contestants c2
+	   , scores s2
+	where
+	   c2.description like '%Wisconsin%'
+	   and c2.shortname = s2.shortname
+	   and c2.gameid = s2.gameid
+	   and s2.round = 'Final Score')
+order by
+   c.fullname
+   , s.score
+;
+
+
+select 'Query 7';
+
+select
+    g.gameid
+    , c.fullname
+    , count(r.clueid) as numcorrect
+from
+    games g
+      join contestants c on g.gameid = c.gameid
+      join clues cl on cl.gameid=c.gameid
+      left join responses r on r.shortname=c.shortname
+              and r.gameid =g.gameid
+	      and r.clueid=cl.clueid
+	      and r.iscorrect = True
+where
+    extract(month from g.airdate) = 1
+    and cl.cat_type = 'DJ'
+group by
+    g.gameid
+    , c.fullname
+order by
+    numcorrect
+    , gameid
+    , fullname ;
+
+
+select 'Query 8';
+
+select distinct
+    s.gameid
+    , s.shortname
+    , s.score as finalscore
+    , s2.score as coryatscore
+from
+    scores s
+    , scores s2
+where
+    s.gameid = s2.gameid
+    and s.shortname = s2.shortname
+    and s.round = 'Final Score'
+    and s2.round = 'Coryat Score'
+    and s.score > 1000
+    and s2.score >= 10*s.score
+order by
+   gameid
+   , shortname
+;
+
+
+select 'Query 9';
+
+select
+   clue
+from
+   clues
+where
+   lower(category) like '%internet%'
+   or lower(clue) like '%internet%'
+union
+select
+   clue
+from
+   final_clues
+where
+   lower(category) like '%internet%'
+   or lower(clue) like '%internet%'
+order by
+   clue
+;
+
+
+select 'Query 10';
+
+select
+    s2.gameid
+    , s2.shortname
+    , s.score as round2score
+    , s2.score as finalscore
+from
+    scores s
+    , scores s2
+where
+    s.round = '2'
+    and s.score < 0
+    and s2.round = 'Final Score'
+    and s2.shortname = s.shortname
+    and s.gameid = s2.gameid
+    and not exists
+        (select
+	     1
+	 from
+	     scores s3
+	 where
+	     s3.gameid = s.gameid
+	     and s3.round = 'Final Score'
+	     and s3.shortname <> s.shortname
+	     and s3.score > s2.score)
+order by
+    finalscore
+    , gameid
+;
+

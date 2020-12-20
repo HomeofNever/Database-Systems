@@ -1,0 +1,1045 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SQL - Part 2: Advanced Features &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>SQL - Part 2: Advanced Features</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2019/course_notes/sql_advanced.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sql-part-2-advanced-features">
+<h1>SQL - Part 2: Advanced Features<a class="headerlink" href="#sql-part-2-advanced-features" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p>In this lecture, we will learn more advanced features of SQL.</p></li>
+<li><p>Examples database to be used in this lecture is given in SQL here:</p>
+<p>See <code class="xref download docutils literal notranslate"><span class="pre">example</span> <span class="pre">database</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">used</span></code>.</p>
+</li>
+</ul>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Remember that while SQL is a standard, there are still differences
+in implementations of it.</p>
+<ul>
+<li><p>Writing queries that do not rely on specific features results in
+portable applications.</p></li>
+<li><p>However, you cannot deny that some constructs may simplify your
+queries and performance. So, it is important to decide when to use
+a specific method to write a query.</p></li>
+</ul>
+</li>
+<li><p>Remember: a query is not an algorithm. It is for the most part
+a logical statement of what you are interested in.</p>
+<ul>
+<li><p>Often, there are multiple algorithms to implement it.</p></li>
+<li><p>Most DBMSs feature state of the art query optimizers (QOPT) that
+choose the lowest cost algorithm for a given query and database.</p></li>
+<li><p>QOPT engines are very sophisticated, often operate better than
+even expert human judgment.</p></li>
+<li><p>So, instead of trying to optimize your queries,
+you can try to make your queries easy to optimize: simple queries
+are better.</p></li>
+</ul>
+</li>
+<li><p>Once you become sophisticated in a specific DBMS, you may learn
+specific weaknesses and you can develop strategies to adopt for
+that. We will discuss some.</p></li>
+<li><p>Finally, you should still follow some very simple guidelines:</p>
+<ul>
+<li><p>Do not join with relations unnecessarily.</p></li>
+<li><p>Do not sort (order by) or remove duplicates (distinct) unless it
+is needed.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="outer-join">
+<h2>Outer Join<a class="headerlink" href="#outer-join" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A INNER JOIN B: inner join selects tuples that satisfy a join condition,
+eliminates all tuples that do not satisfy the join condition. A is
+called the left operand and B is the right operand of the join
+operation.</p></li>
+<li><p>A LEFT OUTER JOIN B returns all tuples in the inner join as well as
+the tuples in A that do not join with any tuples in in B.</p></li>
+<li><p>A RIGHT OUTER JOIN B returns all tuples in the inner join as well as
+the tuples in B that do not join with any tuples in in A.</p></li>
+<li><p>A FULL OUTER JOIN B returns all tuples in the inner join as well as
+the tuples from A and B that do not participate in the inner join.</p>
+<ul>
+<li><p>You can also use terms: JOIN, LEFT JOIN, RIGHT JOIN, FULL JOIN</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="inner-vs-outer-join">
+<h2>Inner vs. outer join.<a class="headerlink" href="#inner-vs-outer-join" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given R(A,B) and S(B,C) with the following contents:</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a1</p></td>
+<td><p>b1</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b2</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>b1</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>b3</p></td>
+<td><p>c3</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>We get the following results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">R</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">C</span>
+<span class="n">FROM</span> <span class="n">R</span> <span class="n">JOIN</span> <span class="n">S</span> <span class="n">ON</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">;</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a1</p></td>
+<td><p>b1</p></td>
+<td><p>b1</p></td>
+<td><p>c1</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">R</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">C</span>
+<span class="n">FROM</span> <span class="n">R</span> <span class="n">LEFT</span> <span class="n">JOIN</span> <span class="n">S</span> <span class="n">ON</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">;</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a1</p></td>
+<td><p>b1</p></td>
+<td><p>b1</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b2</p></td>
+<td><p>null</p></td>
+<td><p>null</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">R</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">C</span>
+<span class="n">FROM</span> <span class="n">R</span> <span class="n">RIGHT</span> <span class="n">JOIN</span> <span class="n">S</span> <span class="n">ON</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">;</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a1</p></td>
+<td><p>b1</p></td>
+<td><p>b1</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>null</p></td>
+<td><p>null</p></td>
+<td><p>b3</p></td>
+<td><p>c3</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">R</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">C</span>
+<span class="n">FROM</span> <span class="n">R</span> <span class="n">FULL</span> <span class="n">JOIN</span> <span class="n">S</span> <span class="n">ON</span> <span class="n">R</span><span class="o">.</span><span class="n">B</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">B</span><span class="p">;</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a1</p></td>
+<td><p>b1</p></td>
+<td><p>b1</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b2</p></td>
+<td><p>null</p></td>
+<td><p>null</p></td>
+</tr>
+<tr class="row-even"><td><p>null</p></td>
+<td><p>null</p></td>
+<td><p>b3</p></td>
+<td><p>c3</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p>We can use the fact that tuples that do not match have
+null values for the join.</p></li>
+</ul>
+<div class="section" id="outer-join-examples">
+<h3>Outer join examples:<a class="headerlink" href="#outer-join-examples" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Find for each student, total number of classes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">student_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">numclasses</span>
+<span class="n">FROM</span>
+   <span class="n">students</span> <span class="n">s</span>
+   <span class="n">left</span> <span class="n">join</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="n">on</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>As count(attr) counts the total number of values, students
+with no classes will have zero classes.</p>
+<p>If we used inner join, we would have elimited all students with
+zero classes as they would not join with transcript.</p>
+</li>
+<li><p>Find faculty who did not teach any classes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">faculty</span> <span class="n">f</span>
+   <span class="n">left</span> <span class="n">join</span> <span class="n">classes</span> <span class="n">c</span>
+   <span class="n">on</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+<span class="n">WHERE</span>
+   <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span> <span class="ow">is</span> <span class="n">null</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Find classes with no students. Return semester, year, section and
+course name.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">co</span><span class="o">.</span><span class="n">crsname</span>
+   <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span>
+   <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span>
+   <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span>
+   <span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span>
+<span class="n">FROM</span>
+   <span class="p">(</span><span class="n">classes</span> <span class="n">c</span>
+   <span class="n">left</span> <span class="n">join</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="n">on</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span>
+      <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span>
+      <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span>
+      <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">section</span><span class="p">),</span>
+   <span class="n">courses</span> <span class="n">co</span>
+<span class="n">WHERE</span>
+   <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="ow">is</span> <span class="n">null</span>
+   <span class="ow">and</span> <span class="n">co</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This works because for each class, there is a course tuple.
+Otherwise, you would need to do a left join with the next table
+as well.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="anonymous-relations">
+<h2>Anonymous relations<a class="headerlink" href="#anonymous-relations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A query can be treated like a relation in the from clause</p>
+<p>It is treated like a virtual relation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">f2class</span><span class="o">.</span><span class="n">numclasses</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numstudents</span>
+<span class="n">FROM</span>
+   <span class="p">(</span> <span class="n">SELECT</span>
+         <span class="n">instructor_id</span> <span class="n">AS</span> <span class="nb">id</span>
+         <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numclasses</span>
+     <span class="n">FROM</span>
+         <span class="n">classes</span>
+     <span class="n">GROUP</span> <span class="n">BY</span>
+         <span class="n">instructor_id</span>
+     <span class="n">HAVING</span>
+         <span class="n">count</span><span class="p">(</span><span class="n">DISTINCT</span> <span class="n">year</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+   <span class="p">)</span> <span class="k">as</span> <span class="n">f2class</span>
+   <span class="p">,</span> <span class="n">classes</span> <span class="n">c</span>
+   <span class="p">,</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="p">,</span> <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+   <span class="n">f2class</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">section</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span>
+   <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">f2class</span><span class="o">.</span><span class="n">numclasses</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The inner query allows us to find faculty who taught in at
+least two years and total number of classes they taught.
+We can then use this information in the main query as if it was
+a real relation.</p>
+<p>This query would be very hard to write without an anonymous
+relation as we cannot count for different types of things with
+a single group by.</p>
+</li>
+<li><p>Be careful: Do not use any anonymous relations to make it
+simpler to write/read the query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">S</span><span class="o">.</span><span class="n">d</span>
+<span class="n">FROM</span>
+   <span class="p">(</span><span class="n">SELECT</span> <span class="n">a</span><span class="o">.*</span> <span class="n">FROM</span> <span class="n">R</span> <span class="n">WHERE</span> <span class="n">b</span><span class="o">&gt;</span><span class="mi">5</span><span class="p">)</span> <span class="k">as</span> <span class="n">newR</span>
+   <span class="p">,</span> <span class="n">S</span>
+<span class="n">WHERE</span>
+   <span class="n">S</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">newR</span><span class="o">.</span><span class="n">c</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Anonymous relation is not really necessary here. The same query
+can be written with a simple join:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">S</span><span class="o">.</span><span class="n">d</span> <span class="n">FROM</span> <span class="n">R</span><span class="p">,</span><span class="n">S</span> <span class="n">WHERE</span> <span class="n">R</span><span class="o">.</span><span class="n">b</span><span class="o">&gt;</span><span class="mi">5</span> <span class="ow">and</span> <span class="n">S</span><span class="o">.</span><span class="n">c</span><span class="o">=</span><span class="n">R</span><span class="o">.</span><span class="n">c</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When using an anonymous view, query optimizer may miss certain
+optimizations, especially in older DBMS.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="scalar-queries">
+<h2>Scalar Queries<a class="headerlink" href="#scalar-queries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Any query that returns a single number with an aggregate function
+is called a scalar query.</p>
+<p>You can use a scalar query as if it was a number.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="n">WHERE</span> <span class="n">instructor_id</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+
+<span class="n">count</span>
+<span class="o">-------</span>
+<span class="mi">5</span>
+<span class="p">(</span><span class="mi">1</span> <span class="n">row</span><span class="p">)</span>
+
+
+<span class="n">SELECT</span>
+   <span class="n">instructor_id</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="n">FROM</span>
+   <span class="n">classes</span> <span class="n">c</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+<span class="n">HAVING</span>
+   <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Let’s rewrite this query by substituting the above query for
+number 5 in the having clause.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+  <span class="n">instructor_id</span>
+  <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="n">FROM</span>
+  <span class="n">classes</span> <span class="n">c</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+  <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+<span class="n">HAVING</span>
+  <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="n">WHERE</span> <span class="n">instructor_id</span> <span class="o">=</span> <span class="mi">4</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="comparisons-involving-sets-bags">
+<h2>Comparisons involving sets/bags<a class="headerlink" href="#comparisons-involving-sets-bags" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Many expressions in the WHERE clause (or HAVING) can compare a
+value against a SET</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WHERE</span> <span class="n">grade</span> <span class="n">IN</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">)</span>
+<span class="n">WHERE</span> <span class="n">year</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2016</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Substitute a query for the set: Find all faculty who never
+taught a class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">instructor_id</span> <span class="n">FROM</span> <span class="n">classes</span><span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can write equivalent queries using EXCEPT and LEFT JOIN.</p></li>
+</ul>
+</div>
+<div class="section" id="set-comparison-operators">
+<h2>Set Comparison Operators<a class="headerlink" href="#set-comparison-operators" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>There are many set comparison operators that can be used in
+queries. The inner query must return a single column for this to
+work.</p>
+<p>Some useful operations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="n">IN</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>
+<span class="n">value</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">&gt;</span> <span class="n">ANY</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">&gt;=</span> <span class="n">ALL</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">&gt;</span> <span class="n">ALL</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">ANY</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>   <span class="o">--&gt;</span> <span class="n">same</span> <span class="k">as</span> <span class="n">IN</span>
+<span class="n">value</span> <span class="o">&lt;&gt;</span> <span class="n">ALL</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span>  <span class="o">--&gt;</span> <span class="n">same</span> <span class="k">as</span> <span class="n">NOT</span> <span class="n">IN</span>
+</pre></div>
+</div>
+</li>
+<li><p>You can also write expressions that check whether a query returns
+any tuples at all:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXISTS</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">Query</span> <span class="n">returns</span> <span class="n">at</span> <span class="n">least</span> <span class="n">one</span> <span class="nb">tuple</span>
+<span class="n">NOT</span> <span class="n">EXISTS</span> <span class="p">(</span><span class="n">QUERY</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">Query</span> <span class="n">returns</span> <span class="n">no</span> <span class="n">tuples</span>
+</pre></div>
+</div>
+</li>
+<li><p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">5</span> <span class="n">IN</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>       <span class="n">FALSE</span>
+<span class="mi">5</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>   <span class="n">TRUE</span>
+<span class="mi">2</span> <span class="n">IN</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>       <span class="n">TRUE</span>
+<span class="n">EXISTS</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>     <span class="n">TRUE</span>
+<span class="n">NOT</span> <span class="n">EXISTS</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="n">FALSE</span>
+<span class="n">NOT</span> <span class="n">EXISTS</span> <span class="p">()</span>        <span class="n">TRUE</span>
+<span class="mi">5</span> <span class="o">&lt;</span><span class="n">ALL</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>     <span class="n">FALSE</span>
+<span class="mi">5</span> <span class="o">&gt;</span><span class="n">ALL</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>     <span class="n">TRUE</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="o">*</span>
+<span class="n">FROM</span>
+    <span class="n">students</span>
+<span class="n">WHERE</span>
+    <span class="n">EXISTS</span> <span class="p">(</span><span class="n">SELECT</span> <span class="mi">1</span>
+            <span class="n">FROM</span> <span class="n">classes</span>
+            <span class="n">WHERE</span> <span class="n">semester</span><span class="o">=</span><span class="s1">&#39;Spring&#39;</span> <span class="ow">and</span> <span class="n">year</span><span class="o">=</span><span class="mi">2016</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This is a kind of stupid query: if there is any class offered in
+Spring 2016, return all students. Otherwise, return no students.</p>
+</li>
+<li><p>Since it does not matter what we return in EXISTS/NOT EXISTS
+conditions (we only care whether a tuple is returned or not), we
+can return something simple like an integer, instead of a
+relation column.</p></li>
+</ul>
+</div>
+<div class="section" id="correlated-subqueries">
+<h2>Correlated Subqueries<a class="headerlink" href="#correlated-subqueries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>More interesting queries involve correlated subqueries.</p></li>
+<li><p>Find faculty with no classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+    <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+    <span class="n">NOT</span> <span class="n">EXISTS</span>
+    <span class="p">(</span> <span class="n">SELECT</span> <span class="mi">1</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="n">c</span> <span class="n">WHERE</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>For each faculty tuple f, execute the inner subquery to find all
+tuples for this faculty. If there is no such tuple, then return
+tuple f.</p>
+<ul class="simple">
+<li><p>Outer query: faculty f</p></li>
+<li><p>Inner query: classes c</p></li>
+</ul>
+</li>
+<li><p>Scope of variables:</p>
+<ul class="simple">
+<li><p>The inner query can reference any tuple value in the outer query
+(from the FROM clause), treating these values as constants for
+the inner query.</p></li>
+<li><p>The outer query cannot access the variables of the inner query.</p></li>
+<li><p>If the iner query rewrites an alias from the outer query, then
+the closest definition is used.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="common-mistake-when-using-a-nested-subquery">
+<h3>Common mistake when using a nested subquery<a class="headerlink" href="#common-mistake-when-using-a-nested-subquery" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Rewrite your own alias in the inner subquery</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+   <span class="n">NOT</span> <span class="n">EXISTS</span>
+   <span class="p">(</span> <span class="n">SELECT</span>
+        <span class="mi">1</span>
+     <span class="n">FROM</span>
+        <span class="n">classes</span> <span class="n">c</span>
+        <span class="p">,</span> <span class="n">faculty</span> <span class="n">f</span>
+     <span class="n">WHERE</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>This query will return a very different result than the correct
+query as inner faculty f overwrites the outer faculty f.</p>
+<p>For each faculty tuple, execute the inner query independently.
+If it returns no tuples, return the faculty tuple. Hence: this
+will return no faculty tuples.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>Find faculty teaching at most 3 courses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">faculty</span> <span class="n">f</span>
+<span class="n">WHERE</span>
+   <span class="mi">3</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">classes</span> <span class="n">c</span> <span class="n">WHERE</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that while this is a correct query, it is likely more
+efficient to use a group by statement for the same purpose:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">faculty</span> <span class="n">f</span>
+   <span class="n">LEFT</span> <span class="n">JOIN</span> <span class="n">classes</span> <span class="n">c</span>
+   <span class="n">ON</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="n">HAVING</span>
+   <span class="n">count</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<blockquote>
+<div><p>Be careful: the query would not be correct without a left join. Why?</p>
+</div></blockquote>
+<ul>
+<li><p>Scalar queries can also be correlated (though use this as a last
+resort as well):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="p">(</span><span class="n">SELECT</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+      <span class="n">FROM</span> <span class="n">transcript</span> <span class="n">t</span>
+      <span class="n">WHERE</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">numAs</span>
+<span class="n">FROM</span>
+   <span class="n">students</span> <span class="n">s</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>Remember: this is not likely an efficient way to write this query.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Examples<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>We will finish section with a few complex queries.</p>
+<p>A problem in using the transcript relation is that a student might
+take a class more than once. However, their grade from the last time
+they took the class is the one that counts.</p>
+<p>When computing credits completed, we need to return a single tuple
+for each course that corresponds to the last valid grade for that
+class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">course_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">coursescompleted</span>
+<span class="n">FROM</span>
+   <span class="n">students</span> <span class="n">s</span>
+   <span class="n">LEFT</span> <span class="n">JOIN</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="n">ON</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+      <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="n">IS</span> <span class="n">NOT</span> <span class="n">NULL</span>
+      <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="o">&lt;&gt;</span> <span class="s1">&#39;I&#39;</span>
+<span class="n">WHERE</span>
+   <span class="n">NOT</span> <span class="n">EXISTS</span>
+      <span class="p">(</span> <span class="n">SELECT</span> <span class="mi">1</span>
+        <span class="n">FROM</span>
+           <span class="n">transcript</span> <span class="n">t2</span>
+        <span class="n">WHERE</span>
+           <span class="n">t2</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+           <span class="n">AND</span> <span class="n">t2</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span>
+           <span class="n">AND</span> <span class="p">(</span><span class="n">t2</span><span class="o">.</span><span class="n">year</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span> <span class="n">OR</span>
+                <span class="p">(</span><span class="n">t2</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span>
+                 <span class="n">AND</span> <span class="n">t2</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="s1">&#39;Spring&#39;</span>
+                 <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span><span class="o">=</span><span class="s1">&#39;Fall&#39;</span><span class="p">))</span>
+       <span class="p">)</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="for-all-queries">
+<h2>FOR ALL Queries<a class="headerlink" href="#for-all-queries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>What is we wanted to find students who have taken a class from
+all the professors in the database.</p></li>
+<li><p>This is a complex query: we want to check that the set of professors
+for a student is equivalent to the set of all professors.</p>
+<p>In relational algebra, this query would need two set subtractions.</p>
+<p>We can represent this query logically as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Find</span> <span class="n">students</span> <span class="n">who</span> <span class="n">took</span> <span class="n">a</span> <span class="k">class</span> <span class="nc">from</span> <span class="n">ALL</span> <span class="n">professors</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">database</span><span class="o">.</span>
+
+<span class="n">Find</span> <span class="n">students</span> <span class="n">s</span> <span class="n">such</span> <span class="n">that</span>
+     <span class="n">there</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">exist</span> <span class="n">a</span> <span class="n">professor</span> <span class="n">f</span> <span class="n">such</span> <span class="n">that</span>
+          <span class="n">s</span> <span class="n">did</span> <span class="ow">not</span> <span class="n">take</span> <span class="n">a</span> <span class="k">class</span> <span class="nc">from</span> <span class="n">f</span>
+          <span class="p">(</span><span class="ow">or</span> <span class="n">there</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">exists</span> <span class="n">a</span> <span class="nb">tuple</span> <span class="ow">in</span> <span class="n">transcript</span>
+           <span class="k">for</span> <span class="n">s</span> <span class="ow">and</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>SQL query will also require two subqueries:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">students</span> <span class="n">s</span>
+<span class="n">WHERE</span>
+   <span class="n">NOT</span> <span class="n">EXISTS</span>
+      <span class="p">(</span><span class="n">SELECT</span> <span class="mi">1</span>
+       <span class="n">FROM</span> <span class="n">faculty</span> <span class="n">f</span>
+       <span class="n">WHERE</span> <span class="n">NOT</span> <span class="n">EXISTS</span>
+             <span class="p">(</span><span class="n">SELECT</span> <span class="mi">1</span>
+              <span class="n">FROM</span> <span class="n">transcript</span> <span class="n">t</span><span class="p">,</span> <span class="n">classes</span> <span class="n">c</span>
+              <span class="n">WHERE</span>
+                  <span class="n">t</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+                  <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+                  <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span>
+                  <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span>
+                  <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span>
+                  <span class="n">AND</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">section</span><span class="p">));</span>
+</pre></div>
+</div>
+</li>
+<li><p>Do we really need this level of complexity? Can we do this
+using a count?</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Return</span> <span class="n">each</span> <span class="n">student</span> <span class="k">if</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">different</span>
+<span class="n">faculty</span> <span class="n">they</span> <span class="n">took</span> <span class="n">classes</span> <span class="k">with</span> <span class="ow">is</span> <span class="n">equal</span> <span class="n">to</span> <span class="n">the</span> <span class="n">number</span>
+<span class="n">of</span> <span class="n">different</span> <span class="n">faculty</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">database</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Let’s write this expression:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+   <span class="n">students</span> <span class="n">s</span>
+   <span class="p">,</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="p">,</span> <span class="n">classes</span> <span class="n">c</span>
+<span class="n">WHERE</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+   <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span>
+   <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span>
+   <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span>
+   <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">section</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+<span class="n">HAVING</span>
+   <span class="n">count</span><span class="p">(</span><span class="n">DISTINCT</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span><span class="p">)</span> <span class="o">=</span>
+          <span class="p">(</span><span class="n">SELECT</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">FROM</span> <span class="n">faculty</span><span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Not only this query is simpler to write, it is likely much more
+efficient given it has no correlated subqueries.</p></li>
+</ul>
+</div>
+<div class="section" id="with-statement-newer-form-of-anonymous-relations">
+<h2>WITH Statement (newer form of anonymous relations)<a class="headerlink" href="#with-statement-newer-form-of-anonymous-relations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Postgresql implements the WITH statement, part of SQL standard. In
+its simplest form, WITH acts like anonymous relations. But in
+reality it can do a lot more.</p></li>
+<li><p>The following is the identical query from above written using
+WITH clause:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WITH</span> <span class="n">f2class</span> <span class="n">AS</span> <span class="p">(</span>
+     <span class="n">SELECT</span>
+         <span class="n">instructor_id</span> <span class="n">AS</span> <span class="nb">id</span>
+         <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numclasses</span>
+     <span class="n">FROM</span>
+         <span class="n">classes</span>
+     <span class="n">GROUP</span> <span class="n">BY</span>
+         <span class="n">instructor_id</span>
+     <span class="n">HAVING</span>
+         <span class="n">count</span><span class="p">(</span><span class="n">DISTINCT</span> <span class="n">year</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+     <span class="p">)</span>
+<span class="n">SELECT</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">f2class</span><span class="o">.</span><span class="n">numclasses</span>
+   <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numstudents</span>
+<span class="n">FROM</span>
+   <span class="n">classes</span> <span class="n">c</span>
+   <span class="p">,</span> <span class="n">transcript</span> <span class="n">t</span>
+   <span class="p">,</span> <span class="n">faculty</span> <span class="n">f</span>
+   <span class="p">,</span> <span class="n">f2class</span>
+<span class="n">WHERE</span>
+   <span class="n">f2class</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">course_id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">course_id</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">semester</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">semester</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">year</span>
+   <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">section</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">section</span>
+   <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">instructor_id</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+   <span class="n">f</span><span class="o">.</span><span class="n">id</span>
+   <span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span>
+   <span class="p">,</span> <span class="n">f2class</span><span class="o">.</span><span class="n">numclasses</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>However, anonymous relations can only be used in FROM  while
+relations generated using WITH can be used in any SQL statement.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WITH</span> <span class="n">fsummary</span> <span class="n">AS</span> <span class="p">(</span>
+     <span class="n">SELECT</span>
+         <span class="n">student_id</span>
+         <span class="p">,</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">numcourses</span>
+     <span class="n">FROM</span>
+         <span class="n">transcript</span> <span class="n">t</span>
+     <span class="n">WHERE</span>
+         <span class="n">grade</span> <span class="o">&lt;&gt;</span> <span class="s1">&#39;I&#39;</span>
+     <span class="n">GROUP</span> <span class="n">BY</span>
+         <span class="n">student_id</span>
+     <span class="p">),</span>
+     <span class="n">advanced_students</span> <span class="n">AS</span> <span class="p">(</span><span class="n">SELECT</span>
+          <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+          <span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+          <span class="p">,</span> <span class="n">major</span>
+     <span class="n">FROM</span>
+          <span class="n">fsummary</span> <span class="n">f</span>
+          <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+     <span class="n">WHERE</span>
+          <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">student_id</span>
+          <span class="n">AND</span> <span class="n">f</span><span class="o">.</span><span class="n">numcourses</span> <span class="o">&gt;</span> <span class="mi">2</span>
+     <span class="p">)</span>
+ <span class="n">SELECT</span> <span class="n">DISTINCT</span>
+     <span class="n">M</span><span class="o">.</span><span class="n">name</span>
+ <span class="n">FROM</span>
+     <span class="n">majors</span> <span class="n">M</span>
+ <span class="n">WHERE</span> <span class="n">M</span><span class="o">.</span><span class="n">abrv</span> <span class="ow">in</span> <span class="p">(</span><span class="n">select</span> <span class="n">major</span> <span class="kn">from</span> <span class="nn">advanced_students</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note that you are doing two things above that you cannot do in
+anonymous relations: <cite>advanced_students</cite> referring to the relation
+<cite>fsummary</cite> just defined above and the query refers to the defined
+relation <cite>advanced_relations</cite> in the WHERE statement, while this
+cannot be done in anonymous relations.</p></li>
+<li><p>While WITH statement is quite powerful as a construct, be very
+careful to use it only if is helps you write a query that is
+cumbersome to write using regular SQL. The above query can be easily
+written with a simple block of SQL:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELECT</span> <span class="n">DISTINCT</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">name</span>
+<span class="n">FROM</span>
+    <span class="n">transcript</span> <span class="n">t</span>
+    <span class="p">,</span> <span class="n">students</span> <span class="n">s</span>
+    <span class="p">,</span> <span class="n">majors</span> <span class="n">m</span>
+<span class="n">WHERE</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">student_id</span>
+    <span class="n">AND</span> <span class="n">t</span><span class="o">.</span><span class="n">grade</span> <span class="o">&lt;&gt;</span> <span class="s1">&#39;I&#39;</span>
+    <span class="n">AND</span> <span class="n">m</span><span class="o">.</span><span class="n">abrv</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">major</span>
+<span class="n">GROUP</span> <span class="n">BY</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span>
+<span class="n">HAVING</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p>We will reexamine WITH when we look at advanced SQL features.</p></li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Most queries that use IN or EXISTS can be rewritten using simple
+joins. Joins are much easier to optimize.</p></li>
+<li><p>Set subtraction usually can be expressed using NOT IN or NOT EXISTS.</p></li>
+<li><p>Using anonymous relations in the from clause may cause the optimizer
+to miss some optimizations. Simpler the query, the better it is.</p></li>
+<li><p>There is a subtle difference on the syntax of the two statements:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Attribute</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="n">select</span> <span class="n">statement</span><span class="p">)</span>
+<span class="n">NOT</span> <span class="n">EXISTS</span> <span class="p">(</span><span class="n">select</span> <span class="n">statement</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>For all queries usually require two NOT EXISTS.</p></li>
+<li><p>SQL aggregates and outer joins are powerful constructs for
+formulating complex queries, even those involving some sort of
+negation.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

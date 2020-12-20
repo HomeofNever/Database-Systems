@@ -1,0 +1,72 @@
+
+Q1:    1328.12     1336.53
+Q2:    11025.79   21876.47  
+Q3:    22546.27  176733.27  
+Q4:    22812.20   22812.95  
+Q5:    1.92       26176.23  
+Q6:    16925.06   16925.08
+----------------------------
+Total: 74,639.36   265,860.53
+
+Rewrite Q3 as:
+
+explain
+select
+   m.id
+   , m.name
+   , avg(tr.rating)::numeric(4,2)
+from
+   movies m
+   , twitterratings tr
+   , (select max(ar.avgrating) as maxr
+      from  (select  avg(rating) as avgrating
+	 from    twitterratings
+	 group by movieid) as ar) as tmp
+where
+   m.id = tr.movieid
+group by
+   m.id
+   , m.name
+   , tmp.maxr
+having
+   avg(tr.rating) = tmp.maxr  ;
+
+
+create index t1 on twitterratings(movieid,rating);
+create index ir1 on imdbratings(movieid,rating);
+create index mridx on movieroles(movieid, actorid) ;
+create index mridx2 on movieroles(actorid, movieid) ;
+cluster movieroles using mridx;
+
+Rewrite Q5 as:
+
+
+explain select
+   m.id
+   , m.name
+from
+   movies m
+   join movieplots mp
+   on (m.id = mp.movieid
+      and mp.plot like '%destruction%'
+      and mp.plot like '%Earth%')
+   and m.id not in (select mg.movieid
+   from moviegenres mg
+   where mg.genre = 'Sci-Fi');
+
+create index mg1 on moviegenres(genre,movieid); 
+
+After the changes:
+
+Q1	810.79	928.42
+Q2	287.62	422.96
+Q3	22314.71	22408.87
+Q4	1175.02	1175.77
+Q5	27.97	15528.55
+Q6	15743.48	15743.5
+---------------------------------
+Total	40359.59	56,208.07
+
+Savings:
+First answers: 0.54
+All answers: 0.21

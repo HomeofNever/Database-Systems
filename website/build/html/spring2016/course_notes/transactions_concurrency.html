@@ -1,0 +1,975 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Transaction Management - Concurrency &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Transaction Management - Concurrency</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/spring2016/course_notes/transactions_concurrency.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="transaction-management-concurrency">
+<h1>Transaction Management - Concurrency<a class="headerlink" href="#transaction-management-concurrency" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Transaction management is about making sure that when database
+operations change data, they do not cause problems.</p></li>
+<li><p>Problems may occur because:</p>
+<ul class="simple">
+<li><p>Concurrency: multiple transactions may need to read or write the
+same data as well as transactions aborting due to different reasons</p></li>
+<li><p>Unforeseen problems: Software or hardware crashes, especially
+problematic is loss of state: loss of all data currently in memory</p></li>
+</ul>
+</li>
+<li><p>We want to ensure some basic guarantees:</p>
+<ul class="simple">
+<li><p>Atomicity: All or nothing. Transactions cannot half-complete,
+either they finish all operations or make no changes</p></li>
+<li><p>Consistency: Transactions must execute the operations correctly
+(assuming that they are correctly written pieces of code)</p></li>
+<li><p>Isolation: Transactions are written as if they are the only
+program executing in the database (in isolation from any other
+program). Their effects should reflect that.</p></li>
+<li><p>Duration: Once a transaction is successfully completed, its
+effects should be recorded on disk and never be lost.</p></li>
+</ul>
+</li>
+<li><p>In this lecture, we will concentrate on the “isolation” component
+assuming atomicity and consistency are ensured.</p>
+<p>Making sure isolation is satisfied means that concurrent transactions
+cannot erase each others data.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="abstracting-transactions">
+<h2>Abstracting Transactions<a class="headerlink" href="#abstracting-transactions" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>To study concurrency, we will abstract how we view transactions.</p></li>
+<li><p>The only operations that matter in a transaction are the data items
+the transaction reads or writes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">T1</span><span class="p">:</span> <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">r1</span><span class="p">(</span><span class="n">Y</span><span class="p">),</span> <span class="n">w1</span><span class="p">(</span><span class="n">Y</span><span class="p">),</span> <span class="n">commit1</span>
+
+<span class="n">T2</span><span class="p">:</span> <span class="n">r2</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">r2</span><span class="p">(</span><span class="n">Z</span><span class="p">),</span> <span class="n">w2</span><span class="p">(</span><span class="n">Z</span><span class="p">),</span> <span class="n">commit2</span>
+</pre></div>
+</div>
+<p>This transaction reads two data items and writes only one.</p>
+</li>
+<li><p>Multiple transactions may execute concurrently and their
+operations may interleave.</p>
+<p>The sequence of operations that take place in the DMBS is
+called a schedule.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">S1</span><span class="p">:</span> <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">r2</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">r1</span><span class="p">(</span><span class="n">Y</span><span class="p">),</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>This schedule shows a partial execution of T1 and T2.</p></li>
+<li><p>Unless we see a commit or abort, we assume that T1 or T2
+are not yet finished.</p></li>
+<li><p>The ordering of the operations is likely determined by many
+things: which operation gets executed first and which operation is
+delayed due to concurrency control.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="serial-schedules">
+<h2>Serial Schedules<a class="headerlink" href="#serial-schedules" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given each transaction is supposed to be a correct piece of code if
+executed completely, then any ordering of transactions is acceptable.</p></li>
+<li><p>A serial schedule is one in which one transaction executes at a
+time.</p></li>
+<li><p>Any serial schedule is an acceptable schedule.</p></li>
+<li><p>Any schedule that is guaranteed to produce the same result as a
+serial schedule is an acceptable schedule.</p></li>
+<li><p>How do we know two schedules have the same result?</p></li>
+</ul>
+</div>
+<div class="section" id="schedule-equivalence">
+<h2>Schedule Equivalence<a class="headerlink" href="#schedule-equivalence" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Two schedules are guaranteed to have same results if they will read
+the same values and write the values in the same order.</p></li>
+<li><p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">S1</span><span class="p">:</span>  <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">w2</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+<span class="n">S2</span><span class="p">:</span>  <span class="n">r2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">w2</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">S3</span><span class="p">:</span>  <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">w2</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>S1 and S2 are equivalent: T2 reads X before T1 writes it.</p>
+<p>S1 and S3 are not necessarily the same. In S3, T2 reads X after T1
+writes, so the value read may be different.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="conflict-ordering">
+<h2>Conflict Ordering<a class="headerlink" href="#conflict-ordering" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A conflict is given by a pair of operations</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">op1_i</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">op2_j</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>on the same item (e.g. X) by two different transactions (e.g. i
+and j) and at least one of the operations is a Write.</p>
+</li>
+<li><p>Basically, all potential conflict examples are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">r2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In each case, if two schedules switch the ordering of any of these
+operations, the result will not be the same.</p>
+</li>
+<li><p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">S1</span><span class="p">:</span>  <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">S2</span><span class="p">:</span>  <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, the value read by r1 may be different.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">S1</span><span class="p">:</span>  <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">S2</span><span class="p">:</span>  <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, the last value written is changed and may not be the
+same.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="serializable-schedules">
+<h2>Serializable schedules<a class="headerlink" href="#serializable-schedules" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>If two schedules S1 and S2 have the same ordering for all
+conflicting operations, then they will have the same result.</p>
+<p>Such schedules are called conflict equivalent.</p>
+<p>Conflict equivalent schedules will always have the same result.</p>
+</li>
+<li><p>If a schedule S1 is (conflict) equivalent to a serial schedule S,
+then we say that S1 is serializable.</p></li>
+</ul>
+</div>
+<div class="section" id="algorithm-to-check-serializability">
+<h2>Algorithm to check serializability<a class="headerlink" href="#algorithm-to-check-serializability" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>To find whether a given schedule is serializable, we need to draw
+the <strong>conflict graph</strong>.</p>
+<ul>
+<li><p>Each transaction in the schedule is represented by a vertex.</p></li>
+<li><p>For each conflict of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">op_i</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">op_j</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>we draw a directed line from node for transaction Ti to
+transaction Tj.</p>
+<p>This means that in all serial schedules equivalent to this
+schedule, Ti must come before Tj.</p>
+</li>
+</ul>
+</li>
+<li><p>If the underlying conflict graph for a schedule has a cycle, then
+the schedule is not serializable.</p></li>
+<li><p>If there are no cycles, then we can find a serial order by running
+topological sort on the conflict graph:</p>
+<ul class="simple">
+<li><p>Find a node with no incoming edges, add to the serial order and
+remove from the graph until no nodes are left.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given the following schedule:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r3</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">r1</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">r3</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">W</span><span class="p">)</span> <span class="n">w3</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">w3</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="n">Let</span><span class="s1">&#39;s find all conflicts first</span>
+
+<span class="n">w1</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+<span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r3</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">r2</span><span class="p">(</span><span class="n">W</span><span class="p">)</span> <span class="n">w3</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting conflict graph is shown below:</p>
+<a class="reference internal image-reference" href="spring2016/course_notes/other_images/conflict_graph1.png"><img alt="spring2016/course_notes/other_images/conflict_graph1.png" class="align-center" src="spring2016/course_notes/other_images/conflict_graph1.png" style="width: 250px;" /></a>
+<p>This graph has no cycles and is therefore serializable.</p>
+<p>Here is a serial order:</p>
+<ul class="simple">
+<li><p>Node T1 has no incoming edges, so it must come first.</p></li>
+<li><p>After we remove T1, node T2 has no incoming edges, so it must come
+second.</p></li>
+<li><p>The final serial order is: T1, T2, T3.</p></li>
+</ul>
+</li>
+<li><p>Suppose we are given the following schedule instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r3</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">r1</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">r3</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">W</span><span class="p">)</span> <span class="n">w3</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">w3</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+<span class="n">Let</span><span class="s1">&#39;s find all conflicts again:</span>
+
+<span class="n">w1</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="n">r2</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+<span class="n">r3</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">r2</span><span class="p">(</span><span class="n">W</span><span class="p">)</span> <span class="n">w3</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting conflict graph is shown below:</p>
+<a class="reference internal image-reference" href="spring2016/course_notes/other_images/conflict_graph2.png"><img alt="spring2016/course_notes/other_images/conflict_graph2.png" class="align-center" src="spring2016/course_notes/other_images/conflict_graph2.png" style="width: 250px;" /></a>
+<p>As this graph has cycles, this schedule is not serializable.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="serializable-schedules-and-concurrency-control">
+<h2>Serializable schedules and Concurrency Control<a class="headerlink" href="#serializable-schedules-and-concurrency-control" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>We want to make sure that the transaction management system only
+produces serializable schedules.</p></li>
+<li><p>This is the main principle behind concurrency control.</p>
+<p>Concurrency control is a series of protocols implemented to ensure
+the resulting schedules are serializable.</p>
+</li>
+<li><p>We can achieve this in two different ways:</p>
+<ul>
+<li><p>Check before each transaction operation to see if it will lead
+to a potentially bad schedule.</p>
+<p>If the operation can cause trouble, stop the operation and suspend
+the transaction until it can continue.</p>
+<p>Often accomplished using locks (see below).</p>
+</li>
+<li><p>Let all transactions execute freely, but check before they commit
+if they may lead to a bad schedule.</p>
+<p>If so, abort the transaction and undo any changes it made.</p>
+<p>Often accomplished using state information (multi-version
+concurrency control used in Postgresql using timestamps).</p>
+</li>
+</ul>
+</li>
+<li><p>We will see the lock mechanism in detail. We will discuss the
+multi-version control very briefly afterwards.</p></li>
+</ul>
+</div>
+<div class="section" id="locking-based-concurrency-control-schemes">
+<h2>Locking based concurrency control schemes<a class="headerlink" href="#locking-based-concurrency-control-schemes" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Request a lock on a data item before accessing it</p>
+<ul>
+<li><p>If the lock is available, then the transaction can proceed</p></li>
+<li><p>If the lock is not available, then the transaction is put on hold
+and will wait until the given lock becomes available</p>
+<p>The transaction management system will put the transaction on hold
+and monitor the lock it needs.</p>
+<p>As soon as the locked item is unlocked, the first transaction
+waiting for that lock is granted the lock and allowed to continue.</p>
+</li>
+</ul>
+</li>
+<li><p>We will consider two actions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>   <span class="p">:</span> <span class="n">transaction</span> <span class="n">T1</span> <span class="n">locks</span> <span class="n">X</span>
+<span class="n">u1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>   <span class="p">:</span> <span class="n">transaction</span> <span class="n">T1</span> <span class="n">unlocks</span> <span class="n">X</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example:</p>
+<p>One possible execution with locks.</p>
+</li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">Transaction Schedule</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>T1</p></th>
+<th class="head"><p>T2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>l1(A)r1(A)</p></th>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>w1(X)</p></th>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"></th>
+<td><p>l2(A) denied, waiting</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>l1(B)r1(B)</p></th>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>w1(B)u1(B)</p></th>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>u1(A)</p></th>
+<td></td>
+</tr>
+<tr class="row-even"><th class="stub"></th>
+<td><p>l2(A) granted</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"></th>
+<td><p>r2(A)</p></td>
+</tr>
+<tr class="row-even"><th class="stub"></th>
+<td><p>w2(A)</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"></th>
+<td><p>u2(A)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="lock-protocols">
+<h2>Lock Protocols<a class="headerlink" href="#lock-protocols" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Locking alone does not guarantee serializable schedules.</p></li>
+<li><p>We need a protocol to tell how long to keep locks.</p></li>
+<li><p>Two phase locking and strict two phase locking are two
+such protocols.</p></li>
+</ul>
+</div>
+<div class="section" id="two-phase-locking-protocol">
+<h2>Two phase locking protocol<a class="headerlink" href="#two-phase-locking-protocol" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>All transactions must get a lock for each item that they need to
+access.</p></li>
+<li><p>Each transaction can be in one of two phases:</p>
+<ul class="simple">
+<li><p>Growing phase: If a transaction is in this phase, it can only get
+new locks.</p></li>
+<li><p>Shrinking phase: If a transaction is in this phase, it can only
+release locks.</p></li>
+</ul>
+<p>As soon as a transaction releases one lock, it enters the shrinking
+phase. After this point, it cannot get any new locks.</p>
+</li>
+<li><p>Schedules generatd by two phase locking (2PL) are always
+serializable.</p>
+<p>We can prove this (informally) by considering the conflict graphs.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="proving-2pl-produces-serializable-schedules">
+<h2>Proving 2PL produces serializable schedules<a class="headerlink" href="#proving-2pl-produces-serializable-schedules" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>We will prove that if a schedule is not serializable, we can show
+that there is no way to generate such a schedule using 2PL.</p>
+<p>This is not a formal proof, but a simple sketch to show the logic.</p>
+</li>
+<li><p>Assume by contradiction that S is a schedule with only two
+transactions T1 and T2 that</p>
+<ol class="loweralpha simple">
+<li><p>has a cycle</p></li>
+<li><p>was allowed by two phase locking</p></li>
+</ol>
+</li>
+<li><p>We will show that such a schedule S cannot exist.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">If</span> <span class="n">S</span> <span class="n">has</span> <span class="n">a</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">there</span> <span class="n">operations</span> <span class="ow">in</span> <span class="n">S</span> <span class="n">that</span> <span class="n">conflict</span> <span class="k">with</span> <span class="n">each</span>
+<span class="n">other</span> <span class="n">to</span> <span class="n">form</span> <span class="n">a</span> <span class="n">cycle</span><span class="o">.</span>
+
+<span class="n">Let</span><span class="s1">&#39;s see one such example:</span>
+
+     <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">...</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">..</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+     <span class="n">where</span> <span class="nb">all</span> <span class="n">three</span> <span class="n">operations</span> <span class="n">conflict</span> <span class="k">with</span> <span class="n">each</span> <span class="n">other</span>
+
+<span class="n">This</span> <span class="n">schedule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">possible</span><span class="o">.</span>
+
+<span class="mf">1.</span> <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">to</span> <span class="n">occur</span><span class="p">,</span> <span class="n">T1</span> <span class="n">must</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">lock</span> <span class="n">X</span> <span class="n">before</span> <span class="n">this</span>
+<span class="mf">2.</span> <span class="n">w2</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">to</span> <span class="n">occur</span><span class="p">,</span> <span class="n">T2</span> <span class="n">must</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">lock</span> <span class="n">X</span> <span class="n">before</span> <span class="n">this</span> <span class="ow">and</span> <span class="n">T1</span> <span class="n">must</span>
+   <span class="n">release</span> <span class="n">it</span><span class="o">.</span>
+
+   <span class="n">At</span> <span class="n">this</span> <span class="n">point</span><span class="p">,</span> <span class="n">T1</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">its</span> <span class="n">shrinking</span> <span class="n">phase</span> <span class="ow">and</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">have</span>
+   <span class="n">a</span> <span class="n">lock</span> <span class="n">on</span> <span class="n">X</span><span class="o">.</span>
+
+<span class="mf">3.</span> <span class="n">For</span> <span class="n">w1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">to</span> <span class="n">occur</span><span class="p">,</span> <span class="n">T1</span> <span class="n">must</span> <span class="n">get</span> <span class="n">a</span> <span class="n">lock</span> <span class="n">on</span> <span class="n">X</span> <span class="n">again</span><span class="p">,</span> <span class="n">but</span> <span class="n">it</span> <span class="ow">is</span> <span class="ow">not</span>
+   <span class="n">allowed</span> <span class="ow">in</span> <span class="mi">2</span><span class="n">PL</span><span class="o">.</span> <span class="n">Hence</span><span class="p">,</span> <span class="n">this</span> <span class="n">schedule</span> <span class="n">cannot</span> <span class="n">happen</span> <span class="n">under</span> <span class="mi">2</span><span class="n">PL</span><span class="o">.</span>
+</pre></div>
+</div>
+</li>
+<li><p>We can show for all other potential schedules with a cycle, they
+cannot happen under 2PL because this would require a transaction to
+get a lock that they did not have after they have entered their
+shrinking phase, which is not allowed under 2PL.</p></li>
+</ul>
+</div>
+<div class="section" id="deadlocks">
+<h2>Deadlocks<a class="headerlink" href="#deadlocks" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>In all schemes that use locks, it is possible to get deadlocks:</p>
+<p>two transactions waiting for locks to be released by each other (or
+any other cycle of this type)</p>
+</li>
+<li><p>Methods to deal with deadlocks:</p>
+<ul class="simple">
+<li><p>prevention</p></li>
+<li><p>detection</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="deadlock-prevention">
+<h2>Deadlock prevention<a class="headerlink" href="#deadlock-prevention" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Give each transaction a unique and increasing timestamp when it
+starts.</p>
+<ul>
+<li><p>Wait and die: if an older transaction requests a lock held by a
+younger transaction then wait, otherwise abort.</p></li>
+<li><p>Wound and wait: if an older transaction requests a lock held by a
+younger transaction then abort the younger transaction.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="deadlock-detection">
+<h2>Deadlock detection<a class="headerlink" href="#deadlock-detection" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Periodically check which transaction is waiting for which
+transaction</p>
+<ul>
+<li><p>If a cycle exists, abort a transaction in the cycle (choose
+oldest, youngest depending on desired system properties)</p></li>
+</ul>
+</li>
+<li><p>If a transaction waits too long, then time out and abort the
+transaction.</p></li>
+</ul>
+</div>
+<div class="section" id="lock-types">
+<h2>Lock types<a class="headerlink" href="#lock-types" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Use two types of locks to allow more concurrent operations</p>
+<ul>
+<li><p>S: shared lock or read lock is needed to read an item</p></li>
+<li><p>X or W: write lock or exclusive lock is needed to write an item</p></li>
+</ul>
+</li>
+<li><p>Many transactions can read the same item, but only one transaction
+can write an item and hold an X lock on that item.</p></li>
+</ul>
+<div class="section" id="lock-compatibility">
+<h3>Lock compatibility<a class="headerlink" href="#lock-compatibility" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>If item A has no locks, whoever asks for an S or X lock can get it.</p></li>
+<li><p>If item A has an S lock by some transaction, only S locks on this
+item are granted to other transactions.</p>
+<p>the only exception is the transaction holding an S lock may upgrade
+its lock to write if there are no other S locks on this item (see
+below 2PL protocol with S/X locks for why)</p>
+</li>
+<li><p>If item A has an X lock, no other transaction can get a lock on A
+until this lock is released</p></li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Lock Compatibility (Existing Lock)</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>Requested lock</p></th>
+<th class="head"><p>None</p></th>
+<th class="head"><p>S</p></th>
+<th class="head"><p>X</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>S</p></th>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>X</p></th>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="two-phase-locking-with-s-x-locks">
+<h2>Two Phase Locking with S/X Locks<a class="headerlink" href="#two-phase-locking-with-s-x-locks" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The two phase locking protocol remains the same.</p></li>
+<li><p>The transactions must request the appropriate lock and release it
+eventually.</p>
+<ul class="simple">
+<li><p>Request a read lock before reading and a write lock before writing</p></li>
+</ul>
+</li>
+<li><p>As before, a transaction cannot get a lock after it releases any
+locks</p>
+<ul>
+<li><p>If the transaction is already holding a read lock, request to
+upgrade to a write lock</p>
+<p>This way, the transaction can get a write lock without releasing
+it first (and avoid going into the shrinking phase)</p>
+<p>This is only allowed if no other transaction is holding a read
+lock on the same item. Otherwise, the transaction has to wait</p>
+</li>
+</ul>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sl1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">r1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">xl1</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">w1</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="n">u1</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="n">u1</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Lock upgrade requests can also lead to deadlocks</p></li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id3">
+<caption><span class="caption-text">Transaction Schedule</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>T1</p></th>
+<th class="head"><p>T2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>sl1(X)r1(X)</p></th>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"></th>
+<td><p>sl2(X)r2(X)</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>x1(X) denied</p></th>
+<td></td>
+</tr>
+<tr class="row-odd"><th class="stub"></th>
+<td><p>xl2(X) denied</p></td>
+</tr>
+</tbody>
+</table>
+<p>Now T1 and T2 are both waiting for the other one to release the S
+lock on X, which will not happen as both are suspended.</p>
+</div>
+<div class="section" id="update-locks">
+<h2>Update locks<a class="headerlink" href="#update-locks" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>We can introduce a new type of lock to address the problem caused by
+lock upgrades.</p></li>
+<li><p>Update lock works as follows:</p>
+<ul>
+<li><p>An update lock can be granted to one transaction only. The
+transaction holding an update lock can later upgrade it to
+exclusive.</p></li>
+<li><p>A transaction must request an update lock before it tries to
+upgrade its lock from S to X.</p></li>
+<li><p>If a transaction holds an update lock, no other transaction may
+get a new lock on that item.</p></li>
+</ul>
+</li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id4">
+<caption><span class="caption-text">Lock Compatibility (Existing Lock)</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head stub"><p>Requested lock</p></th>
+<th class="head"><p>S</p></th>
+<th class="head"><p>X</p></th>
+<th class="head"><p>U</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><th class="stub"><p>S</p></th>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><th class="stub"><p>X</p></th>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><th class="stub"><p>U</p></th>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+</tr>
+</tbody>
+</table>
+<p>Update lock works like a shared lock, but it cannot be shared with
+another update lock.</p>
+</div>
+<div class="section" id="locking-scheduler">
+<h2>Locking scheduler<a class="headerlink" href="#locking-scheduler" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Transactions do not request locks</p>
+<ul>
+<li><p>The locking scheduler examines the actions of the transaction and
+inserts the appropriate lock request before the actions.</p></li>
+</ul>
+</li>
+<li><p>Transactions do not release locks.</p>
+<ul>
+<li><p>The scheduler releases the locks when the transaction commits or
+aborts.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="locking-table">
+<h2>Locking table<a class="headerlink" href="#locking-table" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The locking table lists for each item (that is locked):</p>
+<ul>
+<li><p>what the lock is</p></li>
+<li><p>a bit to indicate that there are transactions waiting for that lock</p></li>
+<li><p>a linked list of transactions waiting for that lock.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="releasing-locks">
+<h2>Releasing locks<a class="headerlink" href="#releasing-locks" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>When a lock is released, the scheduler decides which transaction
+waiting for that lock should get it.</p>
+<ul>
+<li><p>First-come-first-served: the transaction waiting
+longest should get it (no starvation)</p></li>
+<li><p>Priority to shared locks: grant all shared locks first (can cause
+starvation)</p></li>
+<li><p>Priority to upgrading: first grant updates, then use one of the
+other protocols.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="committing-transactions">
+<h2>Committing Transactions<a class="headerlink" href="#committing-transactions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Under 2PL, when a transaction is about to commit, it cannot possibly
+lead to an unserializable schedule. So, commits are granted.</p></li>
+<li><p>If the transaction is holding any locks, they are released.</p></li>
+</ul>
+</div>
+<div class="section" id="strict-two-phase-locking-strict-2pl">
+<h2>Strict Two Phase Locking (Strict 2PL)<a class="headerlink" href="#strict-two-phase-locking-strict-2pl" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Strict two phase locking is a more restrictive version of 2PL.</p></li>
+<li><p>Strict 2PL:</p>
+<ul>
+<li><p>A transaction requests locks that it needs before accessing an
+item.</p></li>
+<li><p>If the lock is not available, the transaction will wait until the
+lock is granted.</p></li>
+<li><p>When the transaction commits, all locks it is holding are released.</p></li>
+</ul>
+</li>
+<li><p>Under Strict 2PL, there is no shrinking phase.</p>
+<ul>
+<li><p>As Strict 2PL is even more restrictive than 2PL, it also guarantees
+serializability.</p></li>
+<li><p>However, it allows for less concurrency as it holds locks longer.</p></li>
+</ul>
+</li>
+<li><p>Lesson: if a lock is not needed, it is better to release it as early
+as possible. As long as 2PL is satisfied, there is no problem.</p></li>
+</ul>
+</div>
+<div class="section" id="lock-granularity">
+<h2>Lock granularity<a class="headerlink" href="#lock-granularity" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Instead of only S/X locks, we can use a multi-level lock hierarchy.</p></li>
+<li><p>This is especially useful for indices:</p>
+<ul class="simple">
+<li><p>Lock upper level of the index with a higher level lock:</p>
+<ul>
+<li><p>IX: Intention to change a lower level node</p></li>
+<li><p>IS: Intention to read (but not change) a lower level node</p></li>
+<li><p>SIX: Intension to read some nodes and change some nodes in the
+lower level.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>When a new transaction comes, it needs to declare intention on
+the top.</p>
+<ul class="simple">
+<li><p>If the intention is compatible, it can continue to the lower
+level.</p></li>
+</ul>
+</li>
+<li><p>Example:</p>
+<ul>
+<li><p>Reading the whole index (index scan) requires a full S
+lock on the index.</p>
+<p>Not compatible with X, IX or SIX.</p>
+</li>
+<li><p>Changing only a single node (inserting a new tuple) requires IX
+lock in the upper level. Only the leaf node being changed is
+locked with X.</p>
+<p>Another transaction with IX or IS can also access the same upper
+level node, just not the leaf node.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="multi-version-concurrency-control">
+<h2>Multi-version Concurrency Control<a class="headerlink" href="#multi-version-concurrency-control" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Often transactions will not access the same information.</p></li>
+<li><p>There is a high cost for requesting and maintaining locks, resolving
+deadlocks</p></li>
+<li><p>Instead we can allow transactions to continue without any upfront
+checks</p>
+<ul>
+<li><p>Read is never blocked and all reads are for committed values.</p>
+<p>Each transaction can read values that were committed at the time
+they started execution (as if a complete snapshot of the db was
+generated)</p>
+<p>Use timestamps to keep track of which transaction is accessing
+which data items</p>
+</li>
+</ul>
+</li>
+<li><p>Data items can have multiple values (multi-version), though only
+one is the latest</p>
+<ul>
+<li><p>If a transaction T wants to write data X, but a transaction with a
+later transaction timestamp has changed it, then T will be
+aborted.</p>
+<p>Because X may have changes that T did not yet see (as it is using
+an earlier timestamp).</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Concurrency control is about making sure that concurrent transactions
+do not access or modify the same data in a problematic way.</p></li>
+<li><p>The golden standard is serializability: make sure that a schedule
+generated by a concurrency control mechanism is guaranteed to
+produce the same result as a serial schedule: one that executes a
+single transaction at a time.</p>
+<p>Though the ordering of transactions in a serial order is not
+important, any order is acceptable.</p>
+</li>
+<li><p>Two check serializability, we only need to ensure that conflicting
+operations by different transaction can occur in the same order in a
+serial schedule.</p>
+<p>We can do this by constructing the conflict graph and checking if
+there are cycles.</p>
+</li>
+<li><p>Two main methods of concurrency control are often used.</p>
+<ul>
+<li><p>Lock based systems (such as in two phase locking) try to prevent
+bad schedules from happening by checking each action (read/write)
+for transactions before they occur.</p>
+<p>Deadlocks are possible.</p>
+</li>
+<li><p>Multi-version control systems are less restrictive, allow reads
+and are restrictive for writes.</p>
+<p>May require transactions to be aborted and restarted if there are
+a lot of conflicting operations.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

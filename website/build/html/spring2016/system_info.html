@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CSCI 4380 Database Server &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>CSCI 4380 Database Server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/spring2016/system_info.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="csci-4380-database-server">
+<h1>CSCI 4380 Database Server<a class="headerlink" href="#csci-4380-database-server" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to the class database server hosted on Microsoft Azure Cloud
+services. The server is accessible from a phpPgAdmin interface and can
+be accessed at:</p>
+<blockquote>
+<div><p><a class="reference external" href="http://csci4380rpi.cloudapp.net/phppgadmin">http://csci4380rpi.cloudapp.net/phppgadmin</a></p>
+</div></blockquote>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="http://www.postgresql.org/docs/9.3/interactive/index.html">http://www.postgresql.org/docs/9.3/interactive/index.html</a>
+The PostgreSQL documentation.</p>
+<p><a class="reference external" href="http://phppgadmin.sourceforge.net/doku.php">http://phppgadmin.sourceforge.net/doku.php</a>
+The PhpPgAdmin web site.</p>
+</div>
+<div class="section" id="database-concepts">
+<h2>Database concepts<a class="headerlink" href="#database-concepts" title="Permalink to this headline">¶</a></h2>
+<p>You will be using PostgreSQL 9.3 database with the phpPgAdmin
+interface. The server installation you will be using is called
+PostgreSQL as well, that is the name of the machine.</p>
+<p>PhpPgAdmin is written in PHP and supports SQL as well as web based
+interfaces to the database. You are welcome to use whatever works for
+you, but I will only concentrate on the SQL interface.</p>
+<p>PostgreSQL introduces a number of basic concepts:</p>
+<ul class="simple">
+<li><p><strong>Server:</strong> the instance of the DBMS running on a specific machine.</p></li>
+<li><p><strong>User or role:</strong> an account on the server usually given by a username
+and password. Some roles may not be able to login to the server, but
+users always can.</p></li>
+<li><p><strong>Database:</strong> a specific filesystem created at the server. Tables are
+created in a specific database. Generally a user or role can access
+any number of databases as long as they possess the specific access
+privileges.</p></li>
+<li><p><strong>Schema:</strong> a namespace that is created within the database. Table names
+are assumed to be unique within the schema. All servers generally
+have a schema called Public which is the default schema. If the
+schema is Public, schema name does not need to be provided in the
+queries.</p></li>
+</ul>
+</div>
+<div class="section" id="the-current-setup">
+<h2>The current setup<a class="headerlink" href="#the-current-setup" title="Permalink to this headline">¶</a></h2>
+<p>All the students are given a username and a password. Later in the
+semester, we will also give each student a database.  Everybody is assumed
+to use the public schema. You can change your own password by using
+the following command at the SQL prompt:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ALTER</span> <span class="n">USER</span> <span class="n">username</span> <span class="n">PASSWORD</span> <span class="s1">&#39;password&#39;</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>Once you change the password, you should logout and log back in to
+have full access to the system.</p>
+<p>We will create a number of public databases for querying and homeworks
+throughout the semester. All students should be able to query tables
+in these databases, but not create their own tables. We will create
+your own database for this purpose later in the semester. Tables in
+your own database should be visible on to you unless you explicitly
+give access to specific users.</p>
+</div>
+<div class="section" id="working-with-the-server">
+<h2>Working with the server<a class="headerlink" href="#working-with-the-server" title="Permalink to this headline">¶</a></h2>
+<p>The main mode of working with the class db server is through the SQL
+interface. To access this do the following.</p>
+<ul>
+<li><p>First login to the server by clicking:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SERVERS</span> <span class="o">-&gt;</span> <span class="n">PostgreSQL</span>
+</pre></div>
+</div>
+<p>menu item on the left side menu, and entering your username and password.</p>
+</li>
+<li><p>Next, choose a database to work with either from the left side menu
+or the list in the main screen. By default this will be your own
+database or the class database is there is one.</p></li>
+<li><p>Finally, choose SQL tab from the top right menu. You can enter SQL
+directly here or enter commands in a file and upload it
+here.</p>
+<p>Remember, regardless of how you input your commands, ALL SQL
+COMMANDS MUST END WITH A ;.</p>
+</li>
+<li><p>You can also view various objects in your database using the
+interface provided by phppgadmin. You can list your tables, views,
+functions, etc. by navigating from the left side menu.</p></li>
+<li><p>Also, click on Servers -&gt; PostgreSQL, and then choose tab Account
+from top. You can see your account and change password.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

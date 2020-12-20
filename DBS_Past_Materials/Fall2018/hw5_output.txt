@@ -1,0 +1,204 @@
+ ?column? 
+----------
+ query 1
+(1 row)
+
+        category         
+-------------------------
+ 19th CENTURY AUTHORS
+ 19th CENTURY PRESIDENTS
+ 20th CENTURY LEADERS
+ OSCAR WINNERS
+ PHRASE ORIGINS
+(5 rows)
+
+ ?column? 
+----------
+ Query 2
+(1 row)
+
+   fullname   | totalscore 
+--------------+------------
+ Ken Jennings |    2684898
+(1 row)
+
+ ?column? 
+----------
+ Query 3
+(1 row)
+
+                   correct_answer                   | numclue | count 
+----------------------------------------------------+---------+-------
+ A Midsummer Nights Dream                           |      13 |    11
+ William Henry Harrison                             |      10 |    10
+ The Old Curiosity Shop                             |      10 |     9
+ The Merry Wives of Windsor                         |       9 |     8
+ William Jennings Bryan                             |       9 |     9
+ Samuel Taylor Coleridge                            |       8 |     8
+ Much Ado About Nothing                             |       8 |     8
+ The Merchant of Venice                             |       8 |     8
+ the Declaration of Independence                    |       7 |     7
+ Oliver Wendell Holmes                              |       7 |     7
+ Jean-Jacques Rousseau                              |       7 |     7
+ Franklin D. Roosevelt                              |       7 |     7
+ Edna St. Vincent Millay                            |       7 |     7
+ William Lloyd Garrison                             |       7 |     6
+ Robert Louis Stevenson                             |       7 |     7
+(15 rows)
+
+ ?column? 
+----------
+ Query 4
+(1 row)
+
+     category      | numtimes | percentcorrect 
+-------------------+----------+----------------
+ CLASSICAL MUSIC   |       60 |           0.59
+ GEOLOGY           |       29 |           0.56
+ PHILOSOPHY        |       26 |           0.56
+ SCULPTURE         |       26 |           0.55
+ PLAYWRIGHTS       |       22 |           0.56
+ QUOTES            |       21 |           0.59
+ THE 20th CENTURY  |       21 |           0.56
+ THE OLD WEST      |       20 |           0.56
+ DOUBLE TALK       |       16 |           0.58
+ MOVIE QUOTES      |       16 |           0.58
+ SHORT STORIES     |       16 |           0.55
+ LIBRARIES         |       15 |           0.53
+ FASHION DESIGNERS |       13 |           0.53
+ ACTORS & ROLES    |       12 |           0.59
+ PLAYS             |       12 |           0.59
+ GEOMETRY          |       12 |           0.37
+ UNREAL ESTATE     |       11 |           0.59
+ PLANTS & TREES    |       11 |           0.54
+ EUROPEAN CITIES   |       11 |           0.42
+ RELIGIOUS LEADERS |       10 |           0.58
+(20 rows)
+
+ ?column? 
+----------
+ Query 5
+(1 row)
+
+  fullname   | gameid | scorediff 
+-------------+--------+-----------
+ Watson      |   3576 |     29200
+ Brad Rutter |    330 |     14200
+ Watson      |   3577 |      5240
+ Brad Rutter |    329 |      4000
+ Brad Rutter |   3576 |      3000
+ Brad Rutter |   4505 |      2000
+ Brad Rutter |    328 |      1200
+(7 rows)
+
+ ?column? 
+----------
+ Query 6
+(1 row)
+
+ gameid |  airdate   
+--------+------------
+   1335 | 1987-04-21
+   2646 | 2004-06-01
+     35 | 2004-10-22
+   3400 | 2010-05-27
+(4 rows)
+
+ ?column? 
+----------
+ Query 7
+(1 row)
+
+ fullname  | winnings 
+-----------+----------
+ Ric Moser |    33599
+(1 row)
+
+ ?column? 
+----------
+ Query 8
+(1 row)
+
+     category     
+------------------
+ ELECTIONS
+ POTENT QUOTABLES
+(2 rows)
+
+ ?column? 
+----------
+ Query 9
+(1 row)
+
+      name      | numcontestants | percapita | percapita5times 
+----------------+----------------+-----------+-----------------
+ Virginia       |            511 |     16405 |         8382993
+ Texas          |            435 |     63147 |         6867278
+ Florida        |            396 |     51190 |         6757091
+ Tennessee      |            135 |     48891 |         6600299
+ Wisconsin      |            131 |     44056 |         5771337
+ Connecticut    |            196 |     18321 |         3590886
+ Arizona        |            114 |     59895 |         3414032
+ Georgia        |            310 |     32951 |         3404953
+ North Carolina |            216 |     46494 |         3347601
+ Indiana        |            143 |     46291 |         3309840
+ Missouri       |            142 |     42843 |         3041836
+ California     |           1901 |     20592 |         3011140
+ Mississippi    |             30 |     99744 |         2992333
+ Kansas         |             62 |     46962 |         2911641
+ Nevada         |             58 |     49842 |         2890845
+ Pennsylvania   |            490 |     26128 |         2560501
+ New York       |           1079 |     18346 |         2474474
+ South Carolina |            107 |     45758 |         2448073
+ Alabama        |             87 |     55850 |         2429490
+ Washington     |            231 |     31040 |         2390117
+ Louisiana      |            125 |     37366 |         2335362
+ New Mexico     |             39 |     53464 |         2085109
+ Oregon         |            139 |     28985 |         2014488
+ Michigan       |            231 |     42955 |         1984515
+ Oklahoma       |             64 |     61115 |         1955669
+ Nebraska       |             46 |     41222 |         1896190
+ West Virginia  |             31 |     59488 |         1844128
+ Illinois       |            551 |     23339 |         1837142
+ Minnesota      |            142 |     38659 |         1829865
+ New Jersey     |            398 |     22508 |         1791603
+ Massachusetts  |            522 |     13016 |         1698606
+ Idaho          |             21 |     78806 |         1654930
+ Iowa           |             64 |     48811 |         1561950
+ Maryland       |            417 |     14404 |         1501600
+ Arkansas       |             43 |     69261 |         1489102
+ Kentucky       |            122 |     36271 |         1475031
+ Ohio           |            331 |     35086 |         1451678
+ Hawaii         |             39 |     36708 |         1431603
+ Colorado       |            142 |     38427 |         1364144
+ Maine          |             50 |     26587 |         1329328
+ Rhode Island   |             55 |     19205 |         1056298
+ Montana        |             28 |     36891 |         1032949
+ Utah           |             30 |     99864 |          998640
+ South Dakota   |             16 |     53654 |          858469
+ North Dakota   |              6 |    126154 |          756927
+ Alaska         |             17 |     43437 |          738432
+ Vermont        |             43 |     14559 |          626042
+ Wyoming        |             15 |     39074 |          586107
+ New Hampshire  |             67 |     19860 |          443536
+ Delaware       |             44 |     21498 |          236484
+(50 rows)
+
+ ?column? 
+----------
+ Query 10
+(1 row)
+
+    fullname     
+-----------------
+ Brandon Libby
+ J.J. Todor
+ Jessamine Price
+ Lisa Osterman
+ Rich Lerner
+ Rich Small
+ Robert Slaven
+ Robin Woods
+ Tim Aten
+(9 rows)
+

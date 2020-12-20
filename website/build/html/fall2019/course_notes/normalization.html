@@ -1,0 +1,1924 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Normalization &mdash; dbms  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> dbms
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Answered Questions for Database Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html">CSCI 4380 Database Systems - Fall 2020</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fall2020/index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">dbms</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Normalization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/fall2019/course_notes/normalization.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="normalization">
+<h1>Normalization<a class="headerlink" href="#normalization" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>In this topic, we will learn about a mathematical way to argue why
+one data model is better than the other.</p></li>
+<li><p>We will learn principled methods and some algorithms
+(i.e. decomposition) to improve a “bad” data model.</p></li>
+<li><p>We will talk about importance of integrity constraints in database
+modeling.</p></li>
+</ul>
+</div>
+<div class="section" id="why-some-data-models-can-be-bad">
+<h2>Why some data models can be bad?<a class="headerlink" href="#why-some-data-models-can-be-bad" title="Permalink to this headline">¶</a></h2>
+<p>Suppose we are given the following MusicGroups relation (some values
+fictitious):</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 22%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Artist</p></th>
+<th class="head"><p>Genre</p></th>
+<th class="head"><p>DateFounded</p></th>
+<th class="head"><p>DateJoined</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Queen</p></td>
+<td><ol class="upperalpha simple" start="6">
+<li><p>Mercury</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1971</p></td>
+<td><p>1971</p></td>
+</tr>
+<tr class="row-odd"><td><p>Queen</p></td>
+<td><ol class="upperalpha simple" start="2">
+<li><p>May</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1971</p></td>
+<td><p>1972</p></td>
+</tr>
+<tr class="row-even"><td><p>Queen</p></td>
+<td><ol class="upperalpha simple" start="18">
+<li><p>Taylor</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1971</p></td>
+<td><p>1971</p></td>
+</tr>
+<tr class="row-odd"><td><p>Queen</p></td>
+<td><ol class="upperalpha simple" start="10">
+<li><p>Deacon</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1971</p></td>
+<td><p>1972</p></td>
+</tr>
+<tr class="row-even"><td><p>Beatles</p></td>
+<td><ol class="upperalpha simple" start="10">
+<li><p>Lennon</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1960</p></td>
+<td><p>1960</p></td>
+</tr>
+<tr class="row-odd"><td><p>Beatles</p></td>
+<td><ol class="upperalpha simple" start="16">
+<li><p>McCartney</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1960</p></td>
+<td><p>1960</p></td>
+</tr>
+<tr class="row-even"><td><p>Beatles</p></td>
+<td><ol class="upperalpha simple" start="18">
+<li><p>Starr</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1960</p></td>
+<td><p>1960</p></td>
+</tr>
+<tr class="row-odd"><td><p>Beatles</p></td>
+<td><ol class="upperalpha simple" start="7">
+<li><p>Harrison</p></li>
+</ol>
+</td>
+<td><p>Pop/Rock</p></td>
+<td><p>1960</p></td>
+<td><p>1960</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>What is the key of this relation? Which combination of attributes must
+be unique for each tuple?</p>
+<ul class="simple">
+<li><p>Group, Artist</p></li>
+<li><p>Remember that you cannot have missing values for the key
+attributes.</p></li>
+</ul>
+</li>
+<li><p>What types of issues do we see with this database?</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>We repeat information: Genre for a group is repeated for each
+artist.</p>
+<ul>
+<li><p>It is possible that we make an error and change the value for one
+tuple. Then, we are left with not knowing what the correct genre
+was.</p></li>
+</ul>
+</li>
+<li><p>What happens we delete all the artists in a group? We end up loosing
+information related to the group. Should they be coupled?</p></li>
+<li><p>What if a new group is formed with no artists? We had not foreseen that
+such a group exists. But, we cannot enter this as our data model does not
+allow it.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="normalization-overview">
+<h2>Normalization Overview<a class="headerlink" href="#normalization-overview" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given a relation, we will examine whether all the attributes in the
+relation should be in the same relation or should be split into multiple
+relations.</p></li>
+<li><p>Given the meaning of these attributes, we need to write down what real
+life conditions/constraints must be true.</p>
+<ul>
+<li><p>Can two music groups have the same name?</p></li>
+<li><p>Can two artists have the same name?</p></li>
+<li><p>Can an artist join a music group more than once?</p></li>
+</ul>
+</li>
+<li><p>Often the database designer will make some assumptions regarding these.</p>
+<ul>
+<li><p>Having constraints will help discovery of incorrect data.</p></li>
+<li><p>Choose the important constraints to track.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="functional-dependency">
+<h2>Functional Dependency<a class="headerlink" href="#functional-dependency" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A function dependency is a logical expression of the form X -&gt; Y such that</p>
+<ul class="simple">
+<li><p>X, Y are sets of attributes from the database schema</p></li>
+<li><p>X -&gt; Y means that whenever two tuples in a relation have the same
+values for attributes in X, then they must also have the same
+values for attributes in Y.</p></li>
+</ul>
+</li>
+<li><p>Functional dependencies are defined for a relation as constraints by
+the database designer based on the meaning of the attributes and the
+properties they represent</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MusicGroups</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">artist</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">dateFounded</span><span class="p">,</span> <span class="n">dateJoined</span><span class="p">)</span>
+
+<span class="n">name</span> <span class="o">-&gt;</span> <span class="n">genre</span> <span class="n">dateFounded</span>
+<span class="n">name</span> <span class="n">artist</span> <span class="o">-&gt;</span> <span class="n">dateJoined</span>
+</pre></div>
+</div>
+<ul>
+<li><p>name -&gt; genre dateFounded</p>
+<p>Means that given group name, there is a single genre and a single
+value for the dateFounded attribute</p>
+</li>
+<li><p>name artist -&gt; dateJoined</p>
+<p>Means that given a group name and an artist, there is a single
+dateJoined corresponding to the date the artist joined the group.</p>
+</li>
+<li><p>What if an artist joins the group multiple times? According to our
+data model, we are not going to store that. Remember, you define the
+rules for your database.</p></li>
+</ul>
+</li>
+<li><p>Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">People</span><span class="p">(</span><span class="n">Name</span><span class="p">,</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span><span class="p">,</span> <span class="n">InsCompAddress</span><span class="p">)</span>
+
+<span class="n">Name</span> <span class="o">-&gt;</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span>
+<span class="n">InsCompName</span> <span class="o">-&gt;</span> <span class="n">InsCompAddress</span>
+</pre></div>
+</div>
+</li>
+<li><p>Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Companies</span><span class="p">(</span><span class="n">company_name</span><span class="p">,</span> <span class="n">company_address</span><span class="p">,</span> <span class="n">date_founded</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">,</span> <span class="n">owner_name</span><span class="p">,</span> <span class="n">owner_title</span><span class="p">,</span> <span class="c1">#shares)</span>
+
+<span class="n">company_name</span>  <span class="o">-&gt;</span> <span class="n">company_address</span>
+<span class="n">company_name</span>  <span class="o">-&gt;</span> <span class="n">date_founded</span>
+<span class="n">company_name</span><span class="p">,</span> <span class="n">owner_id</span> <span class="o">-&gt;</span> <span class="n">owner_title</span>
+<span class="n">company_name</span><span class="p">,</span> <span class="n">owner_id</span> <span class="o">-&gt;</span> <span class="c1">#shares</span>
+<span class="n">company_name</span><span class="p">,</span> <span class="n">owner_title</span> <span class="o">-&gt;</span> <span class="n">owner_id</span>
+<span class="n">owner_id</span> <span class="o">-&gt;</span> <span class="n">owner_name</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Rules of this database according to these functional dependencies:</p></li>
+</ul>
+<blockquote>
+<div><ul>
+<li><p>A single owner can only hold any specific title</p>
+<p>company_name, owner_title -&gt; owner_id</p>
+</li>
+<li><p>An owner can have a single title within the company</p>
+<p>company_name, owner_id -&gt; owner_title</p>
+</li>
+<li><p>Each title is given to a single person within the company</p>
+<p>company_name, owner_title -&gt; owner_id</p>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="keys-and-functional-dependencies">
+<h2>Keys and functional dependencies<a class="headerlink" href="#keys-and-functional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Functional dependencies tell us what the keys are!</p></li>
+<li><p>For example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Student</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span>
+
+<span class="nb">id</span> <span class="o">-&gt;</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span>  <span class="p">(</span><span class="n">FD1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>means that all tuples with the same id must have a unique name and address.</p>
+</li>
+<li><p>Then id is the key! No two tuples can have the same id, but
+different name or address. So, id must be unique.</p></li>
+<li><p>But if the above is true, then we must also have that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">id</span> <span class="n">name</span> <span class="o">-&gt;</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span>  <span class="p">(</span><span class="n">FD2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, id, name is a key too. Which one is better? The smaller one!</p>
+</li>
+<li><p>Also, the functional dependency FD1 is stronger than FD2, i.e. you can
+obtain FD2 from FD1.</p></li>
+</ul>
+</div>
+<div class="section" id="functional-dependencies">
+<h2>Functional Dependencies<a class="headerlink" href="#functional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>For a given relation, we look at all valid set of functional
+dependencies together.</p></li>
+<li><p>We will use F to denote the set of all functional dependencies.</p>
+<ul>
+<li><p>All functional dependencies in F together tell us all the
+relevant rules for our relation, such as the type of tuples can we
+store.</p></li>
+<li><p>Given F, we can also infer new rules using the following inference
+rules.</p></li>
+</ul>
+</li>
+<li><p>Some functional dependencies may be removed if they are not needed
+and some may be simplified based on others. To do this, we will see
+some rules first.</p></li>
+</ul>
+</div>
+<div class="section" id="superkey-unique-attributes">
+<h2>Superkey: Unique Attributes<a class="headerlink" href="#superkey-unique-attributes" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a relation R(A1,…,An) and a set of functional dependencies
+F, a superkey (superset of keys) is a set of attributes B1,…,Bm
+such that</p>
+<ul>
+<li><p>B1,…,Bm imply all the attributes in relation R. This is called
+uniqueness constraint.</p>
+<p>No two tuples may have the same values for the attributes B1,…,Bm.</p>
+<p>In other words,</p>
+<dl>
+<dt>::</dt><dd><p>Given F:</p>
+<p>B1,…,Bm -&gt; A1,…,An</p>
+<p>is implied by the functional dependencies in F.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="keys">
+<h2>Keys<a class="headerlink" href="#keys" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given a relation R(A1,…,An) and a set of functional dependencies F,
+a key is a set of attributes B1,…,Bm such that</p>
+<ul>
+<li><p>B1,…,Bm is a superkey! This is called the uniqueness constraint.</p></li>
+<li><p>No subset of B1,…,Bm is a superkey. This is called the
+minimality constraint.</p></li>
+</ul>
+</li>
+<li><p>From now on we will use X, Y to represent a set of attributes.</p></li>
+</ul>
+</div>
+<div class="section" id="functional-dependency-inference">
+<h2>Functional Dependency Inference<a class="headerlink" href="#functional-dependency-inference" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a set of F functional dependencies, the closure F+ of the set
+is the set of all functional dependencies implied by F.</p></li>
+<li><p>A functional dependency X-&gt;Y is implied by a set F of functional
+dependencies if X-&gt;Y is in the closure.</p></li>
+<li><p>The rules below allow us to find whether a functional dependency
+is implied the others.</p>
+<p>The closure F+ is simply the set of all functional dependencies that
+can be found by applying all possible rules.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="functional-dependency-inference-rules">
+<h2>Functional Dependency Inference Rules<a class="headerlink" href="#functional-dependency-inference-rules" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p><strong>Trivial Functional Dependencies (Reflexivity)</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>If Y ⊆ X, then  X -&gt;Y is true for all relations.
+</pre></div>
+</div>
+<p>Proof. If two tuples have the same values for attributes in X, then
+it is already given that they have the same values for the
+attributes of Y.</p>
+</li>
+<li><p><strong>Splitting Rule</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Given</span> <span class="n">a</span> <span class="n">functional</span> <span class="n">dependency</span>
+
+<span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">B1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Bm</span>
+
+<span class="n">we</span> <span class="n">can</span> <span class="n">split</span> <span class="n">it</span> <span class="n">into</span> <span class="n">singletons</span> <span class="n">on</span> <span class="n">the</span> <span class="n">right</span> <span class="n">hand</span> <span class="n">side</span><span class="p">:</span>
+
+<span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">B1</span>
+<span class="o">....</span>
+<span class="o">....</span>
+<span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">Bm</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Combining Rule</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Given</span> <span class="n">functional</span> <span class="n">dependencies</span>
+
+<span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">B1</span>
+<span class="o">....</span>
+<span class="o">....</span>
+<span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">Bm</span>
+
+<span class="n">we</span> <span class="n">can</span> <span class="n">combine</span> <span class="n">the</span> <span class="n">attributes</span> <span class="n">on</span> <span class="n">the</span> <span class="n">right</span> <span class="n">hand</span> <span class="n">side</span><span class="p">:</span>
+
+<span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">B1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Bm</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Transitivity</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Given</span> <span class="n">functional</span> <span class="n">dependencies</span> <span class="n">X</span> <span class="o">-&gt;</span> <span class="n">Y</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">-&gt;</span> <span class="n">Z</span>
+<span class="n">we</span> <span class="n">can</span> <span class="n">conclude</span> <span class="n">that</span><span class="p">:</span> <span class="n">X</span> <span class="o">-&gt;</span> <span class="n">Z</span>
+</pre></div>
+</div>
+<p>for sets of attributes X, Y and Z.</p>
+</li>
+<li><p><strong>Augmentation</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">If</span> <span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span> <span class="o">-&gt;</span> <span class="n">B1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Bm</span> <span class="ow">and</span> <span class="n">given</span> <span class="n">attributes</span> <span class="n">C1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Ck</span>
+<span class="n">we</span> <span class="n">can</span> <span class="n">conclude</span> <span class="n">that</span> <span class="n">A1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">An</span><span class="p">,</span><span class="n">C1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Ck</span> <span class="o">-&gt;</span> <span class="n">B1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Bm</span><span class="p">,</span><span class="n">C1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Ck</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note that reflexivity, augmentation and transitivity are sufficient
+and necessary rules. The rest of the rules can be driven from these
+three.</p></li>
+</ul>
+<div class="section" id="inference-example-using-the-above-rules">
+<h3>Inference example using the above rules<a class="headerlink" href="#inference-example-using-the-above-rules" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Given: F = {A -&gt; BC, CD -&gt; F, BE -&gt; D} for R(A,B,C,D,E,F)
+
+Is  AE -&gt; CDF true?
+</pre></div>
+</div>
+<p>Apply all the inference rules to get this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BE</span> <span class="o">-&gt;</span> <span class="n">D</span>    <span class="p">(</span><span class="n">given</span><span class="p">)</span>
+<span class="n">BCE</span> <span class="o">-&gt;</span> <span class="n">CD</span>  <span class="p">(</span><span class="n">accumulation</span> <span class="n">of</span> <span class="n">BE</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="p">)</span>
+<span class="n">BCE</span> <span class="o">-&gt;</span> <span class="n">D</span>   <span class="p">(</span><span class="n">decomposition</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">-&gt;</span> <span class="n">BC</span>    <span class="p">(</span><span class="n">given</span><span class="p">)</span>
+<span class="n">AE</span> <span class="o">-&gt;</span> <span class="n">BCE</span>  <span class="p">(</span><span class="n">acculumulation</span><span class="p">)</span>
+<span class="n">AE</span> <span class="o">-&gt;</span> <span class="n">D</span>    <span class="p">(</span><span class="n">transitivity</span><span class="p">)</span>
+<span class="n">AE</span> <span class="o">-&gt;</span> <span class="n">BCDE</span> <span class="p">(</span><span class="n">combining</span> <span class="n">rule</span><span class="p">)</span>
+<span class="n">AE</span> <span class="o">-&gt;</span> <span class="n">CD</span>   <span class="p">(</span><span class="n">decomposition</span><span class="p">)</span>
+<span class="n">AE</span> <span class="o">-&gt;</span> <span class="n">F</span>    <span class="p">(</span><span class="n">transitivity</span><span class="p">)</span>
+<span class="n">AE</span> <span class="o">-&gt;</span> <span class="n">CDF</span>  <span class="p">(</span><span class="n">combining</span> <span class="n">rule</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li><p>Method 2: compute the closure of AE to find all that is implied by
+AE. See method below.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="closure-of-a-set-of-attributes">
+<h2>Closure of a set of attributes<a class="headerlink" href="#closure-of-a-set-of-attributes" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The closure of a set X of attributes given by X+ with respect to
+a set F of functional dependencies is the set of all attributes implied
+by X with respect to F.</p>
+<p>In other words, if Y=X+, then X-&gt;Y is in F+.</p>
+</li>
+<li><p>Given a set F of functional dependencies, the closure X+ of a set X
+of attributes is given by the following algorithm.</p>
+<ol class="arabic simple">
+<li><p>Initialize, X+ =  X</p></li>
+<li><p>Find any functional dependency Y -&gt; Z in F such that Y ⊆ X+, then
+X+ = X+ ∪ Z.</p></li>
+<li><p>Continue until X+ does not change.</p></li>
+</ol>
+</li>
+<li><p>Inference rule:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>If Y⊆X+ with respect to F then X-&gt;Y is implied by F (is in F+).
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="closure-example">
+<h2>Closure Example<a class="headerlink" href="#closure-example" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given A -&gt; BC, CD -&gt; E, BE -&gt; C</p>
+<ul>
+<li><p>AE closure must include AE (given AE, we know AE).</p></li>
+<li><p>Now given we know AE, what else can we conclude based on the above fds?</p>
+<ul>
+<li><p>AE + = {AE},   use  A -&gt; BC to get:</p></li>
+<li><p>AE + = {ABCE}   nothing else we can use. So, we are finished.</p></li>
+<li><p>This means:  AE -&gt; ABCE.</p></li>
+<li><p>We can also write it as:</p>
+<p>AE -&gt; A, AE -&gt; B, AE-&gt;C, AE-&gt;E</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="keys-revisited">
+<h2>Keys revisited<a class="headerlink" href="#keys-revisited" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A key for a relation R is a minimal set of attributes A1,..,An such
+that {A1,…,An}+ is the set of all attributes in R.</p></li>
+<li><p>Given:</p>
+<p>name -&gt; genre dateFounded</p>
+<p>name artist -&gt; dateJoined</p>
+<p>key: name artist</p>
+<p>{name artist}+ = {name, artist, genre, dateFounded, dateJoined}</p>
+</li>
+<li><p>Find the keys for the following relations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">G</span><span class="p">)</span>  <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BC</span><span class="p">,</span> <span class="n">AD</span><span class="o">-&gt;</span><span class="n">EF</span><span class="p">,</span> <span class="n">AC</span><span class="o">-&gt;</span><span class="n">G</span><span class="p">}</span>
+
+<span class="n">R2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">)</span> <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BC</span><span class="p">,</span> <span class="n">D</span><span class="o">-&gt;</span><span class="n">E</span><span class="p">}</span>
+
+<span class="n">R3</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">)</span> <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BC</span><span class="p">}</span>
+
+<span class="n">R4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">G</span><span class="p">)</span>  <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BCD</span><span class="p">,</span> <span class="n">BE</span><span class="o">-&gt;</span><span class="n">FG</span><span class="p">,</span> <span class="n">CG</span><span class="o">-&gt;</span><span class="n">A</span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="simplifying-the-set-of-functional-dependencies">
+<h2>Simplifying the set of functional dependencies<a class="headerlink" href="#simplifying-the-set-of-functional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given a key for a relation, we would like to argue whether the
+underlying model is a good model or not (using normal forms).</p></li>
+<li><p>If the model is not good, i.e. does not satisfy a certain normal
+form, we can improve it by decomposition.</p></li>
+<li><p>To properly apply decomposition, we need to make sure that the functional
+dependencies do not have any redundant information that may result in
+non-optimal decompositions.</p></li>
+<li><p>We will revisit the closure of all functional dependencies to
+accomplish this.</p></li>
+</ul>
+</div>
+<div class="section" id="closure-of-a-set-of-functional-dependencies-revisited">
+<h2>Closure of a set of functional dependencies (revisited)<a class="headerlink" href="#closure-of-a-set-of-functional-dependencies-revisited" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Closure F+ of a set F of function dependencies is the set of all functional
+dependencies that can be inferred by the given set of inference rules.</p>
+<blockquote>
+<div><ul>
+<li><p>Closure F+ includes all dependencies in F.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>F ⊆ F+
+</pre></div>
+</div>
+</li>
+<li><p>Closure includes all trivial functional dependencies.</p></li>
+<li><p>Closure also includes all other non-trivial dependencies that can be
+inferred by using the above rules.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Two sets of functional dependencies F1 and F2 over the same relation
+are equivalent, if they have the same closure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F1</span> <span class="n">equivalent</span> <span class="n">F2</span> <span class="n">iff</span> <span class="n">F1</span><span class="o">+</span> <span class="o">=</span> <span class="n">F2</span><span class="o">+</span>
+</pre></div>
+</div>
+<p>In essence, two functional dependencies with the same closure have
+the same meaning.</p>
+</li>
+<li><p>For example F1 and F2 below are equivalent:</p></li>
+</ul>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F1</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BC</span><span class="p">,</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">DE</span><span class="p">,</span> <span class="n">E</span><span class="o">-&gt;</span><span class="n">F</span><span class="p">,</span> <span class="n">AB</span><span class="o">-&gt;</span><span class="n">DF</span><span class="p">}</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BC</span><span class="p">,</span> <span class="n">AB</span><span class="o">-&gt;</span><span class="n">DE</span><span class="p">,</span> <span class="n">E</span><span class="o">-&gt;</span><span class="n">F</span><span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul>
+<li><p>How can you check two sets F1 and F2 are equivalent?</p>
+<ul>
+<li><p>First check that each functional dependency in F1 is implied by F2.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>For each X-&gt;Y in F1:
+    compute X+ using F2 and check if Y ⊆ X+
+</pre></div>
+</div>
+<p>This proves that F1+ ⊆ F2+.</p>
+</li>
+<li><p>Then check that each functional dependency in F2 is implied by F1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>For each X-&gt;Y in F2:
+    compute X+ using F1 and check if Y ⊆ X+
+</pre></div>
+</div>
+<p>This proves that F2+ ⊆ F1+.</p>
+</li>
+<li><p>If both are true, then the closures must be the same: F1+ = F2+.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="basis-of-functional-dependencies">
+<h2>Basis of Functional Dependencies<a class="headerlink" href="#basis-of-functional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Basis: A basis is a set of functional dependencies such that
+there is only one attribute on the right hand side of a functional
+dependency.</p>
+<p>It is easy to convert any functional dependency set to a basis by
+using the splitting rule.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">BC</span><span class="p">,</span> <span class="n">CD</span><span class="o">-&gt;</span><span class="n">EF</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>convert to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span><span class="o">-&gt;</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="o">-&gt;</span><span class="n">C</span><span class="p">,</span> <span class="n">CD</span><span class="o">-&gt;</span><span class="n">E</span><span class="p">,</span> <span class="n">CD</span><span class="o">-&gt;</span><span class="n">F</span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Remember, split the right hand side. The left hand side should not
+be changed unless it is implied by other functional dependencies
+as we will see next.</p></li>
+</ul>
+</div>
+<div class="section" id="minimal-set-of-functional-dependencies">
+<h2>Minimal Set of Functional Dependencies<a class="headerlink" href="#minimal-set-of-functional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A basis F is minimal if there is no other basis F1 that can be obtained
+from F by</p>
+<ul class="simple">
+<li><p>either removing some functional dependencies</p></li>
+<li><p>or by removing some attributes from the left hand side of functional
+dependencies</p></li>
+</ul>
+<p>such that F and F1 are equivalent (i.e. they have the same closure).</p>
+</li>
+</ul>
+</div>
+<div class="section" id="finding-a-minimal-basis">
+<h2>Finding a minimal basis<a class="headerlink" href="#finding-a-minimal-basis" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Input a basis F.</p>
+<ul>
+<li><p>Step 1.</p>
+<p>For each fd X -&gt; Y in the set F, check if F - { X -&gt; Y } implies X -&gt; Y.
+If so, remove X -&gt; Y.</p>
+<p>Note: all trivial functional dependencies follow this rule.</p>
+</li>
+<li><p>Step 2.</p>
+<p>For each fd XW -&gt; Y in the set F, check if X+ is the same
+with respect F and (F - { XW -&gt; Y }) ∪ { X -&gt; Y }.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>F = {ABC -&gt; D,  AB -&gt; E, E -&gt; C, ABE -&gt; C, E -&gt; F, A -&gt; A}</p>
+<ul>
+<li><p>Step 1. Can we remove ABE -&gt; C ?</p>
+<p>Given F,  ABE+ = {A,B,C,D,E,F}</p>
+<p>Given F1 = {ABC -&gt; D,  AB -&gt; E, E -&gt; C, E -&gt; F},</p>
+<p>ABE+ = {A,B,C,D,E,F}.</p>
+<p>As they are equivalent, we can remove ABE -&gt; C.</p>
+<p>We can also remove any functional dependency that is trivial, i.e. A -&gt; A.</p>
+</li>
+</ul>
+</li>
+<li><p>F = {ABC -&gt; D,  AB -&gt; E, E -&gt; C, E -&gt; F}</p>
+<ul>
+<li><p>Step 2. Can we replace ABC -&gt;D with AB -&gt; D ?</p>
+<p>Given F:</p>
+<p>AB+ = {A,B,C,D,E,F}</p>
+<p>Given F2={AB -&gt; D,  AB -&gt; E, E -&gt; C, E -&gt; F}:</p>
+<p>AB+ = {A,B,C,D,E,F}.</p>
+<p>As they are equivalent, we can replace with F with F2.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Normalization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a schema, are there any problems with the way the attributes
+are grouped into the relations?</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">Name</span><span class="p">,</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span><span class="p">,</span> <span class="n">InsCompAddress</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>When two people have the same insurance company (InsCompName), then
+the insurance company address of these two people should also be the
+same.</p>
+<ul class="simple">
+<li><p>Possible problems:</p>
+<ol class="arabic simple">
+<li><p>If we insert a new person with the same insurance company but
+different address, the database becomes inconsistent. Addition
+of an atomic unit of information should not cause inconsistency.</p></li>
+<li><p>If we delete a person with a specific insurance company X and
+if there are no other people with this insurance company, we
+loose the information about where this company is located.</p></li>
+<li><p>If we update the insurance information for one person but not
+the others with the same insurance, then the database becomes
+inconsistent -similar to insertion above.</p></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="normal-forms">
+<h2>Normal Forms<a class="headerlink" href="#normal-forms" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Normal forms are introduced as rules that help avoid the above
+problems, based on the functional dependencies true for this
+relation.</p></li>
+<li><p>We have already seen first normal form: all attributes should
+have simple values.</p></li>
+</ul>
+</div>
+<div class="section" id="boyce-codd-normal-form-bcnf">
+<h2>Boyce-Codd Normal Form (BCNF)<a class="headerlink" href="#boyce-codd-normal-form-bcnf" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given a set F of functional dependencies, a set R is said to be in
+Boyce-Codd normal form if all functional dependencies X -&gt; Y in F
+are</p>
+<ul>
+<li><p>either trivial, i.e. Y ⊆ X</p></li>
+<li><p>or has a superkey on the left side (i.e. X is a superkey).</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="bcnf">
+<h2>BCNF<a class="headerlink" href="#bcnf" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">Name</span><span class="p">,</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span><span class="p">,</span> <span class="n">InsCompAddress</span><span class="p">)</span>
+
+<span class="n">Name</span> <span class="o">-&gt;</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span>
+<span class="n">InsCompName</span> <span class="o">-&gt;</span> <span class="n">InsCompAddress</span>
+
+<span class="n">Key</span><span class="p">:</span> <span class="n">Name</span>
+</pre></div>
+</div>
+<p>Not in BCNF since the second f.d. does not have a superkey on the
+left (InsCompName is not a superkey).</p>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MusicGroup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">artist</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">dateFounded</span><span class="p">,</span> <span class="n">dateJoined</span><span class="p">)</span>
+
+<span class="n">name</span> <span class="o">-&gt;</span> <span class="n">genre</span> <span class="n">dateFounded</span>
+<span class="n">name</span> <span class="n">artist</span> <span class="o">-&gt;</span> <span class="n">dateJoined</span>
+
+<span class="n">Key</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="n">artist</span>
+</pre></div>
+</div>
+<p>Not in BCNF since the first f.d. violates it (name is not a superkey)</p>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BankAccount</span><span class="p">(</span><span class="n">routingno</span><span class="p">,</span> <span class="n">accountno</span><span class="p">,</span> <span class="n">userid</span><span class="p">,</span> <span class="n">bankname</span><span class="p">,</span> <span class="n">bankaddress</span><span class="p">)</span>
+
+<span class="n">userid</span><span class="p">,</span> <span class="n">routingno</span><span class="p">,</span> <span class="n">accountno</span> <span class="o">-&gt;</span> <span class="n">bankname</span><span class="p">,</span> <span class="n">bankaddress</span>
+<span class="n">userid</span><span class="p">,</span> <span class="n">bankname</span><span class="p">,</span> <span class="n">accountno</span> <span class="o">-&gt;</span> <span class="n">routingno</span>
+
+<span class="n">Key</span><span class="p">:</span> <span class="n">userid</span><span class="p">,</span> <span class="n">routingno</span><span class="p">,</span> <span class="n">accountno</span>  <span class="ow">or</span> <span class="n">userid</span><span class="p">,</span> <span class="n">bankname</span><span class="p">,</span> <span class="n">accountno</span>
+</pre></div>
+</div>
+<p>In BCNF because both keys have a superkey on the left hand side.</p>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Student</span><span class="p">(</span><span class="n">Id</span><span class="p">,</span> <span class="n">lastname</span><span class="p">,</span> <span class="n">firstname</span><span class="p">,</span> <span class="n">SSN</span><span class="p">,</span> <span class="n">firstmajor</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+
+<span class="nb">id</span> <span class="o">-&gt;</span> <span class="n">lastname</span> <span class="n">firstname</span> <span class="n">ssn</span> <span class="n">firstmajor</span> <span class="n">year</span> <span class="n">email</span>
+<span class="n">ssn</span> <span class="o">-&gt;</span> <span class="nb">id</span> <span class="n">lastname</span> <span class="n">firstname</span> <span class="n">firstmajor</span> <span class="n">year</span> <span class="n">email</span>
+<span class="n">email</span> <span class="o">-&gt;</span> <span class="n">lastname</span> <span class="n">firstname</span> <span class="nb">id</span> <span class="n">ssn</span> <span class="n">firstmajor</span> <span class="n">year</span>
+
+<span class="n">Key</span><span class="p">:</span> <span class="nb">id</span> <span class="ow">or</span> <span class="n">ssn</span> <span class="ow">or</span> <span class="n">email</span>
+</pre></div>
+</div>
+<p>In BCNF because all functional dependencies have a superkey on the left.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="prime-attribute">
+<h2>Prime attribute<a class="headerlink" href="#prime-attribute" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given a relation R and a set of functional dependencies, a prime
+attribute is an attribute that appears in a key for R.</p></li>
+</ul>
+</div>
+<div class="section" id="third-normal-form-3nf">
+<h2>Third Normal Form (3NF)<a class="headerlink" href="#third-normal-form-3nf" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a set F of functional dependencies, a set R is said to be in
+third normal form if all functional dependencies X -&gt; Y in F are</p>
+<ul class="simple">
+<li><p>either trivial, i.e. Y ⊆ X,</p></li>
+<li><p>or has a superkey on the left side (i.e. X is a superkey),</p></li>
+<li><p>or has only prime attributes on the right hand side (i.e. all
+attributes in Y are prime attributes).</p></li>
+</ul>
+</li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Address</span><span class="p">(</span><span class="n">city</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">street</span><span class="p">,</span> <span class="nb">zip</span><span class="p">)</span>
+
+<span class="n">city</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">street</span> <span class="o">-&gt;</span> <span class="nb">zip</span>
+<span class="nb">zip</span> <span class="o">-&gt;</span> <span class="n">city</span><span class="p">,</span> <span class="n">state</span>
+
+<span class="n">Key</span><span class="p">:</span>  <span class="n">city</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">street</span>  <span class="ow">or</span> <span class="nb">zip</span><span class="p">,</span> <span class="n">street</span>
+<span class="n">Prime</span> <span class="n">attributes</span><span class="p">:</span> <span class="n">city</span><span class="p">,</span> <span class="n">street</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="nb">zip</span>
+</pre></div>
+</div>
+<p>This is not in BCNF because the second functional dependency does not
+have a superkey on the left. However, as city and state are both prime
+attributes, this relation is in 3NF.</p>
+<ul class="simple">
+<li><p>First functional dependency is not trivial but has a superkey on the left.</p></li>
+<li><p>The second functional dependency is not trivial, does not have a
+superkey on the left, but all attributes on the right are prime
+attributes.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="bcnf-and-3nf-relations">
+<h2>BCNF and 3NF relations<a class="headerlink" href="#bcnf-and-3nf-relations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>All relations that are in BCNF are also in 3NF. The reverse is not true.</p>
+<ul>
+<li><p>In the above example, Address is in 3NF but not in BCNF.</p></li>
+</ul>
+</li>
+<li><p>BCNF is the golden standard, it is desirable to put all relations in
+BCNF.</p></li>
+<li><p>If a relation is not in BCNF, we need to decompose the it to get relations
+that are in BCNF.</p>
+<ul>
+<li><p>There is no single way to do this. You need to run the algorithm
+multiple ways and choose the most reasonable solution.</p></li>
+</ul>
+</li>
+<li><p>If a relation is not in 3NF, there is a simple algorithm to
+decompose it into relations that are in 3NF.</p>
+<ul>
+<li><p>It will produce a single result.</p></li>
+</ul>
+</li>
+<li><p>We will now see how to do decompositions!</p></li>
+</ul>
+</div>
+<div class="section" id="decomposition">
+<h2>Decomposition<a class="headerlink" href="#decomposition" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>For example, we know that the following relation is not in BCNF:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">Name</span><span class="p">,</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span><span class="p">,</span> <span class="n">InsCompAddress</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because insurance information belongs in a different relation than people.
+A better model would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span><span class="p">(</span><span class="n">Name</span><span class="p">,</span> <span class="n">Phone</span><span class="p">,</span> <span class="n">InsCompName</span><span class="p">),</span>
+<span class="n">Insurance</span><span class="p">(</span><span class="n">InsCompName</span><span class="p">,</span> <span class="n">InsCompAddress</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>This act of splitting the relation is called decomposition.</p>
+<p>The objective is to have relations that are atomic, contain only
+information relevant to the key as a whole, have fever null values.</p>
+<ul>
+<li><p>Given a relation R and functional dependencies F, a decomposition is
+given by</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R1</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span><span class="o">..</span><span class="p">,</span><span class="n">An</span><span class="p">),</span> <span class="n">F1</span>
+<span class="n">R2</span><span class="p">(</span><span class="n">B1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span><span class="n">Bm</span><span class="p">),</span> <span class="n">F2</span>
+</pre></div>
+</div>
+<p>such that</p>
+<ul>
+<li><p>Atttributes in R1 and R2 together are equivalent to attributes in R</p></li>
+<li><p>F1 only involves attributes in R1, and F1 ⊆ F+</p></li>
+<li><p>F2 only involves attributes in R2, and F2 ⊆ F+</p></li>
+<li><p>Tuples in R1 and R2 are obtained from R:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}R1 = \Pi_{A1,...,An}\, R\\R2 = \Pi_{B1,...,BM}\, R\end{aligned}\end{align} \]</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="decomposition-properties">
+<h2>Decomposition Properties<a class="headerlink" href="#decomposition-properties" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Suppose we are given a decomposition</p>
+<p>R1(A1,..,An), F1  and R2(B1,…,Bm), F2</p>
+<p>of a relation R with functional dependencies F.</p>
+</li>
+<li><p>The decomposition is dependency preserving iff</p>
+<div class="math notranslate nohighlight">
+\[(F1 \cup F2)+ = F+\]</div>
+</li>
+<li><p>The decomposition is lossless if we are guaranteed that</p>
+<div class="math notranslate nohighlight">
+\[R1 * R2 = R\]</div>
+<p>The natural join of tuples is guaranteed to return the same relation
+as R.</p>
+</li>
+<li><p>We will now see how to create decompositions that satisfy these
+conditions.</p></li>
+</ul>
+</div>
+<div class="section" id="projecting-functional-dependencies">
+<h2>Projecting functional dependencies<a class="headerlink" href="#projecting-functional-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>The functional dependencies for a decomposition are
+found by projecting the original set F of functional dependencies
+on the decomposed relation.</p></li>
+<li><p>Given:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">),</span> <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span> <span class="o">-&gt;</span> <span class="n">B</span><span class="p">,</span> <span class="n">B</span> <span class="o">-&gt;</span> <span class="n">CD</span><span class="p">}</span>
+
+<span class="n">Decompose</span> <span class="n">into</span><span class="p">:</span> <span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span> <span class="ow">and</span> <span class="n">R2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>What are the maximal set of functional dependencies implied by
+original set, but only involve attributes in R1 or R2?</p>
+</li>
+<li><p>First find all (non-trivial) functional dependencies implied by the
+above:</p>
+<p>A -&gt; B, B -&gt; C, A -&gt; C, AB -&gt; C, etc.</p>
+</li>
+<li><p>Now, for R1(A,B): choose the subset of these that have only A and B
+(A -&gt; B)</p></li>
+<li><p>For R2(A,C,D): choose the subset that have only A, C and D (A -&gt; C)</p></li>
+<li><p>Simplify each set to be a minimal basis!</p></li>
+<li><p>Is this decomposition after choosing best functional dependencies
+preserve them all?</p>
+<p>In other words, did we loose something by decomposing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">),</span> <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span> <span class="o">-&gt;</span> <span class="n">B</span><span class="p">,</span> <span class="n">B</span> <span class="o">-&gt;</span> <span class="n">C</span><span class="p">}</span>
+
+<span class="n">into</span><span class="p">:</span>
+
+<span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>  <span class="n">F1</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span> <span class="o">-&gt;</span> <span class="n">B</span><span class="p">}</span>
+<span class="n">R2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">)</span> <span class="n">F2</span> <span class="o">=</span> <span class="p">{</span><span class="n">A</span> <span class="o">-&gt;</span> <span class="n">C</span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>We check if this decomposition is dependency preserving.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>F1 ⋃ F2 and F are equivalent
+
+F1 ⋃ F2 = {A -&gt; B, B -&gt; C}
+F = {A -&gt; B, A -&gt; C }
+</pre></div>
+</div>
+</li>
+<li><p>Are the two equivalent?</p>
+<p>F1: A -&gt; B, B -&gt; C</p>
+<p>F1 implies everything in F2</p>
+<p>F2: A -&gt; B, A -&gt; C</p>
+<p>F2 does not imply everything in F1 (i.e. B -&gt; C)</p>
+<p>B+ = {B}, does not include C.</p>
+<p>Hence, F1 and F2 are not equivalent.
+Actually, F1 is more strict than F2.</p>
+<p>This means that this decomposition is not dependency preserving as B
+-&gt; C is lost!</p>
+</li>
+</ul>
+</div>
+<div class="section" id="projecting-functional-dependencies-algorithm">
+<h2>Projecting functional dependencies (Algorithm)<a class="headerlink" href="#projecting-functional-dependencies-algorithm" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Suppose we are given a set of functional dependencies F for a
+relation R. We decompose the relation to a subset of the attributes
+L, R1 = ΠL R.</p></li>
+<li><p>The functional dependencies that hold for R1 are computed as follows:</p>
+<ul>
+<li><p>For all possible subsets X of L, compute X+ with respect to F.</p></li>
+<li><p>For all attributes A in X+ that are in L, add the dependency X -&gt; A
+to the projection.</p></li>
+<li><p>Simplify the basis to find a minimal basis.</p></li>
+</ul>
+</li>
+<li><p>For example, for R2 above, we need to compute: A+,C+,D+,AC+,AD+,CD+.</p></li>
+</ul>
+</div>
+<div class="section" id="dependency-preserving">
+<h2>Dependency Preserving<a class="headerlink" href="#dependency-preserving" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a set F of functional dependencies for R, a decomposition R
+into R1, R2 is dependency preserving if</p>
+<ul>
+<li><p>Let F1 be the projection of F onto R1</p></li>
+<li><p>Let F2 be the projection of F onto R2</p></li>
+<li><p>If F1 ∪ F2 ≡ F then the decomposition is dependency preserving.</p>
+<p>This is the same as checking: (F1 ∪ F2)+ =  F+</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="chase-test-for-lossless-decomposition">
+<h2>Chase test for lossless decomposition<a class="headerlink" href="#chase-test-for-lossless-decomposition" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Recall that a decomposition is lossless if we are guaranteed that</p>
+<div class="math notranslate nohighlight">
+\[R1 * R2 = R\]</div>
+<p>The natural join of tuples is guaranteed to return the same relation
+as R.</p>
+</li>
+<li><p>The chase test for lossless decomposition works as follows:</p>
+<ul class="simple">
+<li><p>Given a decomposition R1,…,Rn we construct a relation R with a
+tuple for each decomposition. For each attribute, we will use a
+symbol (usually a lowercase letter).</p></li>
+<li><p>The tuple for relation Ri has the specific symbol for each
+attribute in the relation. But, the symbols for the attributes in
+Ri have no subscript. The remaining symbols have subscript i.</p></li>
+</ul>
+</li>
+<li><p>Given a functional dependency X -&gt; Y, we find two tuples t1, t2 such
+that the attributes in X are the same for these tuples. Then, we set
+attributes in Y for these two tuples to be the same as follows:</p>
+<ul class="simple">
+<li><p>If the attributes have both subscript, then set one to be equivalent
+to the other arbitrarily.</p></li>
+<li><p>If one of the attributes have no subscript, then change the other so
+that it has no subscript as well.</p></li>
+</ul>
+</li>
+<li><p>We continue to apply the functional dependencies until we find a
+tuple with no subscripts, which is a proof that the decomposition is
+lossless, and stop.</p></li>
+<li><p>If after we apply all the functional dependencies, there are no
+tuples without a subscript, then this decomposition is
+lossy. Furthermore, the resulting table is a counter example: if you
+decompose this table and join back, you will get more tuples than the
+original table.</p></li>
+</ul>
+</div>
+<div class="section" id="chase-algorithm-examples">
+<h2>Chase Algorithm Examples<a class="headerlink" href="#chase-algorithm-examples" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Given</span> <span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="ow">and</span> <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">C</span> <span class="o">-&gt;</span> <span class="n">B</span><span class="p">}</span>
+<span class="n">Decompositions</span> <span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">C</span><span class="p">)</span> <span class="ow">and</span> <span class="n">R2</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We have following starting relation:</p>
+</li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b1</p></td>
+<td><p>c</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Apply C-&gt;B to get:</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>This is the point we stop. This decomposition is losless as the
+first tuple is without a subscript.</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>   <span class="n">F</span><span class="o">=</span> <span class="p">{</span><span class="n">B</span><span class="o">-&gt;</span><span class="n">E</span><span class="p">,</span> <span class="n">EF</span><span class="o">-&gt;</span><span class="n">C</span><span class="p">,</span> <span class="n">BC</span><span class="o">-&gt;</span><span class="n">A</span><span class="p">,</span> <span class="n">AD</span><span class="o">-&gt;</span><span class="n">E</span><span class="p">}</span>
+<span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>
+<span class="n">R2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">)</span>
+<span class="n">R3</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+<th class="head"><p>E</p></th>
+<th class="head"><p>F</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d1</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+<tr class="row-odd"><td><p>a</p></td>
+<td><p>b2</p></td>
+<td><p>c2</p></td>
+<td><p>d</p></td>
+<td><p>e</p></td>
+<td><p>f2</p></td>
+</tr>
+<tr class="row-even"><td><p>a3</p></td>
+<td><p>b</p></td>
+<td><p>c3</p></td>
+<td><p>d</p></td>
+<td><p>e3</p></td>
+<td><p>f</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Apply B-&gt;E to rows 1 and 3.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+<th class="head"><p>E</p></th>
+<th class="head"><p>F</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d1</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+<tr class="row-odd"><td><p>a</p></td>
+<td><p>b2</p></td>
+<td><p>c2</p></td>
+<td><p>d</p></td>
+<td><p>e</p></td>
+<td><p>f2</p></td>
+</tr>
+<tr class="row-even"><td><p>a3</p></td>
+<td><p>b</p></td>
+<td><p>c3</p></td>
+<td><p>d</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Apply EF-&gt;C to rows 1 and 3.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+<th class="head"><p>E</p></th>
+<th class="head"><p>F</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d1</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+<tr class="row-odd"><td><p>a</p></td>
+<td><p>b2</p></td>
+<td><p>c2</p></td>
+<td><p>d</p></td>
+<td><p>e</p></td>
+<td><p>f2</p></td>
+</tr>
+<tr class="row-even"><td><p>a3</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Apply BC-&gt;A to rows 1 and 3.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+<th class="head"><p>E</p></th>
+<th class="head"><p>F</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d1</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+<tr class="row-odd"><td><p>a</p></td>
+<td><p>b2</p></td>
+<td><p>c2</p></td>
+<td><p>d</p></td>
+<td><p>e</p></td>
+<td><p>f2</p></td>
+</tr>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Apply AD-&gt;E to rows 2 and 3.</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+<th class="head"><p>D</p></th>
+<th class="head"><p>E</p></th>
+<th class="head"><p>F</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d1</p></td>
+<td><p>e1</p></td>
+<td><p>f</p></td>
+</tr>
+<tr class="row-odd"><td><p>a</p></td>
+<td><p>b2</p></td>
+<td><p>c2</p></td>
+<td><p>d</p></td>
+<td><p>e</p></td>
+<td><p>f2</p></td>
+</tr>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+<td><p>d</p></td>
+<td><p>e</p></td>
+<td><p>f</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>The last row has no subscripted letters, hence this is a lossless
+decomposition.</p></li>
+<li><p>Example:</p>
+<dl class="simple">
+<dt>::</dt><dd><p>R(A,B,C) {A-&gt;C}
+R1(A,B)
+R2(B,C)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Cannot apply any functional dependencies and this relation is a
+lossy.</p>
+<p>We can use the above relation as proof of this:</p>
+<p>R1:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>R2:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>b</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>R1*R2 (natural join) results in a different relation than R:</p>
+</div></blockquote>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>A</p></th>
+<th class="head"><p>B</p></th>
+<th class="head"><p>C</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c1</p></td>
+</tr>
+<tr class="row-odd"><td><p>a</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+<tr class="row-even"><td><p>a2</p></td>
+<td><p>b</p></td>
+<td><p>c</p></td>
+</tr>
+<tr class="row-odd"><td><p>a2</p></td>
+<td><p>b</p></td>
+<td><p>c1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="objectives-for-decomposition-methods">
+<h2>Objectives for Decomposition Methods<a class="headerlink" href="#objectives-for-decomposition-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>If we are decomposing relations to obtain BCNF or 3NF relations:</p>
+<ul>
+<li><p>All our decompositions must be lossless</p></li>
+<li><p>It is highly desirable that decompositions are dependency
+preserving, but that may not always be possible.</p>
+<p>In this case, choose the least important dependencies to let go.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="decomposition-into-bcnf">
+<h2>Decomposition into BCNF<a class="headerlink" href="#decomposition-into-bcnf" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a set of functional dependencies F for a relation R(A1,…,An)
+that violate BCNF,</p>
+<ol class="arabic simple">
+<li><p>Convert F to minimal basis</p></li>
+<li><p>Find a functional dependency X -&gt; Y that violate BCNF</p>
+<ul class="simple">
+<li><p>Compute X+</p></li>
+<li><p>Decompose R into two: a relation R1 containing attributes
+in X+ and a relation containing attributes {A1,…,An} - (X+ - {X}).</p></li>
+<li><p>Find projection of f.d.s into R1 and R2, now recursively apply
+BCNF decomposition to R1 and R2 (with corresponding set of
+functional dependencies) until all the relations are in BCNF.</p></li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MusicGroup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">artist</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">dateFounded</span><span class="p">,</span> <span class="n">dateJoined</span><span class="p">)</span>
+
+<span class="n">name</span> <span class="o">-&gt;</span> <span class="n">genre</span> <span class="n">dateFounded</span>
+
+<span class="n">name</span> <span class="n">artist</span> <span class="o">-&gt;</span> <span class="n">dateJoined</span>
+
+<span class="n">Key</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="n">artist</span>
+
+<span class="n">Given</span> <span class="n">name</span> <span class="o">-&gt;</span> <span class="n">genre</span> <span class="n">dateFounded</span> <span class="n">violates</span> <span class="n">BCNF</span><span class="p">,</span> <span class="n">decompose</span> <span class="n">into</span><span class="p">:</span>
+
+<span class="n">R1</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">dateFounded</span><span class="p">),</span> <span class="n">name</span> <span class="o">-&gt;</span> <span class="n">genre</span> <span class="n">dateFounded</span>
+
+<span class="n">R2</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">artist</span><span class="p">,</span> <span class="n">dateJoined</span><span class="p">),</span> <span class="n">name</span> <span class="n">artist</span> <span class="o">-&gt;</span> <span class="n">dateJoined</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="notes-about-bcnf-decomposition">
+<h2>Notes about BCNF Decomposition<a class="headerlink" href="#notes-about-bcnf-decomposition" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>BCNF decomposition algorithm is non-deterministic. Depending on the
+choice of functional dependency you choose in each step, you may get
+a different output.</p>
+<p>You must use judgment of which decomposition results in a better data
+model.</p>
+</li>
+<li><p>While BCNF decomposition is lossless, it is not always guaranteed
+to be dependency preserving.</p></li>
+<li><p>Also, sometimes BCNF may result in unintuitive results.</p></li>
+<li><p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tracks</span><span class="p">(</span><span class="n">album</span><span class="p">,</span> <span class="n">trackNo</span><span class="p">,</span> <span class="n">song</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
+<span class="n">album</span> <span class="n">trackNo</span> <span class="o">-&gt;</span> <span class="n">song</span>
+
+<span class="n">song</span> <span class="n">version</span> <span class="n">album</span> <span class="o">-&gt;</span> <span class="n">trackNo</span>
+
+<span class="n">Key</span><span class="p">:</span>  <span class="n">song</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">album</span>   <span class="ow">or</span> <span class="n">album</span><span class="p">,</span> <span class="n">trackNo</span><span class="p">,</span> <span class="n">version</span>
+
+<span class="n">Not</span> <span class="ow">in</span> <span class="n">BCNF</span> <span class="n">due</span> <span class="n">to</span> <span class="n">album</span> <span class="n">trackNo</span> <span class="o">-&gt;</span> <span class="n">song</span>
+</pre></div>
+</div>
+<p>BCNF Decomposition requires us to create relations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tracks1</span><span class="p">(</span><span class="n">album</span><span class="p">,</span> <span class="n">trackNo</span><span class="p">,</span> <span class="n">song</span><span class="p">)</span>   <span class="n">album</span> <span class="n">trackNo</span> <span class="o">-&gt;</span> <span class="n">song</span>
+
+<span class="n">tracks2</span><span class="p">(</span><span class="n">song</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>This decomposition is not desirable for two reasons:</p>
+<ul class="simple">
+<li><p>The second dependency is lost: there is no way now to check for
+it after decomposition.</p></li>
+<li><p>These four attributes semantically belong together, but BCNF
+decomposition is forcing us to divide them into different relations.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="nf-decomposition-algorithm">
+<h2>3NF decomposition algorithm<a class="headerlink" href="#nf-decomposition-algorithm" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Given a set F of functional dependencies that form a minimal basis
+for a relation R, use the combining rule for F to combine all f.d.s
+with the same left hand side. (this is an optional step as discussed
+in the example below)</p>
+<ul>
+<li><p>Decomp = {}</p></li>
+<li><p>For each functional dependency X -&gt; Y in F:</p>
+<ul>
+<li><p>If there is no relation in Decomp that contains all the
+attributes in X and Y then add a relation with attributes X∪Y to
+Decomp.</p></li>
+</ul>
+</li>
+<li><p>If there are no relations in Decomp that have all the attributes
+of one of the keys of R then, add a new relation to Decomp that
+contain all the attributes in one of the keys of R.</p></li>
+<li><p>Simplify Decomp: If R1,R2 are in Decomp but R2 contains all the
+attributes in R1 then remove R1.</p></li>
+</ul>
+</li>
+<li><p>The algorithm guarantees that</p>
+<ul>
+<li><p>the resulting relations are in 3NF,</p></li>
+<li><p>the decomposition is dependency preserving, and</p></li>
+<li><p>the decomposition is lossless</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="nf-decomposition-examples">
+<h2>3NF Decomposition Examples<a class="headerlink" href="#nf-decomposition-examples" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>  <span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">AB</span> <span class="o">-&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">AB</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">,</span> <span class="n">C</span> <span class="o">-&gt;</span> <span class="n">A</span><span class="p">,</span> <span class="n">BC</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="p">}</span>
+
+<span class="n">Key</span><span class="p">:</span> <span class="n">ABE</span> <span class="ow">or</span> <span class="n">BCE</span> <span class="p">(</span><span class="ow">not</span> <span class="ow">in</span> <span class="mi">3</span><span class="n">NF</span> <span class="ow">or</span> <span class="n">BCNF</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Before decomposing, join the right hand sides for F to get:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="p">{</span><span class="n">AB</span> <span class="o">-&gt;</span> <span class="n">CF</span><span class="p">,</span> <span class="n">C</span> <span class="o">-&gt;</span> <span class="n">A</span><span class="p">,</span> <span class="n">BC</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="p">}</span>
+
+<span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>    <span class="p">{</span><span class="n">AB</span> <span class="o">-&gt;</span> <span class="n">CF</span><span class="p">,</span> <span class="n">C</span> <span class="o">-&gt;</span> <span class="n">A</span><span class="p">}</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">AB</span>
+
+<span class="n">R2</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">)</span> <span class="p">{</span><span class="n">BC</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="p">}</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">BC</span>
+
+<span class="n">R3</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">E</span><span class="p">)</span>
+<span class="n">Key</span><span class="p">:</span> <span class="n">ABE</span>
+</pre></div>
+</div>
+</li>
+<li><p>Note: no need to create a new relation for C -&gt; A if we already
+created R1. If R1 is created afterwards, we will remove the relation
+with attributes (A,C) in the simplification step.</p></li>
+<li><p>Note: R3 is needed as no relation has all the attributes of a key
+(either ABE or BCE is enough)</p></li>
+<li><p>Note: What happens if we do not use the combining rule? We would
+get the following decomposition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">R1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>  <span class="p">{</span><span class="n">AB</span> <span class="o">-&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">C</span><span class="o">-&gt;</span><span class="n">A</span><span class="p">}</span>
+<span class="n">R2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>  <span class="p">{</span><span class="n">AB</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">}</span>
+<span class="n">R3</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">D</span><span class="p">)</span>  <span class="p">{</span><span class="n">BC</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="p">}</span>
+<span class="n">R4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">E</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Attributes A,B,C,F are now distributed to two relations. This may
+be desirable in some applications, allowing us to separate frequently
+queried attributes from the other. However, it may also be very undesirable
+if we need to join R1 and R2 all the time. It will really depend on the
+use of these relations.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="fourth-normal-form-4nf">
+<h2>Fourth Normal Form (4NF)<a class="headerlink" href="#fourth-normal-form-4nf" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Suppose we have</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">People</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">hobby</span><span class="p">,</span> <span class="n">phone</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As hobby and phone can take multiple values, there are no functional
+dependencies for this relation. So, it is in BCNF.</p>
+</li>
+<li><p>But, there is still a problem:</p>
+<p>Hobby and phone take multiple values but they are not related. Why
+put them in the same relation?</p>
+</li>
+<li><p>We must separate them.</p>
+<p>Decompose into</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PersonHobby</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">hobby</span><span class="p">)</span>
+<span class="n">PersonPhone</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">phone</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Multivalued dependencies shows the technical way to accomplish this.</p></li>
+</ul>
+</div>
+<div class="section" id="multi-valued-dependencies">
+<h2>Multi-valued dependencies<a class="headerlink" href="#multi-valued-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>A multi-valued dependency of the form</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A1</span> <span class="o">...</span>  <span class="n">An</span> <span class="o">=&gt;&gt;</span> <span class="n">B1</span> <span class="o">...</span> <span class="n">Bm</span>
+</pre></div>
+</div>
+<p>means that for all pairs of tuples t1 and t2 that agree on A, we can
+find a tuple v in R such that</p>
+<ul class="simple">
+<li><p>v agrees with t1 and t2 on As</p></li>
+<li><p>v agrees with t1 on B’s</p></li>
+<li><p>v agrees with t2 on the remaining attributes (not As or Bs)</p></li>
+</ul>
+</li>
+<li><p>For example, suppose we have that</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hero</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">weaponsused</span><span class="p">,</span> <span class="n">hobby</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=&gt;&gt;</span> <span class="n">hobby</span>
+</pre></div>
+</div>
+<p>This means that we would expect to see tuples as follows:</p>
+</li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 34%" />
+<col style="width: 39%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>hero</p></th>
+<th class="head"><p>weaponsused</p></th>
+<th class="head"><p>hobby</p></th>
+<th class="head"><p>tuple</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>lara</p></td>
+<td><p>ice axe</p></td>
+<td><p>relic collecting</p></td>
+<td><p>t1</p></td>
+</tr>
+<tr class="row-odd"><td><p>lara</p></td>
+<td><p>compound bow</p></td>
+<td><p>motorcycling</p></td>
+<td><p>t2</p></td>
+</tr>
+<tr class="row-even"><td><p>lara</p></td>
+<td><p>ice axe</p></td>
+<td><p>motorcycling</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>lara</p></td>
+<td><p>compound bow</p></td>
+<td><p>relic collecting</p></td>
+<td><p>v</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>where for t1 and t2 given as above, we need to have v that agrees
+with the hobby for t1 and weaponsused for t2.</p>
+<p>In other words, unless we store all possible combination of values
+for Bs and the remaining attributes, we claim that there is a
+relation between them. But, the multi-valued functional dependency</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A1</span> <span class="o">...</span>  <span class="n">An</span> <span class="o">=&gt;&gt;</span> <span class="n">B1</span> <span class="o">...</span> <span class="n">Bm</span>
+</pre></div>
+</div>
+<p>claims that Bs and the remaining attributes are unrelated.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="inference-rules">
+<h2>Inference rules<a class="headerlink" href="#inference-rules" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Trivial MDs, A1 …  An =&gt;&gt; B1 … Bm is true if {B1, …,Bm } ⊆
+{A1,…,An}</p></li>
+<li><p>The transitive rule: X =&gt;&gt; Y and Y =&gt;&gt; Z implies X =&gt;&gt; Z (where
+X,Y,Z are sets of attributes).</p></li>
+<li><p>If A1 … An -&gt; B1 … Bm then A1 …  An =&gt;&gt; B1 … Bm is also true.</p></li>
+<li><p>A1 …  An =&gt;&gt; B1 … Bm is true and C1 … Ck are all the
+attributes in R that are not As or Bs then A1 …  An =&gt;&gt; C1 … Ck
+is also true.</p></li>
+<li><p>Note that the splitting/combining rule does not apply to MVDs.</p></li>
+</ul>
+</div>
+<div class="section" id="fourth-normal-form">
+<h2>Fourth Normal Form<a class="headerlink" href="#fourth-normal-form" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A relation is fourth normal form iff whenever
+A1 …  An =&gt;&gt; B1 … Bm is a non-trivial MVD, then A1 … An is a superkey.</p></li>
+<li><p>To decompose a relation into Fourth normal form, use an algorithm
+similar to BCNF decomposition algorithm using MVDs.</p></li>
+<li><p>Relations in 4NF ⊆ Relations in BCNF ⊆ Relations in 3NF.</p></li>
+</ul>
+</div>
+<div class="section" id="nf-decomposition">
+<h2>4NF decomposition<a class="headerlink" href="#nf-decomposition" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Given a relation R where A1 …  An =&gt;&gt; B1 … Bm violates the 4NF,
+decompose R into:</p>
+<p>R1(A1,…,An,B1,..,Bm)</p>
+<p>R2 contains all attributes except for B1,…,Bm.</p>
+<p>If the resulting relations are not in 4NF, then continue decomposing
+until they are.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Make sure that all tables in your database are in 3NF and 4NF in the
+least, and BCNF if possible.</p></li>
+<li><p>All decompositions you perform should be lossless.</p></li>
+<li><p>Not all decompositions can be necessarily dependency preserving.</p>
+<p>Choose which dependencies are important to enforce for your application
+and find ways to enforce them, either through integrity constraints
+or other application logic.</p>
+</li>
+<li><p>Normalization and decomposition is one way of thinking of improving
+a data model, but may not necessily help design the database from
+scratch.</p>
+<ul class="simple">
+<li><p>It does not help when you have already normalized the database too
+far, splitting related information across different tables.</p></li>
+<li><p>It does not help you see the big picture.</p></li>
+</ul>
+</li>
+<li><p>We will learn E-R modeling methodology to design a full database,
+but with normalization in our minds.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, sibel
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

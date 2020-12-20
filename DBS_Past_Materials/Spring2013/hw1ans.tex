@@ -1,0 +1,233 @@
+\documentclass[11pt]{article}
+\usepackage{enumerate}
+\usepackage{upquote,textcomp}
+\usepackage{graphicx}
+
+\setlength{\parindent}{0cm}
+
+\setlength{\parskip}{0.3cm plus4mm minus3mm}
+
+\oddsidemargin = 0.2in
+\textwidth = 6.5 in
+\textheight = 9.8 in
+\headsep = -1in
+
+\title{Database Systems, CSCI 4380-01 \\
+Homework \# 1 Answers \\
+Due Thursday February 7, 2013 at 2 pm}
+\date{}
+\begin{document}
+\maketitle
+
+\vspace*{-0.7in}
+
+\noindent{\bf Homework Statement.} This homework aim to teach you how
+to construct complex queries using relational algebra. Please do the
+parts in sequence, as they build on each other. Suppose you are given
+the following database that tracks the activities of the Mars
+Curiosity Rover : \\ \\
+\hspace*{0.6in} {\tt RoverLocations( \underline{locationId}, name, arrivalDT, south, east, departureDT )}  \\
+\hspace*{0.6in} {\tt Distances( \underline{locationid1, locationid2}, distance)} \\
+\hspace*{0.6in} {\tt TestTypes ( \underline{testTypeID}, name, instrumentName, description )} \\
+\hspace*{0.6in} {\tt Tests ( \underline{testDT, testTypeID}, parameters )} \\
+\hspace*{0.6in} {\tt Chemistry ( \underline{chemId},  name, description )}  \\
+\hspace*{0.6in} {\tt TestResults ( \underline{testDT, testTypeID, chemId}, amount, unit )} \\
+
+Note: All datetime fields are indicated as {\tt DT} and combine both
+the date and the time, e.g. a valid value would look like
+\verb+ datetime '01-31-2013 08:00:00'+. You can assume that you can
+check if a date time {\tt X} comes after another date time {\tt Y} by
+checking whether {\tt X $>$ Y}.
+
+The relation {\tt RoverLocations} tracks the location of the rover (in
+terms of south and east degrees). Each time the rover stops, its
+location has a new identifier. When the rover departs from a location,
+the departure date and time is filled in. The attribute \verb+name+ is
+the name given to a specific location if such a name exists. For the
+rover's current location, you can assume the departureDT has a special
+value {\tt Null} which is compatible with the datetime data type.
+
+The relation {\tt Distances} tracks the actual distance between two
+locations. Technically we can use this to compute speed for rover, but
+we will not do this at this time. Distance information is stored only
+for a couple of locations that the rover visited in sequence, meaning
+that the rover visited \verb+locationid2+ right after
+\verb+locationid1+.
+
+The rover carries multiple instruments that can run many different
+types of tests. Each test type is given an identifier and the detailed
+information for these types are stored in the {\tt TestTypes} relation.
+
+The relation {\tt Tests} records the many different types of tests that
+the rover runs. Each test is done when the rover is stopped at a
+specific location. The rover cannot run tests when moving. The tests
+may have many parameters. We assume they are stored as a text field
+for now.
+
+Generally, the tests search for different chemical species (for
+example specific carbon isotopes, or elements, minerals, etc.) Each
+species is given a different identifier and stored in the relation
+{\tt Chemistry}.
+
+Finally, after each test, if certain chemical species are identified,
+we this store in relation {\tt TestResults}. The test results include
+which species are identified in a specific test and the amount
+measured together with the unit.
+
+You can see a visual explanation of the data model in the last page.
+
+\newpage
+
+Write the following queries using relational algebra:
+
+{\bf Part 1.} The following queries only need a single SELECT
+($\sigma$), followed by a PROJECT ($\pi$):
+
+\begin{enumerate}  [(a)]
+\item Find and return the dateTime of all tests that found at least
+  0.5 parts per million (i.e. unit of \verb+ppm+) of the chemistry with id
+  100.
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+Answer & = & \pi_{testDT} (\sigma_{chemid=100 \mbox{ and } unit = ppm} TestResults)
+\end{eqnarray*}
+
+\item Find the location id, south and east coordinates of all locations
+  that the rover visited before \verb+datetime '11-01-2012 08:00:00'+.
+
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+Answer & = & \pi_{locationID, south, east} (\sigma_{arrivalDT < datetime '11-01-2012 08:00:00'} RoverLocations)
+\end{eqnarray*}
+
+\item Find all test type identifiers conducted on the instrument
+  \verb+RAD+ (short for Radiation Assessment Detector).
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+Answer & = & \pi_{testTypeID} (\sigma_{instrumentName = RAD} TestTypes)
+\end{eqnarray*}
+
+\end{enumerate}
+
+{\bf Part 2.} The following queries combine SELECT ($\sigma$), SET
+operations ($\cap,\cup,\setminus$), PROJECTION ($\pi$) and RENAMING
+($\rho$) as necessary:
+
+
+\begin{enumerate} [(a)]
+\item Find all test identifiers of test that are conducted on the
+  instrument \verb+DAN+ (short for Dynamic Albedo of Neutrons) after
+  \verb+datetime '1-01-2013 08:00:00'+ and have found the chemistry
+  with identifier \verb+123+.
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+T1 & = & \pi_{testTypeID} (\sigma_{chemID = 123 \mbox{ and } testDB > datetime '1-01-2013 08:00:00'} TestResults) \\
+T2 & = & \pi_{testTypeID} (\sigma_{instrumentName = DAN} Tests) \\
+Answer & = &  T1 \cap T2
+\end{eqnarray*}
+
+\item Find all chemistry that the have not been found in any tests for
+  more than 0.2 parts per million (e.g. unit {\tt ppm}). (Note: we are
+  disregarding tests using different units and making no conversions.)
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+T1 & = & \pi_{chemId} (\sigma_{amount>0.2 \mbox{ and } unit = ppm} TestsResults) \\
+T2 & = & \pi_{chemId} Chemistry \\
+Answer & = &  T2 - T1
+\end{eqnarray*}
+
+\item Find all tests that have either found one of the chemical
+  species with identifier 101, 102 or 155 with at least 0.2 parts per
+  million (e.g. unit {\tt ppm}), or found both chemical species 104
+  and 105 both with at least 0.4 parts per million (e.g. unit {\tt
+    ppm}).
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+T1a & = & \sigma_{(chemId=101 \mbox{ or } chemId=102 \mbox{ or } chemId=155) \mbox{ and } amount=0.2 \mbox{ and } unit = ppm } TestResults \\
+T1b & = & \pi_{testDT, testTypeID} (T1a) \\
+T2 & = & \pi_{testDT, testTypeID} (\sigma_{chemId=104 \mbox{ and } amount=0.4 \mbox{ and } unit = ppm } TestResults) \\
+T3 & = & \pi_{testDT, testTypeID} (\sigma_{chemId=105 \mbox{ and } amount=0.4 \mbox{ and } unit = ppm } TestResults) \\
+T4 & = & T2 \cap T3 \\
+Answer & = &  T1 \cup T4
+\end{eqnarray*}
+
+\end{enumerate}
+
+{\bf Part 3.} The following queries combine SELECT ($\sigma$)
+statements with JOIN ($\bowtie$) only, followed by a PROJECT ($\pi$):
+
+\begin{enumerate} [(a)]
+\item Find the name of all chemical species that are found by a test
+  of the instrument \verb+RAD+.
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+Answer & = & \pi_{name} (Chemistry \bowtie (TestResults \bowtie (\pi_{testTypeId}(\sigma_{instrumentName=RAD} TestTypes))))
+\end{eqnarray*}
+
+Note: I am projecting out attributes in {\tt TestTypes} to remove {\tt
+  TestsTypes.name} attribute. Otherwise, the resulting relation will
+have two attributes called {\tt name} and the last projection would be
+ambiguous and incorrect.
+
+\item Find the identifier of all tests conducted at the location with
+  coordinates \verb+south=4.5+, and \verb+east=137.4+.
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+T1 & = & \sigma_{south=4.5 \mbox{ and } east=137.4} RoverLocations \\
+T2 & = & TestResults \bowtie_{testDT >= arrivalDT \mbox{ and } (testDT <= departureDT \mbox{ or } departureDT = Null)} T1 \\
+Answer & = & \pi_{testDT, testTypeID} T2
+\end{eqnarray*}
+
+\end{enumerate}
+
+{\bf Part 4.} Freeform, you decide which combination is needed.
+
+\begin{enumerate} [(a)]
+\item {\bf Bonus/Optional.} Find two locations \verb+L1,L2+ that the
+  rover visited in sequence and that in both locations, it has found
+  the chemical species with name \verb+methane+. Return the id of the
+  locations.
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+T1 & = & \pi_{chemId} (\sigma_{name=methane} Chemistry) \\
+T2 & = & \pi_{testDT} (TestResults \bowtie T1) \\
+T3a & = & T2 \bowtie_{testDT >= arrivalDT \mbox{ and } (testDT < departureDT or departureDT=Null)} RoverLocations \\
+T3b & = & \pi_{testDT, locationId} (T3a) \\
+T4 & = & \pi_{locationId1,locationId2} (T3b \bowtie_{locationID=locationID1} Distances) \\
+Answer & = & \pi_{locationId1,locationId2} (T4 \bowtie_{locationID2=locationID} T3) \\
+\end{eqnarray*}
+
+\item Find the name of all the test types that have not been performed
+  before date time\\
+ \verb+datetime '1-1-2013 00:00:00'+.
+
+{\bf Answer.}
+
+\begin{eqnarray*}
+T1 & = & \pi_{testTypeID} (\sigma_{testDT < datetime '1-1-2013 00:00:00'} TestResults) \\
+T2 & = & (\pi_{testTypeID} TestTypes) - T1 \\
+Answer & = & \pi_{name} ( T2 \bowtie TestTypes)
+\end{eqnarray*}
+
+\end{enumerate}
+
+\end{document}
+
